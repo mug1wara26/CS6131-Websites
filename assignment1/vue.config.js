@@ -1,6 +1,9 @@
-const { defineConfig } = require('@vue/cli-service')
-module.exports = defineConfig({
+import { defineConfig } from '@vue/cli-service'
+defineConfig({
   transpileDependencies: [
     'vuetify'
-  ]
+  ],
+  publicPath: process.env.NODE_ENV === 'production'
+      ? '/reponame'
+      : '/'
 })
