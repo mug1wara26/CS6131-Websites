@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
 import Search from '../views/Search.vue'
 import Feedback from '../views/Feedback.vue'
+import Notes from "../views/Notes.vue"
 
 Vue.use(VueRouter)
 
@@ -12,6 +13,11 @@ const routes = [
         path: '/',
         name: 'home',
         component: Home
+    },
+    {
+        path: '/notes',
+        name: 'notes',
+        component: Notes
     },
     {
         path: '/login',
