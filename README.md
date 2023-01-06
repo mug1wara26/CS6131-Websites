@@ -1,5 +1,10 @@
 # assignment1
 
+## Project plans
+Ideas:
+1. CTF hosting site
+2. CTF notes site
+
 ## Project setup
 ```
 npm install

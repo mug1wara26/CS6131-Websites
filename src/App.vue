@@ -2,6 +2,7 @@
   <v-app>
     <v-app-bar
         app
+        clipped-left
         color="primary"
         dark
     >
@@ -10,30 +11,42 @@
         App Name
       </v-toolbar-title>
 
-      <v-spacer></v-spacer>
+    </v-app-bar>
 
-      <v-toolbar-items class="flex align-center">
+    <v-navigation-drawer
+        permanent
+        app
+        clipped
+        mini-variant-width="100px"
+        mini-variant
+        absolute
+    >
+      <v-list dense nav>
         <v-tooltip bottom v-for="item in routes" :key="item.name">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn
-                   :to="item.route"
-                   class="mr-4"
-                   text
-                   auto-height
-                   depressed
-                   rounded
-                   v-bind="attrs"
-                   v-on="on">
-              <v-icon>
-                {{ item.icon }}
-              </v-icon>
-            </v-btn>
+            <v-list-item>
+              <v-list-item-icon>
+                <v-btn
+                    :to="item.route"
+                    text
+                    auto-height
+                    depressed
+                    rounded
+                    v-bind="attrs"
+                    v-on="on">
+                  <v-icon>
+                    {{ item.icon }}
+                  </v-icon>
+                </v-btn>
+              </v-list-item-icon>
+
+            </v-list-item>
           </template>
           <span>{{ item.name }}</span>
         </v-tooltip>
-      </v-toolbar-items>
+      </v-list>
+    </v-navigation-drawer>
 
-    </v-app-bar>
 
     <v-main>
       <router-view/>
