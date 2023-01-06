@@ -2,21 +2,29 @@
   <v-container fluid>
     <h1> Organise your CTF experience</h1>
     <p>For the regular CTF player who loses track of the challenges they are working on</p>
+    Features:
+    <ul>
+      <li>Collaborative note taking</li>
+      <li>Order challenges by points, category or difficulty</li>
+      <li>Markdown rending with syntax highlighting</li>
+    </ul>
 
-    <v-btn color="primary" class="mr-4 mb-2" to="/notes">
-      Start Now
-      <v-icon>mdi-arrow-right-thin</v-icon>
-    </v-btn>
+    <v-container class="mt-4">
+      <v-btn color="primary" class="mr-4 mb-2" to="/notes">
+        Start Now
+        <v-icon>mdi-arrow-right-thin</v-icon>
+      </v-btn>
 
-    <v-btn color="secondary" class="mr-4 mb-2" to="/search">
-      Search
-      <v-icon>mdi-magnify</v-icon>
-    </v-btn>
+      <v-btn color="secondary" class="mr-4 mb-2" to="/search">
+        Search
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
 
-    <v-btn outlined class="mr-4 mb-2" @click="register = true">
-      Register
-      <v-icon>mdi-login</v-icon>
-    </v-btn>
+      <v-btn outlined class="mr-4 mb-2" @click="register = true">
+        Register
+        <v-icon>mdi-login</v-icon>
+      </v-btn>
+    </v-container>
 
     <v-dialog
         v-model="register"

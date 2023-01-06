@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app style="background: #6EB3D8">
     <v-app-bar
         app
         clipped-left
@@ -25,8 +25,9 @@
         clipped
         :mini-variant.sync="isNotMobile"
         :temporary.sync="isMobile"
-        mini-variant-width="100px"
+        mini-variant-width="75px"
         absolute
+        color="#1E5471"
     >
       <v-list dense nav>
         <v-tooltip bottom v-for="item in routes" :key="item.name">
@@ -40,7 +41,7 @@
                   rounded
                   v-bind="attrs"
                   v-on="on">
-                <v-icon>
+                <v-icon color="white">
                   {{ item.icon }}
                 </v-icon>
 
