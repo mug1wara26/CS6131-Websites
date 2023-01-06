@@ -89,11 +89,6 @@ export default Vue.extend({
           icon: "mdi-note-edit",
         },
         {
-          name: "Login",
-          route: "/login",
-          icon: "mdi-login",
-        },
-        {
           name: "Search",
           route: "/search",
           icon: "mdi-magnify",
