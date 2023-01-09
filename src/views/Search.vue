@@ -1,9 +1,11 @@
 <template>
   <v-container fluid class="px-16">
     <v-container class="d-flex justify-center">
+      <v-icon>mdi-magnify</v-icon>
       <v-text-field
           v-model="searchText"
           label="Search"
+          class="ml-2"
           style="max-width: 300px"
       >
       </v-text-field>
