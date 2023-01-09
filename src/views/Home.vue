@@ -6,7 +6,7 @@
     <ul>
       <li>Collaborative note taking</li>
       <li>Order challenges by points, category or difficulty</li>
-      <li>Markdown rending with syntax highlighting</li>
+      <li>Markdown rendering with syntax highlighting</li>
     </ul>
 
     <v-container class="mt-4">

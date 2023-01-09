@@ -26,7 +26,6 @@
         :mini-variant.sync="isNotMobile"
         :temporary.sync="isMobile"
         mini-variant-width="75px"
-        absolute
         color="#1E5471"
     >
       <v-list dense nav>
@@ -87,7 +86,7 @@ export default Vue.extend({
         {
           name: "Notes",
           route: "/notes",
-          icon: "mdi-note-edit",
+          icon: "mdi-note-multiple",
         },
         {
           name: "Search",
