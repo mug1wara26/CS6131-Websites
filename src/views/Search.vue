@@ -10,7 +10,7 @@
     </v-container>
 
     <v-row class="mt-4">
-      <v-col cols="12" lg="4" md="8" v-for="(item, index) in notes.filter(obj=>{ return obj.name.toLowerCase().startsWith(searchText) || searchText.length === 0})" :key="index">
+      <v-col cols="12" lg="4" md="8" v-for="(item, index) in notes.filter(obj=>{ return obj.name.toLowerCase().startsWith(searchText.toLowerCase().trim()) || searchText.trim().length === 0})" :key="index">
           <v-card class="pa-4 fill-height d-flex flex-column" elevation="2" color="#AED5EA">
             <v-card-title> {{item.name}} </v-card-title>
             <v-card-text>
