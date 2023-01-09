@@ -26,11 +26,11 @@
 
     <v-navigation-drawer
         v-model="drawer"
-        :permanent.sync="isNotMobile"
         app
         clipped
-        :mini-variant.sync="isNotMobile"
         :temporary.sync="isMobile"
+        :permanent.sync="isNotMobile"
+        :mini-variant.sync="isNotMobile"
         mini-variant-width="75px"
         color="#1E5471"
     >
@@ -77,8 +77,10 @@
       <login-dialog @close-dialog="login=false" @open-register="register=true"/>
     </v-dialog>
 
-    <v-main class="mx-8 my-6">
-      <router-view/>
+    <v-main>
+      <v-container fluid>
+        <router-view/>
+      </v-container>
     </v-main>
   </v-app>
 </template>

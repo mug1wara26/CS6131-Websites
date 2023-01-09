@@ -9,7 +9,7 @@
       <li>Markdown rendering with syntax highlighting</li>
     </ul>
 
-    <v-container class="mt-4 flex-row justify-center d-flex">
+    <v-row class="mt-4 justify-center d-flex">
       <v-btn color="primary" class="mr-4 mb-2" to="/notes">
         Start Now
         <v-icon>mdi-arrow-right-thin</v-icon>
@@ -24,7 +24,7 @@
         Register
         <v-icon>mdi-login</v-icon>
       </v-btn>
-    </v-container>
+    </v-row>
 
     <v-dialog
         v-model="register"
