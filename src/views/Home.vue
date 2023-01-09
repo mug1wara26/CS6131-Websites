@@ -1,15 +1,15 @@
 <template>
-  <v-container fluid>
+  <v-container fluid class="flex-column align-center d-flex mt-8">
     <h1> Organise your CTF experience</h1>
-    <p>For the regular CTF player who loses track of the challenges they are working on</p>
-    Features:
-    <ul>
+    <i>For the regular CTF player who loses track of the challenges they are working on</i>
+    <ul class="mt-2">
+      <b>Features:</b>
       <li>Collaborative note taking</li>
       <li>Order challenges by points, category or difficulty</li>
       <li>Markdown rendering with syntax highlighting</li>
     </ul>
 
-    <v-container class="mt-4">
+    <v-container class="mt-4 flex-row justify-center d-flex">
       <v-btn color="primary" class="mr-4 mb-2" to="/notes">
         Start Now
         <v-icon>mdi-arrow-right-thin</v-icon>
