@@ -11,7 +11,7 @@
       <!-- This is not needed on desktop, as there is more than enough space for a mini nav bar-->
       <v-app-bar-nav-icon v-if="isMobile" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
-      <v-toolbar-title>
+      <v-toolbar-title style="cursor: pointer" @click="$router.push('/')">
         CTF Notes
       </v-toolbar-title>
 
