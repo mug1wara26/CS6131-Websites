@@ -11,6 +11,8 @@
       </v-text-field>
     </v-container>
 
+    <!-- TODO: Search for note, search for ctf, search for user, search for team-->
+
     <v-row class="mt-4">
       <v-col cols="12" lg="4" md="8" v-for="(item, index) in notes.filter(obj=>{ return obj.name.toLowerCase().startsWith(searchText.toLowerCase().trim()) || searchText.trim().length === 0})" :key="index">
           <v-card class="pa-4 fill-height d-flex flex-column" elevation="2" color="#AED5EA">
