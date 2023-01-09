@@ -15,6 +15,12 @@
         CTF Notes
       </v-toolbar-title>
 
+      <v-spacer/>
+
+      <v-btn outlined @click="login=true">
+        Login
+        <v-icon>mdi-login</v-icon>
+      </v-btn>
     </v-app-bar>
 
 
@@ -57,6 +63,20 @@
     </v-navigation-drawer>
 
 
+    <v-dialog
+        v-model="register"
+        max-width="300"
+    >
+      <register-dialog @close-dialog="register=false" @open-login="login=true"/>
+    </v-dialog>
+
+    <v-dialog
+        v-model="login"
+        max-width="300"
+    >
+      <login-dialog @close-dialog="login=false" @open-register="register=true"/>
+    </v-dialog>
+
     <v-main class="mx-8 my-6">
       <router-view/>
     </v-main>
@@ -65,11 +85,16 @@
 
 <script lang="ts">
 import Vue from "vue"
+import RegisterDialog from "@/components/RegisterDialog.vue";
+import LoginDialog from "@/components/LoginDialog.vue";
 
 export default Vue.extend({
   name: 'App',
+  components: {LoginDialog, RegisterDialog},
   data: () => ({
-    drawer: false
+    drawer: false,
+    register: false,
+    login: false,
   }),
   computed: {
     routes(): Array<{
