@@ -6,7 +6,7 @@
       </v-card-title>
 
       <v-card-text>
-        Note: Registering does nothing as of now
+        Note: Registering does nothing as of now <br/>
         <a @click="openLogin">Already have an account?</a>
         <v-text-field label="Username*" required/>
         <v-text-field label="Email*" required/>

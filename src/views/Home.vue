@@ -10,12 +10,7 @@
     </ul>
 
     <v-row class="mt-4 justify-center d-flex">
-      <v-btn color="primary" class="mr-4 mb-2" to="/notes">
-        Start Now
-        <v-icon>mdi-arrow-right-thin</v-icon>
-      </v-btn>
-
-      <v-btn color="secondary" class="mr-4 mb-2" to="/search">
+      <v-btn color="primary" class="mr-4 mb-2" to="/search">
         Search
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
@@ -24,18 +19,23 @@
         Register
         <v-icon>mdi-login</v-icon>
       </v-btn>
+
+      <v-btn color="secondary" class="mr-4 mb-2" to="/search">
+        Feedback
+        <v-icon class="ml-1">mdi-message-alert-outline</v-icon>
+      </v-btn>
     </v-row>
 
     <v-dialog
         v-model="register"
-        max-width="300"
+        width="auto"
     >
       <register-dialog @close-dialog="register=false" @open-login="login=true"/>
     </v-dialog>
 
     <v-dialog
         v-model="login"
-        max-width="300"
+        width="auto"
     >
       <login-dialog @close-dialog="login=false" @open-register="register=true"/>
     </v-dialog>
