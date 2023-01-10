@@ -26,23 +26,6 @@
           CTF Notes
         </v-toolbar-title>
 
-        <v-col cols="3" v-if="isNotMobile">
-          <v-autocomplete
-              :search-input.sync="searchText"
-              label="Search"
-              class="mt-4"
-              :items="items"
-              no-filter
-              return-object
-              :menu-props="{closeOnContentClick:true}"
-          >
-            <template v-slot:item="{ item }">
-              <v-list-item v-on:click="onClickSearch(item)">{{ item.name }}</v-list-item>
-            </template>
-          </v-autocomplete>
-
-        </v-col>
-
         <v-btn outlined @click="login=true" class="mx-2 ml-auto">
           Login
           <v-icon>mdi-login</v-icon>
@@ -126,29 +109,6 @@ export default Vue.extend({
       register: false,
       login: false,
       windowWidth: window.innerWidth,
-      items: [
-        {
-          "name": "In Notes",
-          "route": "/notes",
-        },
-        {
-          "name": "In Users",
-          "route": "/users",
-        },
-        {
-          "name": "In Teams",
-          "route": "/teams",
-        },
-        {
-          "name": "In CTFs",
-          "route": "/ctfs",
-        },
-        {
-          "name": "In Write Ups",
-          "route": "/writeups",
-        }
-      ],
-      searchText: ""
     }
   },
   computed: {
@@ -164,9 +124,9 @@ export default Vue.extend({
           icon: "mdi-home",
         },
         {
-          name: "Notes",
-          route: "/notes",
-          icon: "mdi-note-multiple",
+          name: "Search",
+          route: "/search",
+          icon: "mdi-magnify",
         },
         {
           name: "Users",
@@ -197,14 +157,6 @@ export default Vue.extend({
 
     isNotMobile(): boolean {
       return this.windowWidth > 480
-    }
-  },
-  methods: {
-    // @ts-ignore
-    onClickSearch(item) {
-      if (this.searchText !== '' && this.searchText !== null) {
-        this.$router.push(item.route + `?search=${this.searchText}`);
-      }
     }
   },
   mounted() {
