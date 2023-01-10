@@ -7,20 +7,47 @@
         dark
     >
 
-      <!-- The nav bar icon is only present on mobile, where a temporary overlay will appear on click -->
-      <!-- This is not needed on desktop, as there is more than enough space for a mini nav bar-->
-      <v-app-bar-nav-icon v-if="isMobile" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-row align="center">
+        <!-- The nav bar icon is only present on mobile, where a temporary overlay will appear on click -->
+        <!-- This is not needed on desktop, as there is more than enough space for a mini nav bar-->
+        <v-app-bar-nav-icon
+            v-if="isMobile"
+            @click.stop="drawer = !drawer"
+            class="mr-auto ml-2"
+        />
 
-      <v-toolbar-title style="cursor: pointer" @click="$router.push('/')">
-        CTF Notes
-      </v-toolbar-title>
 
-      <v-spacer/>
+        <v-toolbar-title
+            style="cursor: pointer"
+            @click="$router.push('/')"
+            class="mr-auto ml-2"
+            v-if="isNotMobile"
+        >
+          CTF Notes
+        </v-toolbar-title>
 
-      <v-btn outlined @click="login=true">
-        Login
-        <v-icon>mdi-login</v-icon>
-      </v-btn>
+        <v-col cols="3" v-if="isNotMobile">
+          <v-autocomplete
+              :search-input.sync="searchText"
+              label="Search"
+              class="mt-4"
+              :items="items"
+              no-filter
+              return-object
+              :menu-props="{closeOnContentClick:true}"
+          >
+            <template v-slot:item="{ item }">
+              <v-list-item v-on:click="onClickSearch(item)">{{ item.name }}</v-list-item>
+            </template>
+          </v-autocomplete>
+
+        </v-col>
+
+        <v-btn outlined @click="login=true" class="mx-2 ml-auto">
+          Login
+          <v-icon>mdi-login</v-icon>
+        </v-btn>
+      </v-row>
     </v-app-bar>
 
 
@@ -79,7 +106,7 @@
 
     <v-main>
       <v-container fluid>
-        <router-view/>
+        <router-view :key="$route.fullPath"/>
       </v-container>
     </v-main>
   </v-app>
@@ -93,11 +120,37 @@ import LoginDialog from "@/components/LoginDialog.vue";
 export default Vue.extend({
   name: 'App',
   components: {LoginDialog, RegisterDialog},
-  data: () => ({
-    drawer: false,
-    register: false,
-    login: false,
-  }),
+  data() {
+    return {
+      drawer: false,
+      register: false,
+      login: false,
+      windowWidth: window.innerWidth,
+      items: [
+        {
+          "name": "In Notes",
+          "route": "/notes",
+        },
+        {
+          "name": "In Users",
+          "route": "/users",
+        },
+        {
+          "name": "In Teams",
+          "route": "/teams",
+        },
+        {
+          "name": "In CTFs",
+          "route": "/ctfs",
+        },
+        {
+          "name": "In Write Ups",
+          "route": "/writeups",
+        }
+      ],
+      searchText: ""
+    }
+  },
   computed: {
     routes(): Array<{
       name: string;
@@ -116,25 +169,48 @@ export default Vue.extend({
           icon: "mdi-note-multiple",
         },
         {
-          name: "Search",
-          route: "/search",
-          icon: "mdi-magnify",
+          name: "Users",
+          route: "/users",
+          icon: "mdi-account",
         },
         {
-          name: "Feedback",
-          route: "/feedback",
-          icon: "mdi-message-alert",
+          name: "Teams",
+          route: "/teams",
+          icon: "mdi-account-group",
+        },
+        {
+          name: "CTFs",
+          route: "/ctfs",
+          icon: "mdi-flag",
+        },
+        {
+          name: "Write Ups",
+          route: "/writeups",
+          icon: "mdi-file-document",
         },
       ];
     },
 
     isMobile(): boolean {
-      return screen.width <= 480
+      return this.windowWidth <= 480
     },
 
     isNotMobile(): boolean {
-      return screen.width > 480
+      return this.windowWidth > 480
     }
   },
+  methods: {
+    // @ts-ignore
+    onClickSearch(item) {
+      if (this.searchText !== '' && this.searchText !== null) {
+        this.$router.push(item.route + `?search=${this.searchText}`);
+      }
+    }
+  },
+  mounted() {
+    window.onresize = () => {
+      this.windowWidth = window.innerWidth;
+    }
+  }
 });
 </script>

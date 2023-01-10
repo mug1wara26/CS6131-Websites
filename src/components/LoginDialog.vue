@@ -6,7 +6,7 @@
       </v-card-title>
 
       <v-card-text>
-        Note: Logging in does nothing as of now
+        Note: Logging in does nothing as of now <br/>
         <a @click="openRegister">Don't have an account?</a>
         <v-text-field label="Email*" required/>
         <v-text-field label="Password*" required/>

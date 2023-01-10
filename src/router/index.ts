@@ -1,9 +1,12 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-import Search from '../views/Search.vue'
 import Feedback from '../views/Feedback.vue'
 import Notes from "../views/Notes.vue"
+import Users from "@/views/Users.vue";
+import Teams from "@/views/Teams.vue";
+import WriteUps from "@/views/WriteUps.vue";
+import CTF from "@/views/CTF.vue";
 
 Vue.use(VueRouter)
 
@@ -19,14 +22,29 @@ const routes = [
         component: Notes
     },
     {
-        path: '/search',
-        name: 'search',
-        component: Search
-    },
-    {
         path: '/feedback',
         name: 'feedback',
         component: Feedback
+    },
+    {
+        path: '/users',
+        name: 'users',
+        component: Users
+    },
+    {
+        path: '/teams',
+        name: 'teams',
+        component: Teams
+    },
+    {
+        path: '/writeups',
+        name: 'writeups',
+        component: WriteUps
+    },
+    {
+        path: '/ctfs',
+        name: 'ctfs',
+        component: CTF
     },
 ]
 
