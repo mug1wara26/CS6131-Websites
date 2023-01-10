@@ -10,9 +10,9 @@
     </ul>
 
     <v-row class="mt-4 justify-center d-flex">
-      <v-btn color="primary" class="mr-4 mb-2" to="/notes">
-        Start Now
-        <v-icon>mdi-arrow-right-thin</v-icon>
+      <v-btn color="primary" class="mr-4 mb-2" to="/search">
+        Search
+        <v-icon>mdi-magnify</v-icon>
       </v-btn>
 
       <v-btn outlined class="mr-4 mb-2" @click="register = true">
