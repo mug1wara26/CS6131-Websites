@@ -24,4 +24,4 @@ const users: Array<{
     },
 ]
 
-export {users}
+export default users

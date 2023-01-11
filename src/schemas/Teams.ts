@@ -14,3 +14,5 @@ const teams: Array<{
         users: ["3"]
     }
 ]
+
+export default teams

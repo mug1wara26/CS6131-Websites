@@ -49,4 +49,4 @@ const notes: Array<{
     }
 ]
 
-export {notes}
+export default notes
