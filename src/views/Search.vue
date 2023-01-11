@@ -68,6 +68,7 @@
 <script lang="ts">
 import Vue from "vue";
 import {notes} from "@/schemas/Notes";
+import {users} from "@/schemas/Users";
 
 export default Vue.extend({
   name: "Search",
@@ -97,6 +98,7 @@ export default Vue.extend({
         }
       ],
       notes: notes,
+      users: users
     }
   },
   mounted() {
