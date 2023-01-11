@@ -2,7 +2,7 @@ const notes: Array<{
     name: string,
     points: number,
     difficulty: string,
-    description: string,
+    description?: string,
     category: string
 }> = [
     {

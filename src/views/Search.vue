@@ -56,14 +56,7 @@
           <v-col cols="12" lg="4" md="8"
                  v-for="(item, index) in searchItems[searchCategory].filter(obj=>{ return obj.name.toLowerCase().startsWith(searchText.toLowerCase().trim()) || searchText.trim().length === 0})"
                  :key="index">
-            <v-card class="pa-4 fill-height d-flex flex-column" elevation="2" color="#AED5EA">
-              <v-card-title> {{ item.name }}</v-card-title>
-              <v-card-text>
-                Category: {{ item.category }} <br/>
-                Points: {{ item.points }}
-                <p class="text-truncate">{{ item.description }}</p>
-              </v-card-text>
-            </v-card>
+            <component v-bind:is="currentCardComponent" :item="item"/>
           </v-col>
         </v-row>
       </v-col>
@@ -76,9 +69,17 @@ import Vue from "vue";
 import notes from "@/schemas/Notes";
 import users from "@/schemas/Users";
 import teams from "@/schemas/Teams";
+import ctfs from "@/schemas/CTFs";
+import writeUps from "@/schemas/WriteUps";
+import NoteSearchCard from "@/components/NoteSearchCard.vue";
+import UserSearchCard from "@/components/UserSearchCard.vue";
+import TeamSearchCard from "@/components/TeamSearchCard.vue";
+import CTFSearchCard from "@/components/CTFSearchCard.vue";
+import WriteUpSearchCard from "@/components/WriteUpSearchCard.vue";
 
 export default Vue.extend({
   name: "Search",
+  components: {NoteSearchCard, UserSearchCard, TeamSearchCard, CTFSearchCard, WriteUpSearchCard},
   data() {
     return {
       searchText: '',
@@ -107,10 +108,13 @@ export default Vue.extend({
       searchItems: {
         'notes': notes,
         'users': users,
-        'teams': teams
+        'teams': teams,
+        'ctfs': ctfs,
+        'writeups': writeUps
       },
       selected: 0,
-      searchCategory: 'notes'
+      searchCategory: 'notes',
+      currentCardComponent: "NoteSearchCard"
     }
   },
   created() {
@@ -118,6 +122,15 @@ export default Vue.extend({
       const searchQuery = this.$route.query.q as string
       this.selected = this.searchQueries.findIndex(obj => {return obj.query === searchQuery})
       this.searchCategory = searchQuery
+
+      const categoryCardComponents: {[index: string]:string} = {
+        'notes': 'NoteSearchCard',
+        'users': 'UserSearchCard',
+        'teams': 'TeamSearchCard',
+        'ctfs': 'CTFSearchCard',
+        'writeups': 'WriteUpSearchCard'
+      }
+      this.currentCardComponent = categoryCardComponents[searchQuery]
     }
   }
 })
