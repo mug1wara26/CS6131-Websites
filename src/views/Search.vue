@@ -1,5 +1,8 @@
 <template>
-  <v-container fluid class="pr-16">
+  <v-container
+      fluid
+      :class="{'pr-16': $vuetify.breakpoint.mdAndUp, 'px-2': $vuetify.breakpoint.smAndDown}"
+  >
     <v-container class="d-flex justify-center">
       <v-icon>mdi-magnify</v-icon>
       <v-text-field
@@ -10,10 +13,17 @@
       >
       </v-text-field>
     </v-container>
-
+    <v-select
+        v-if="isMobile"
+        v-model="selectedQuery"
+        :items="searchQueries"
+        item-text="name"
+        outlined
+        @change="onClickSelect"
+    ></v-select>
 
     <v-row>
-      <v-col cols="2">
+      <v-col cols="2" v-if="isNotMobile" sm="0">
         <v-card
             color="#6EB3D8"
             class="mx-auto"
@@ -50,9 +60,9 @@
         </v-card>
       </v-col>
 
-      <v-col cols="10">
+      <v-col lg="10" sm="12">
 
-        <v-row class="mt-4">
+        <v-row>
           <v-col cols="12" lg="4" md="8"
                  v-for="(item, index) in searchItems[searchCategory].filter(obj=>{ return obj.name.toLowerCase().startsWith(searchText.toLowerCase().trim()) || searchText.trim().length === 0})"
                  :key="index">
@@ -114,13 +124,38 @@ export default Vue.extend({
       },
       selected: 0,
       searchCategory: 'notes',
-      currentCardComponent: "NoteSearchCard"
+      currentCardComponent: "NoteSearchCard",
+      windowWidth: innerWidth,
+      selectedQuery: "Notes",
+    }
+  },
+  computed: {
+    isMobile(): boolean {
+      return this.windowWidth <= 480
+    },
+
+    isNotMobile(): boolean {
+      return this.windowWidth > 480
+    }
+  },
+  methods: {
+    onClickSelect() {
+      this.$router.push({path: 'search', query: {q: this.selectedQuery.toLowerCase().replaceAll(' ','')}})
     }
   },
   created() {
     if (this.$route.query.q !== undefined) {
       const searchQuery = this.$route.query.q as string
-      this.selected = this.searchQueries.findIndex(obj => {return obj.query === searchQuery})
+      if(this.isNotMobile){
+        this.selected = this.searchQueries.findIndex(obj => {
+          return obj.query === searchQuery
+        })
+      }
+      else if (this.isMobile) {
+        this.selectedQuery = this.searchQueries.find(obj => {
+          return obj.query === searchQuery
+        })!.name
+      }
       this.searchCategory = searchQuery
 
       const categoryCardComponents: {[index: string]:string} = {
@@ -132,6 +167,10 @@ export default Vue.extend({
       }
       this.currentCardComponent = categoryCardComponents[searchQuery]
     }
-  }
+
+    window.onresize = () => {
+      this.windowWidth = window.innerWidth;
+    }
+  },
 })
 </script>
