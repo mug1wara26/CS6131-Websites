@@ -7,6 +7,7 @@ import Users from "@/views/Users.vue";
 import Teams from "@/views/Teams.vue";
 import WriteUps from "@/views/WriteUps.vue";
 import CTF from "@/views/CTF.vue";
+import flag from "@/views/flag.vue";
 
 Vue.use(VueRouter)
 
@@ -45,6 +46,11 @@ const routes = [
         path: '/ctfs',
         name: 'ctfs',
         component: CTF
+    },
+    {
+        path: '/flag',
+        name: 'flag',
+        component: flag
     },
 ]
 
