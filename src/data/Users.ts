@@ -1,9 +1,6 @@
-const users: Array<{
-    name: string,
-    uid: string,
-    bio?: string,
-    email: string
-}> = [
+import {User} from "@/schemas/User";
+
+const users: Array<User> = [
     {
         name: "Alice",
         uid: "1",

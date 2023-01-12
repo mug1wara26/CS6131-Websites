@@ -29,6 +29,11 @@ const routes = [
     },
     {
         path: '/users',
+        name: 'default-users',
+        component: Users
+    },
+    {
+        path: '/users/:id',
         name: 'users',
         component: Users
     },
