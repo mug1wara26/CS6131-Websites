@@ -76,11 +76,11 @@
 
 <script lang="ts">
 import Vue from "vue";
-import notes from "@/schemas/Notes";
-import users from "@/schemas/Users";
-import teams from "@/schemas/Teams";
-import ctfs from "@/schemas/CTFs";
-import writeUps from "@/schemas/WriteUps";
+import notes from "@/data/Notes";
+import users from "@/data/Users";
+import teams from "@/data/Teams";
+import ctfs from "@/data/CTFs";
+import writeUps from "@/data/WriteUps";
 import NoteSearchCard from "@/components/NoteSearchCard.vue";
 import UserSearchCard from "@/components/UserSearchCard.vue";
 import TeamSearchCard from "@/components/TeamSearchCard.vue";
