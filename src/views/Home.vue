@@ -20,7 +20,7 @@
         <v-icon>mdi-login</v-icon>
       </v-btn>
 
-      <v-btn color="secondary" class="mr-4 mb-2" to="/search">
+      <v-btn color="secondary" class="mr-4 mb-2" to="/feedback">
         Feedback
         <v-icon class="ml-1">mdi-message-alert-outline</v-icon>
       </v-btn>
