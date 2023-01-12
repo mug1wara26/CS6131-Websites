@@ -25,14 +25,12 @@
     <v-row>
       <v-col cols="2" v-if="isNotMobile" sm="0">
         <v-card
-            color="#6EB3D8"
             class="mx-auto"
         >
           <v-list
               v-model="selected"
               nav
               outlined
-              color="#6EB3D8"
           >
             <v-list-item-group v-model="selected">
               <template v-for="(item, index) in searchQueries">

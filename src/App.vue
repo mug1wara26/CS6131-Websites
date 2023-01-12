@@ -1,10 +1,8 @@
 <template>
-  <v-app style="background: #6EB3D8">
+  <v-app>
     <v-app-bar
         app
         clipped-left
-        color="primary"
-        dark
     >
 
       <v-row align="center">
@@ -42,7 +40,6 @@
         :permanent.sync="isNotMobile"
         :mini-variant.sync="isNotMobile"
         mini-variant-width="75px"
-        color="#1E5471"
     >
       <v-list dense nav>
         <v-tooltip bottom v-for="item in routes" :key="item.name">
