@@ -1,8 +1,27 @@
 <template>
   <v-container fluid>
-    <p v-if="user === undefined"> No User Found</p>
+    <p v-if="user === undefined"> User login not implemented yet, click on a user in search to view their page</p>
     <template v-else>
-      {{user}}
+      <v-row>
+        <v-col cols="3">
+          <v-card>
+            <v-card-title>
+              <v-avatar size="56">
+                <img
+                    alt="user"
+                    src="../../public/assets/default-pfp.webp"
+                />
+              </v-avatar>
+              <h3 class="ml-4"> {{ user.name }} </h3>
+            </v-card-title>
+            <v-card-subtitle class="mt-2"> {{ user.email }} </v-card-subtitle>
+            <v-divider/>
+            <v-card-text>
+              <p> {{ user.bio }} </p>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
     </template>
   </v-container>
 </template>

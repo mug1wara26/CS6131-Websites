@@ -126,7 +126,7 @@ export default Vue.extend({
           icon: "mdi-magnify",
         },
         {
-          name: "Users",
+          name: "User",
           route: "/users",
           icon: "mdi-account",
         },
