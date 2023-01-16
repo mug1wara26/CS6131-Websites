@@ -9,7 +9,7 @@
         Note: Logging in does nothing as of now <br/>
         <a @click="openRegister">Don't have an account?</a>
         <v-text-field label="Email*" required/>
-        <v-text-field label="Password*" required/>
+        <v-text-field label="Password*" required type="password"/>
       </v-card-text>
 
       <v-card-actions>

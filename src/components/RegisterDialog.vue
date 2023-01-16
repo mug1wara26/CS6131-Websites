@@ -10,7 +10,7 @@
         <a @click="openLogin">Already have an account?</a>
         <v-text-field label="Username*" required/>
         <v-text-field label="Email*" required/>
-        <v-text-field label="Password*" required/>
+        <v-text-field label="Password*" required type="password"/>
       </v-card-text>
 
       <v-card-actions>
