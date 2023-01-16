@@ -2,8 +2,6 @@
   <v-rating
       v-model="value"
       class="text-center"
-      background-color="black"
-      color="primary"
       empty-icon="mdi-star-outline"
       full-icon="mdi-star"
       half-icon="mdi-star-half-full"

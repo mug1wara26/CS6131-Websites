@@ -1,5 +1,5 @@
 <template>
-  <v-card class="pa-4 fill-height d-flex flex-column" elevation="2">
+  <v-card class="pa-4 fill-height d-flex flex-column" elevation="4" outlined>
     <v-card-title> <a @click="$router.push({path: `users/${item.uid}`})"> {{ item.name }} </a></v-card-title>
     <v-card-text>
       <div class="font-weight-medium text-truncate"> {{ item.bio }} </div>

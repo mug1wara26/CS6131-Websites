@@ -24,7 +24,16 @@
           CTF Notes
         </v-toolbar-title>
 
-        <v-btn outlined @click="login=true" class="mx-2 ml-auto">
+        <v-btn text class="ml-auto" @click="toggleDark">
+          <v-icon v-if="this.$vuetify.theme.dark">
+            mdi-lightbulb-on
+          </v-icon>
+          <v-icon v-else>
+            mdi-lightbulb-off
+          </v-icon>
+        </v-btn>
+
+        <v-btn outlined @click="login=true" class="mx-2">
           Login
           <v-icon>mdi-login</v-icon>
         </v-btn>
@@ -53,7 +62,7 @@
                   rounded
                   v-bind="attrs"
                   v-on="on">
-                <v-icon color="white">
+                <v-icon>
                   {{ item.icon }}
                 </v-icon>
 
@@ -147,13 +156,17 @@ export default Vue.extend({
         },
       ];
     },
-
     isMobile(): boolean {
       return this.windowWidth <= 480
     },
 
     isNotMobile(): boolean {
       return this.windowWidth > 480
+    }
+  },
+  methods: {
+    toggleDark() {
+      this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
     }
   },
   mounted() {

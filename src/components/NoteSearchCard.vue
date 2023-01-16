@@ -1,5 +1,5 @@
 <template>
-  <v-card class="pa-4 fill-height d-flex flex-column" elevation="2">
+  <v-card class="pa-4 fill-height d-flex flex-column" elevation="4" outlined>
     <v-card-title> <a> {{ item.name }} </a> </v-card-title>
     <v-card-text>
       Category: {{ item.category }} <br/>
