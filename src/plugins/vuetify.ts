@@ -1,11 +1,10 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify/lib';
-import {getCookie} from "typescript-cookie";
 
 Vue.use(Vuetify);
 
-const dark_cookie = getCookie("dark")
-const dark = (!(dark_cookie !== undefined && dark_cookie === "false"))
+const dark_string = window.localStorage.getItem("dark")
+const dark = (!(dark_string !== undefined && dark_string === "false"))
 export default new Vuetify({
     theme: { dark: dark },
 });
