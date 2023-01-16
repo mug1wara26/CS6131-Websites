@@ -105,6 +105,7 @@
 import Vue from "vue"
 import RegisterDialog from "@/components/RegisterDialog.vue";
 import LoginDialog from "@/components/LoginDialog.vue";
+import {setCookie} from "typescript-cookie";
 
 export default Vue.extend({
   name: 'App',
@@ -167,6 +168,7 @@ export default Vue.extend({
   methods: {
     toggleDark() {
       this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
+      setCookie("dark", this.$vuetify.theme.dark)
     }
   },
   mounted() {
