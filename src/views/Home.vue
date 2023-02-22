@@ -1,6 +1,7 @@
 <template>
   <v-container fluid class="flex-column align-center d-flex mt-8">
-    <h1> Organise your CTF experience</h1>
+    <h1 v-if="username===undefined"> Organise your CTF experience</h1>
+    <h1 v-else> Welcome back, {{username}}</h1>
     <i>For the regular CTF player who loses track of the challenges they are working on</i>
     <ul class="mt-2">
       <b>Features:</b>
@@ -53,9 +54,15 @@ export default Vue.extend({
     registerDialog,
     loginDialog
   },
-  data: ()=>({
-    register: false,
-    login: false,
-  })
+  data() {
+    return {
+      register: false,
+      login: false,
+      username: this.$route.params.name
+    }
+  },
+  created() {
+    console.log(this.username)
+  }
 })
 </script>

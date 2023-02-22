@@ -57,6 +57,11 @@ const routes = [
         name: 'flag',
         component: flag
     },
+    {
+        path: '/:name',
+        name: 'home',
+        component: Home
+    },
 ]
 
 const router = new VueRouter({
