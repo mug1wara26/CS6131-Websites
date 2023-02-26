@@ -3,14 +3,13 @@ import {db} from "../db";
 import { OkPacket, RowDataPacket } from "mysql2";
 
 export const create = (user: User, callback: Function) => {
-    const queryString = "INSERT INTO user VALUES (?,?,?,?,?,?,?)"
+    const queryString = "INSERT INTO user VALUES (?,?,?,?,?,?)"
 
     db.query(
         queryString,
         [user.username,user.displayName,user.email,user.pfp,user.bio,user.hash],
         (err, result) => {
             if (err) {callback(err)}
-
             callback(null, user.username);
         }
     )

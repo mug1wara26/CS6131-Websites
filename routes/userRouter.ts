@@ -24,11 +24,12 @@ userRouter.post("/register", async (req: Request, res: Response) => {
         password: req.body.password
     })
 
+
     validate(registerUser).then(errors => {
         if (errors.length > 0) return res.status(400).json({"errors": errors})
 
         bcrypt.hash(registerUser.password, 10, function (err, hash) {
-            if (typeof err !== undefined) return res.status(500).json({"errors": err?.message});
+            if (typeof err !== 'undefined') return res.status(500).json({"errors": err?.message});
 
             const user = new User();
             user.username = registerUser.username;
@@ -36,10 +37,13 @@ userRouter.post("/register", async (req: Request, res: Response) => {
             user.email = registerUser.email;
             user.hash = hash;
 
+
             userModel.create(user, (err: Error, username: string) => {
+                console.log(err)
+                console.log(username)
                 if (err) return res.status(500).json({"message": err.message});
 
-                res.status(200).json({"message": username + " created successfully"})
+                return res.status(200).json({"message": username + " created successfully"})
             })
         });
     })
