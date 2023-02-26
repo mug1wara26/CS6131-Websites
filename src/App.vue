@@ -106,6 +106,7 @@ import Vue from "vue"
 import RegisterDialog from "@/components/RegisterDialog.vue";
 import LoginDialog from "@/components/LoginDialog.vue";
 
+
 export default Vue.extend({
   name: 'App',
   components: {LoginDialog, RegisterDialog},

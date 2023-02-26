@@ -33,7 +33,7 @@ const routes = [
         component: Users
     },
     {
-        path: '/users/:id',
+        path: '/users/:username',
         name: 'users',
         component: Users
     },
@@ -59,7 +59,7 @@ const routes = [
     },
     {
         path: '/:name',
-        name: 'home',
+        name: 'homeName',
         component: Home
     },
 ]

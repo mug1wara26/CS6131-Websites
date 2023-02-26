@@ -9,6 +9,7 @@
         Note: Registering does nothing as of now <br/>
         <a @click="openLogin">Already have an account?</a>
         <v-text-field label="Username*" required/>
+        <v-text-field label="Display Name*" required/>
         <v-text-field label="Email*" required/>
         <v-text-field label="Password*" required type="password"/>
       </v-card-text>

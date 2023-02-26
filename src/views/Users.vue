@@ -12,7 +12,7 @@
                     src="../../public/assets/default-pfp.webp"
                 />
               </v-avatar>
-              <h3 class="ml-4"> {{ user.name }} </h3>
+              <h3 class="ml-4"> {{ user.username }} </h3>
             </v-card-title>
             <v-card-subtitle class="mt-2"> {{ user.email }} </v-card-subtitle>
             <v-divider/>
@@ -28,21 +28,38 @@
 
 <script lang="ts">
 import Vue from "vue";
-import users from "@/data/Users";
-import {User} from "@/schemas/User";
+import {BasicUser} from "../../cs6131-backend/types/user";
 
 export default Vue.extend({
   name: "Users",
   data() {
     return {
-      user: {} as User
+      user: {} as BasicUser
     }
   },
-  created() {
-    const id = this.$route.params.id;
-    this.user = users.filter(obj => {
-      return obj.uid === id;
-    })[0]
+  methods: {
+    getUser(username: string) : Promise<BasicUser> {
+      return new Promise<BasicUser>((resolve, reject) => {
+            fetch(`http://localhost:3000/users/${username}`, {
+                  method: 'GET',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  }
+                }
+            ).then(res => res.json()).then(json => {
+              resolve(json.data)
+            }).catch(err => {
+              reject(err);
+            })
+          }
+      )
+    }
+},
+  async created() {
+    const username = this.$route.params.username;
+    await this.getUser(username).then(user => {
+      this.user = user as BasicUser
+    })
   }
 })
 </script>
