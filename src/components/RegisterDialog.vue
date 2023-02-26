@@ -46,6 +46,8 @@
 
 <script lang="ts">
 import Vue from "vue";
+import {register} from "@/api";
+import {RegisteringUser} from "../../cs6131-backend/types/user";
 
 export default Vue.extend({
   data() {
@@ -90,7 +92,16 @@ export default Vue.extend({
       this.$emit('open-login')
     },
     register() {
-      this.loading = true;
+      const user = new RegisteringUser();
+      user.username = this.username;
+      user.displayName = this.displayName;
+      user.email = this.email;
+      user.password = this.password;
+
+      register(user).then(res => {
+        console.log(res);
+        // this.close();
+      });
     }
   },
 })
