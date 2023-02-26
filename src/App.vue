@@ -106,6 +106,7 @@ import Vue from "vue"
 import RegisterDialog from "@/components/RegisterDialog.vue";
 import LoginDialog from "@/components/LoginDialog.vue";
 
+Vue.prototype.$apilink = 'https://cs6131-backend-rpllssu76q-as.a.run.app';
 
 export default Vue.extend({
   name: 'App',

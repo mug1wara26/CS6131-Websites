@@ -29,7 +29,7 @@
 
     <v-dialog
         v-model="register"
-        width="auto"
+        width="400px"
     >
       <register-dialog @close-dialog="register=false" @open-login="login=true"/>
     </v-dialog>
