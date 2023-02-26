@@ -20,7 +20,7 @@ jobs:
           run: npm run deploy
 
   backend-google-cloud-deploy:
-    name: Deploy to GitHub Pages
+    name: Deploy to Google Cloud
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
