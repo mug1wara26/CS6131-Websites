@@ -6,7 +6,7 @@
       </v-card-title>
 
       <v-card-text>
-        Note: Registering does nothing as of now <br/>
+        Note: Registering does create an account in the database, but does not log you in yet. <br/>
         <a @click="openLogin">Already have an account?</a>
         <v-form v-model="validity" ref="form">
           <v-text-field v-model="username" label="Username*" required :rules="usernameRules"/>

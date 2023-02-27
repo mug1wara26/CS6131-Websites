@@ -81,7 +81,7 @@
 
     <v-dialog
         v-model="register"
-        width="auto"
+        width="400"
     >
       <register-dialog
           @close-dialog="register=false"
@@ -92,7 +92,7 @@
 
     <v-dialog
         v-model="login"
-        width="auto"
+        width="400"
     >
       <login-dialog @close-dialog="login=false" @open-register="register=true"/>
     </v-dialog>
