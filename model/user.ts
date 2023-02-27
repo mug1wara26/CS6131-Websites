@@ -9,8 +9,8 @@ export const create = (user: User, callback: Function) => {
         queryString,
         [user.username,user.displayName,user.email,user.pfp,user.bio,user.hash],
         (err, result) => {
-            if (err) {callback(err)}
-            callback(null, user.username);
+            if (err) callback(err)
+            else callback(null, user.username);
         }
     )
 }
