@@ -8,7 +8,7 @@
       <v-card-text>
         Note: Registering does nothing as of now <br/>
         <a @click="openLogin">Already have an account?</a>
-        <v-form v-model="validity">
+        <v-form v-model="validity" ref="form">
           <v-text-field v-model="username" label="Username*" required :rules="usernameRules"/>
           <v-text-field v-model="displayName" label="Display Name*" required :rules="displayNameRules"/>
           <v-text-field v-model="email" label="Email*" required :rules="emailRules"/>
@@ -47,7 +47,7 @@
 <script lang="ts">
 import Vue from "vue";
 import {register} from "@/api";
-import {RegisteringUser} from "../../cs6131-backend/types/user";
+import {RegisteringUser} from "@/../cs6131-backend/types/user";
 
 export default Vue.extend({
   data() {
@@ -62,7 +62,7 @@ export default Vue.extend({
       displayName: "",
       displayNameRules: [
         (displayName: string | null) => !!displayName || 'Display name is required',
-        (displayName: string | null) => (displayName && displayName.length > 3 && displayName.length < 32) || 'Display name must be between 3 and 32 characters'
+        (displayName: string | null) => (displayName && displayName.length >= 3 && displayName.length < 32) || 'Display name must be between 3 and 32 characters'
       ],
       email: "",
       emailRules: [
@@ -85,13 +85,16 @@ export default Vue.extend({
   },
   methods: {
     close(){
-      this.$emit('close-dialog')
+      this.$emit('close-dialog');
+      (this.$refs.form as any).reset();
+      this.loading=false;
     },
     openLogin() {
       this.$emit('close-dialog')
       this.$emit('open-login')
     },
     register() {
+      this.loading=true;
       const user = new RegisteringUser();
       user.username = this.username;
       user.displayName = this.displayName;
@@ -99,8 +102,10 @@ export default Vue.extend({
       user.password = this.password;
 
       register(user).then(res => {
-        console.log(res);
-        // this.close();
+        if (res.status === 200) {
+          this.$emit('register-success', this.username);
+          this.close();
+        }
       });
     }
   },

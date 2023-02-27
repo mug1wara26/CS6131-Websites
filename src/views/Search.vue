@@ -79,11 +79,11 @@ import users from "@/data/Users";
 import teams from "@/data/Teams";
 import ctfs from "@/data/CTFs";
 import writeUps from "@/data/WriteUps";
-import NoteSearchCard from "@/components/NoteSearchCard.vue";
-import UserSearchCard from "@/components/UserSearchCard.vue";
-import TeamSearchCard from "@/components/TeamSearchCard.vue";
-import CTFSearchCard from "@/components/CTFSearchCard.vue";
-import WriteUpSearchCard from "@/components/WriteUpSearchCard.vue";
+import NoteSearchCard from "@/components/SearchCards/NoteSearchCard.vue";
+import UserSearchCard from "@/components/SearchCards/UserSearchCard.vue";
+import TeamSearchCard from "@/components/SearchCards/TeamSearchCard.vue";
+import CTFSearchCard from "@/components/SearchCards/CTFSearchCard.vue";
+import WriteUpSearchCard from "@/components/SearchCards/WriteUpSearchCard.vue";
 
 export default Vue.extend({
   name: "Search",

@@ -16,7 +16,7 @@
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
 
-      <v-btn outlined class="mr-4 mb-2" @click="register = true">
+      <v-btn outlined class="mr-4 mb-2" @click="registerDialog">
         Register
         <v-icon>mdi-login</v-icon>
       </v-btn>
@@ -27,42 +27,22 @@
       </v-btn>
     </v-row>
 
-    <v-dialog
-        v-model="register"
-        width="400px"
-    >
-      <register-dialog @close-dialog="register=false" @open-login="login=true"/>
-    </v-dialog>
-
-    <v-dialog
-        v-model="login"
-        width="auto"
-    >
-      <login-dialog @close-dialog="login=false" @open-register="register=true"/>
-    </v-dialog>
-
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import registerDialog from "@/components/RegisterDialog.vue";
-import loginDialog from "@/components/LoginDialog.vue";
 
 export default Vue.extend({
-  components: {
-    registerDialog,
-    loginDialog
-  },
   data() {
     return {
-      register: false,
-      login: false,
       username: this.$route.params.name
     }
   },
-  created() {
-    console.log(this.username)
+  methods: {
+    registerDialog() {
+      this.$emit("open-register")
+    }
   }
 })
 </script>

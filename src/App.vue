@@ -83,7 +83,11 @@
         v-model="register"
         width="auto"
     >
-      <register-dialog @close-dialog="register=false" @open-login="login=true"/>
+      <register-dialog
+          @close-dialog="register=false"
+          @open-login="login=true"
+          @register-success="(username) => {this.username = username; showAlert('registerSuccess')}"
+      />
     </v-dialog>
 
     <v-dialog
@@ -94,8 +98,14 @@
     </v-dialog>
 
     <v-main>
+      <v-container class="d-flex justify-center mt-2">
+        <RegisterSuccess
+            :username="username"
+            :value="alertShown === 'registerSuccess'"
+        />
+      </v-container>
       <v-container fluid>
-        <router-view :key="$route.fullPath"/>
+        <router-view :key="$route.fullPath" @open-register="register=true"/>
       </v-container>
     </v-main>
   </v-app>
@@ -103,17 +113,27 @@
 
 <script lang="ts">
 import Vue from "vue"
-import RegisterDialog from "@/components/RegisterDialog.vue";
-import LoginDialog from "@/components/LoginDialog.vue";
+import RegisterDialog from "@/components/Dialogs/RegisterDialog.vue";
+import LoginDialog from "@/components/Dialogs/LoginDialog.vue";
+import RegisterSuccess from "@/components/Alerts/RegisterSuccess.vue";
 
-Vue.prototype.$apilink = 'https://cs6131-backend-rpllssu76q-as.a.run.app';
-// Vue.prototype.$apilink = 'http://localhost:3000'
+if (process.env.NODE_ENV === 'production') {
+  console.log("Running in production")
+  Vue.prototype.$apilink = 'https://cs6131-backend-rpllssu76q-as.a.run.app';
+}
+else {
+  console.log("Running locally")
+  Vue.prototype.$apilink = 'http://localhost:3000'
+}
+
 
 export default Vue.extend({
   name: 'App',
-  components: {LoginDialog, RegisterDialog},
+  components: {RegisterSuccess, LoginDialog, RegisterDialog},
   data() {
     return {
+      username: "",
+      alertShown: "",
       drawer: false,
       register: false,
       login: false,
@@ -171,6 +191,13 @@ export default Vue.extend({
     toggleDark() {
       this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
       window.localStorage.setItem("dark", this.$vuetify.theme.dark.toString())
+    },
+    showAlert(alertName: string) {
+      console.log(alertName)
+      this.alertShown = alertName
+      setTimeout(() => {
+        this.alertShown = ""
+      }, 3000)
     }
   },
   mounted() {
