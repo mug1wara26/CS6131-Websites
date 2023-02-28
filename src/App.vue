@@ -102,7 +102,7 @@
         <RegisterSuccess
             :username="username"
             :value="alertShown === 'registerSuccess'"
-            :width="isMobile ? '100%' : '30%'"
+            :width="(windowWidth * 0.3 >= 300) ? '30%' : '100%'"
         />
       </v-container>
       <v-container fluid>
@@ -198,7 +198,7 @@ export default Vue.extend({
       this.alertShown = alertName
       setTimeout(() => {
         this.alertShown = ""
-      }, 3000)
+      }, 30000)
     }
   },
   mounted() {
