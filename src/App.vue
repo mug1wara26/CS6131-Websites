@@ -198,7 +198,7 @@ export default Vue.extend({
       this.alertShown = alertName
       setTimeout(() => {
         this.alertShown = ""
-      }, 30000)
+      }, 3000)
     }
   },
   mounted() {
