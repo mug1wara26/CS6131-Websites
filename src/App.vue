@@ -102,6 +102,7 @@
         <RegisterSuccess
             :username="username"
             :value="alertShown === 'registerSuccess'"
+            :width="isMobile ? '100%' : '30%'"
         />
       </v-container>
       <v-container fluid>

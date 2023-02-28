@@ -3,7 +3,7 @@
       type="success"
       title="Registered Successfully"
       text
-      width="30%"
+      :width="width"
       :value="value"
       transition="slide-y-transition"
   >
@@ -17,6 +17,6 @@ import Vue from "vue";
 
 export default Vue.extend({
   name: "RegisterSuccess",
-  props: ['username', 'value']
+  props: ['username', 'value', 'width']
 });
 </script>
