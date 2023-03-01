@@ -6,15 +6,18 @@ import bcrypt from "bcrypt"
 
 const userRouter = express.Router();
 
-
 userRouter.get("/:username", async (req: Request, res: Response) => {
     const username = req.params.username;
-    userModel.findOne(username, (err: Error, user: BasicUser) => {
+    userModel.findOne(username, (err: Error, user: User) => {
         if (err) {
             res.statusMessage = 'User does not exist'
             return res.status(400).end();
         }
-        else res.status(200).json({"data": user})
+        else {
+            const {hash, ...basicUser} = user;
+            console.log(basicUser)
+            res.status(200).json({"data": basicUser})
+        }
     })
 })
 
@@ -52,10 +55,10 @@ userRouter.post("/register", async (req: Request, res: Response) => {
                     return res.status(500).json({"message": "Database Error"});
                 }
 
-                return res.status(200).json({"message": username + " created successfully"})
+                return res.status(200).json({"message": username})
             })
         });
     })
-})
+});
 
 export {userRouter};
