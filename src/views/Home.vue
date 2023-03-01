@@ -1,5 +1,7 @@
 <template>
   <v-container fluid class="flex-column align-center d-flex mt-8">
+    <h1>Any requests made to the backend server will not work until closer to the project due date because google cloud costs money 💀</h1>
+
     <h1 v-if="username===undefined"> Organise your CTF experience</h1>
     <h1 v-else> Welcome back, {{username}}</h1>
     <i>For the regular CTF player who loses track of the challenges they are working on</i>
