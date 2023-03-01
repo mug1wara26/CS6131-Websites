@@ -102,6 +102,7 @@
         <RegisterSuccess
             :username="username"
             :value="alertShown === 'registerSuccess'"
+            :width="(windowWidth * 0.3 >= 300) ? '30%' : '100%'"
         />
       </v-container>
       <v-container fluid>
