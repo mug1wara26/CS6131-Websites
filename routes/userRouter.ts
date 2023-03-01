@@ -3,6 +3,7 @@ import * as userModel from "../model/user"
 import {BasicUser, RegisteringUser, User} from "../types/user";
 import {validate} from "class-validator";
 import bcrypt from "bcrypt"
+import {loginWithUsername} from "../model/user";
 
 const userRouter = express.Router();
 
@@ -15,7 +16,6 @@ userRouter.get("/:username", async (req: Request, res: Response) => {
         }
         else {
             const {hash, ...basicUser} = user;
-            console.log(basicUser)
             res.status(200).json({"data": basicUser})
         }
     })
@@ -35,6 +35,7 @@ userRouter.post("/register", async (req: Request, res: Response) => {
             const responseMessage = {"message" : ''}
             if (errors.filter(e => e.property === 'email').length > 0) responseMessage.message = "Email not valid"
             else responseMessage.message = "Check the information provided"
+
             res.statusMessage = responseMessage.message
             return res.status(400).end()
         }
@@ -60,5 +61,23 @@ userRouter.post("/register", async (req: Request, res: Response) => {
         });
     })
 });
+
+userRouter.post('/login', async (req, res) => {
+    const username = req.body.username
+    const password = req.body.password
+
+    if (username && password) {
+        loginWithUsername(username, password, (err: Error, token: String) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({"error": err})
+            }
+            else {
+
+                return res.status(200).json({"token": token})
+            }
+        })
+    }
+})
 
 export {userRouter};
