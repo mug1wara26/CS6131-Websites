@@ -9,15 +9,15 @@
         Note: Registering does create an account in the database, but does not log you in yet. <br/>
         <a @click="openLogin">Already have an account?</a>
         <v-form v-model="validity" ref="form">
-          <v-text-field v-model="username" label="Username*" required :rules="usernameRules"/>
-          <v-text-field v-model="displayName" label="Display Name*" required :rules="displayNameRules"/>
-          <v-text-field v-model="email" label="Email*" required :rules="emailRules"/>
+          <v-text-field autofocus v-model="user.username" label="Username*" required :rules="rules.usernameRules"/>
+          <v-text-field v-model="user.displayName" label="Display Name*" required :rules="rules.displayNameRules"/>
+          <v-text-field v-model="user.email" label="Email*" required :rules="rules.emailRules"/>
           <v-text-field
-              v-model="password"
+              v-model="user.password"
               label="Password*"
               required
               :type="showPass ? '' : 'password'"
-              :rules="passwordRules"
+              :rules="rules.passwordRules"
               :append-icon="showPass? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
               @click:append="showPass = !showPass"
 
@@ -54,40 +54,63 @@ export default Vue.extend({
     return {
       loading: false,
       validity: false,
-      username: "",
-      usernameRules: [
-        (username: string | null) => !!username || 'Username is required',
-        (username: string | null) => (username && username.length > 6 && username.length < 32) || 'Username must be between 6 and 32 characters'
-      ],
-      displayName: "",
-      displayNameRules: [
-        (displayName: string | null) => !!displayName || 'Display name is required',
-        (displayName: string | null) => (displayName && displayName.length >= 3 && displayName.length < 32) || 'Display name must be between 3 and 32 characters'
-      ],
-      email: "",
-      emailRules: [
-          (email: string | null) => !!email || 'Email is required',
-        // eslint-disable-next-line
-          (email: string | null) => (email && /^.+\@.+\..+$/.test(email)) || 'Not a valid email'
-      ],
-      password: "",
-      passwordRules: [
-        (password: string | null) => !!password || 'Password is required',
-        (password: string | null) => (password && password.length >= 8) || 'Password must be longer than or equal to 8 characters',
-        (password: string | null) => (password && password.length < 1024) || 'Password too long',
-        (password: string | null) => (password && /[A-Z]/.test(password)) || 'Password must contain at least one uppercase letter',
-        (password: string | null) => (password && /[a-z]/.test(password)) || 'Password must contain at least one lowercase letter',
-        (password: string | null) => (password && /\d/.test(password)) || 'Password must contain at least one number',
-        (password: string | null) => (password && /[@$!%*#?&]/.test(password)) || 'Password must contain at least one special character (@$!%*#?&)',
-      ],
+      user: {
+        username: "",
+        displayName: "",
+        email: "",
+        password: "",
+      },
       showPass: false,
+      rules: {
+        usernameRules: {},
+        displayNameRules: {},
+        emailRules: {},
+        passwordRules: {}
+      },
+    }
+  },
+  computed: {
+    dirty(): boolean {
+      return Object.values(this.user).every((val) => val != '')
     }
   },
   methods: {
     close(){
       this.$emit('close-dialog');
+      this.rules = {
+        usernameRules: {},
+        displayNameRules: {},
+        emailRules: {},
+        passwordRules: {}
+      };
       (this.$refs.form as any).reset();
       this.loading=false;
+    },
+    onSave() {
+      this.rules = {
+        passwordRules: [
+          (password: string | null) => !!password || 'Password is required',
+          (password: string | null) => (password && password.length >= 8) || 'Password must be longer than or equal to 8 characters',
+          (password: string | null) => (password && password.length < 1024) || 'Password too long',
+          (password: string | null) => (password && /[A-Z]/.test(password)) || 'Password must contain at least one uppercase letter',
+          (password: string | null) => (password && /[a-z]/.test(password)) || 'Password must contain at least one lowercase letter',
+          (password: string | null) => (password && /\d/.test(password)) || 'Password must contain at least one number',
+          (password: string | null) => (password && /[@$!%*#?&]/.test(password)) || 'Password must contain at least one special character (@$!%*#?&)',
+        ],
+        emailRules: [
+          (email: string | null) => !!email || 'Email is required',
+          // eslint-disable-next-line
+          (email: string | null) => (email && /^.+\@.+\..+$/.test(email)) || 'Not a valid email'
+        ],
+        displayNameRules: [
+          (displayName: string | null) => !!displayName || 'Display name is required',
+          (displayName: string | null) => (displayName && displayName.length >= 3 && displayName.length < 32) || 'Display name must be between 3 and 32 characters'
+        ],
+        usernameRules: [
+          (username: string | null) => !!username || 'Username is required',
+          (username: string | null) => (username && username.length > 6 && username.length < 32) || 'Username must be between 6 and 32 characters'
+        ],
+      }
     },
     openLogin() {
       this.$emit('close-dialog')
@@ -95,15 +118,11 @@ export default Vue.extend({
     },
     register() {
       this.loading=true;
-      const user = new RegisteringUser();
-      user.username = this.username;
-      user.displayName = this.displayName;
-      user.email = this.email;
-      user.password = this.password;
+      const registeringUser = this.user as RegisteringUser
 
-      register(user).then(res => {
+      register(registeringUser).then(res => {
         if (res.status === 200) {
-          this.$emit('register-success', this.username);
+          this.$emit('register-success', registeringUser.username);
           this.close();
         }
       });
