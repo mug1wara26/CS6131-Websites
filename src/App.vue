@@ -208,7 +208,6 @@ export default Vue.extend({
       window.localStorage.setItem("dark", this.$vuetify.theme.dark.toString())
     },
     showAlert(alertName: string, alertText: string) {
-      console.log(alertName)
       this.alertText = alertText;
       this.alertShown = alertName;
       setTimeout(() => {

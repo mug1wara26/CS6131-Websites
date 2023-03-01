@@ -114,6 +114,7 @@ export default Vue.extend({
       this.$nextTick(() => {
         //NOW trigger validation
         if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+          console.log(JSON.stringify(this.user))
           this.register();
         }
       })
@@ -129,15 +130,14 @@ export default Vue.extend({
       userExists(registeringUser.username).then(res => {
         if (!res) {
           register(registeringUser).then(res => {
-            if (res.status === 200) this.$emit('register-success', registeringUser.username);
-            if (res.status === 400) {
-              this.$emit('register-error', res.statusText);
-            }
+            if (res.status === 200) res.json().then(data => {console.log(data);this.$emit('register-success', data.message)});
+            else if (res.status === 400) this.$emit('register-error', res.statusText);
+            else this.$emit('register-error', "Unknown error, please try again")
           })
         }
         else this.$emit('register-error', 'Username taken')
+        this.onClose();
       })
-      this.onClose();
     }
   },
 })
