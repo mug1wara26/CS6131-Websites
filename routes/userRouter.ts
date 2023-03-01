@@ -26,7 +26,13 @@ userRouter.post("/register", async (req: Request, res: Response) => {
 
 
     validate(registerUser).then(errors => {
-        if (errors.length > 0) return res.status(400).json()
+        if (errors.length > 0) {
+            const responseMessage = {"message" : ''}
+            if (errors.filter(e => e.property === 'email').length > 0) responseMessage.message = "Email not valid"
+            else responseMessage.message = "Check the information provided"
+            res.statusMessage = responseMessage.message
+            return res.status(400).end()
+        }
 
         bcrypt.hash(registerUser.password, 10, function (err, hash) {
             if (typeof err !== 'undefined') return res.status(500).json({"message": err?.name});
