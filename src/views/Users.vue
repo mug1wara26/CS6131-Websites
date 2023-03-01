@@ -29,6 +29,7 @@
 <script lang="ts">
 import Vue from "vue";
 import {BasicUser} from "../../cs6131-backend/types/user";
+import {getUser} from "@/api";
 
 export default Vue.extend({
   name: "Users",
@@ -37,29 +38,11 @@ export default Vue.extend({
       user: {} as BasicUser
     }
   },
-  methods: {
-    getUser(username: string) : Promise<BasicUser> {
-      return new Promise<BasicUser>((resolve, reject) => {
-            fetch(`http://localhost:3000/users/${username}`, {
-                  method: 'GET',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  }
-                }
-            ).then(res => res.json()).then(json => {
-              resolve(json.data)
-            }).catch(err => {
-              reject(err);
-            })
-          }
-      )
-    }
-},
   async created() {
     const username = this.$route.params.username;
-    await this.getUser(username).then(user => {
+    await getUser(username).then(user => {
       this.user = user as BasicUser
-    })
+    }).catch(err => console.log(err))
   }
 })
 </script>

@@ -46,7 +46,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {register} from "@/api";
+import {register, userExists} from "@/api";
 import {RegisteringUser} from "@/../cs6131-backend/types/user";
 
 export default Vue.extend({
@@ -126,13 +126,18 @@ export default Vue.extend({
       this.loading=true;
       const registeringUser = this.user as RegisteringUser
 
-      register(registeringUser).then(res => {
-        if (res.status === 200) this.$emit('register-success', registeringUser.username);
-        if (res.status === 400) {
-          this.$emit('register-error', res.statusText);
+      userExists(registeringUser.username).then(res => {
+        if (!res) {
+          register(registeringUser).then(res => {
+            if (res.status === 200) this.$emit('register-success', registeringUser.username);
+            if (res.status === 400) {
+              this.$emit('register-error', res.statusText);
+            }
+          })
         }
-        this.onClose();
+        else this.$emit('register-error', 'Username taken')
       })
+      this.onClose();
     }
   },
 })
