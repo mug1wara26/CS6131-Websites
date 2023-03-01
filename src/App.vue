@@ -86,7 +86,8 @@
       <register-dialog
           @close-dialog="register=false"
           @open-login="login=true"
-          @register-success="(username) => {this.username = username; showAlert('registerSuccess')}"
+          @register-success="(registeredUsername) => {showAlert('registerSuccess', 'Welcome ' + registeredUsername)}"
+          @register-error="(err) => {showAlert('registerError', err)}"
       />
     </v-dialog>
 
@@ -99,10 +100,19 @@
 
     <v-main>
       <v-container class="d-flex justify-center mt-2">
-        <RegisterSuccess
-            :username="username"
+        <Alert
+            type="success"
             :value="alertShown === 'registerSuccess'"
-            :width="(windowWidth * 0.3 >= 300) ? '30%' : '100%'"
+            :width="alertWidth"
+            title="Register Success"
+            :text="alertText"
+        />
+        <Alert
+            type="error"
+            :value="alertShown === 'registerError'"
+            :width="alertWidth"
+            title="Register Error"
+            :text="alertText"
         />
       </v-container>
       <v-container fluid>
@@ -116,7 +126,7 @@
 import Vue from "vue"
 import RegisterDialog from "@/components/Dialogs/RegisterDialog.vue";
 import LoginDialog from "@/components/Dialogs/LoginDialog.vue";
-import RegisterSuccess from "@/components/Alerts/RegisterSuccess.vue";
+import Alert from "@/components/Alerts/Alert.vue";
 
 if (process.env.NODE_ENV === 'production') {
   console.log("Running in production")
@@ -130,10 +140,11 @@ else {
 
 export default Vue.extend({
   name: 'App',
-  components: {RegisterSuccess, LoginDialog, RegisterDialog},
+  components: {Alert: Alert, LoginDialog, RegisterDialog},
   data() {
     return {
       username: "",
+      alertText: "",
       alertShown: "",
       drawer: false,
       register: false,
@@ -186,6 +197,9 @@ export default Vue.extend({
 
     isNotMobile(): boolean {
       return this.windowWidth > 480
+    },
+    alertWidth(): string {
+      return (this.windowWidth * 0.3 >= 300) ? '30%' : '100%'
     }
   },
   methods: {
@@ -193,9 +207,10 @@ export default Vue.extend({
       this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
       window.localStorage.setItem("dark", this.$vuetify.theme.dark.toString())
     },
-    showAlert(alertName: string) {
+    showAlert(alertName: string, alertText: string) {
       console.log(alertName)
-      this.alertShown = alertName
+      this.alertText = alertText;
+      this.alertShown = alertName;
       setTimeout(() => {
         this.alertShown = ""
       }, 3000)

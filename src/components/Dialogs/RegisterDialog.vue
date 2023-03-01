@@ -8,7 +8,7 @@
       <v-card-text>
         Note: Registering does create an account in the database, but does not log you in yet. <br/>
         <a @click="openLogin">Already have an account?</a>
-        <v-form v-model="validity" ref="form">
+        <v-form ref="form">
           <v-text-field autofocus v-model="user.username" label="Username*" required :rules="rules.usernameRules"/>
           <v-text-field v-model="user.displayName" label="Display Name*" required :rules="rules.displayNameRules"/>
           <v-text-field v-model="user.email" label="Email*" required :rules="rules.emailRules"/>
@@ -26,16 +26,16 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-btn color="warning" left @click.stop="close">Close</v-btn>
+        <v-btn color="warning" left @click.stop="onClose">Close</v-btn>
 
         <v-spacer/>
 
         <v-btn
             color="primary"
             right
-            @click.stop="register"
+            @click="onSave"
             :loading="loading"
-            :disabled="loading || !validity"
+            :disabled="loading || !clean"
         >
           Register
         </v-btn>
@@ -53,7 +53,6 @@ export default Vue.extend({
   data() {
     return {
       loading: false,
-      validity: false,
       user: {
         username: "",
         displayName: "",
@@ -70,12 +69,12 @@ export default Vue.extend({
     }
   },
   computed: {
-    dirty(): boolean {
+    clean(): boolean {
       return Object.values(this.user).every((val) => val != '')
     }
   },
   methods: {
-    close(){
+    onClose(){
       this.$emit('close-dialog');
       this.rules = {
         usernameRules: {},
@@ -110,7 +109,14 @@ export default Vue.extend({
           (username: string | null) => !!username || 'Username is required',
           (username: string | null) => (username && username.length > 6 && username.length < 32) || 'Username must be between 6 and 32 characters'
         ],
-      }
+      };
+
+      this.$nextTick(() => {
+        //NOW trigger validation
+        if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+          this.register();
+        }
+      })
     },
     openLogin() {
       this.$emit('close-dialog')
@@ -121,11 +127,12 @@ export default Vue.extend({
       const registeringUser = this.user as RegisteringUser
 
       register(registeringUser).then(res => {
-        if (res.status === 200) {
-          this.$emit('register-success', registeringUser.username);
-          this.close();
+        if (res.status === 200) this.$emit('register-success', registeringUser.username);
+        if (res.status === 400) {
+          this.$emit('register-error', res.statusText);
         }
-      });
+        this.onClose();
+      })
     }
   },
 })
