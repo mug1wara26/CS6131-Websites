@@ -1,5 +1,7 @@
 import {BasicUser, RegisteringUser} from "../cs6131-backend/types/user";
 import Vue from "vue";
+import {getCookie, removeCookie} from "typescript-cookie";
+import jwt_decode from "jwt-decode";
 
 export const register = (user: RegisteringUser): Promise<Response> => {
     return new Promise<Response>((resolve, reject) => {
@@ -35,9 +37,9 @@ export const getUser = (username: string): Promise<BasicUser> => {
 
 export const userExists = (username: string): Promise<boolean> => {
     return new Promise<boolean>(resolve => {
-        getUser(username).then(res => {
+        getUser(username).then(_ => {
             resolve(true)
-        }).catch(err => {
+        }).catch(_ => {
             return resolve(false)
         })
     });
@@ -56,10 +58,41 @@ export const login = (username: string, password: string): Promise<string> => {
                 password: password
             })
         }).then(res => {
-            if (res.status === 400) resolve(res.statusText);
-            else res.json().then(data => {
-                resolve(data.token);
-            })
+            if (res.status === 200) {
+                res.json().then(data => {
+                    resolve(data.token);
+                })
+            }
+            if (res.status === 400) reject(res.statusText);
         })
     });
+}
+
+export interface AlertError {
+    errorType: string;
+    errorTitle: string;
+    errorText: string;
+}
+
+export const onLogin = (callback: Function) => {
+    const token = getCookie('token');
+    if (token) {
+        try {
+            const decoded = jwt_decode(token);
+            const decodedKeys = Object.getOwnPropertyNames(decoded);
+            if(Object.keys(new BasicUser()).every((key) => decodedKeys.includes(key))) {
+                // eslint-disable-next-line no-unused-vars
+                const {iat, exp, ...user} =decoded as any;
+                callback(null, user);
+            }
+            else {
+                removeCookie('token')
+                callback({errorType: "error", errorTitle: "Login Error", errorText: "Please login again"} as AlertError);
+            }
+        }
+        catch {
+            removeCookie('token')
+            callback({errorType: "error", errorTitle: "Login Error", errorText: "Please login again"} as AlertError);
+        }
+    }
 }

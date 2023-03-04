@@ -33,7 +33,7 @@
           </v-icon>
         </v-btn>
 
-        <v-btn outlined @click="login=true" class="mx-2">
+        <v-btn v-if="userExists" outlined @click="login=true" class="mx-2">
           Login
           <v-icon>mdi-login</v-icon>
         </v-btn>
@@ -86,8 +86,8 @@
       <register-dialog
           @close-dialog="register=false"
           @open-login="login=true"
-          @register-success="(registeredUsername) => {showAlert('registerSuccess', 'Welcome ' + registeredUsername)}"
-          @register-error="(err) => {showAlert('registerError', err)}"
+          @register-success="showAlert('success', 'Register Successful','Please login with your registered info')"
+          @register-error="(err) => {showAlert('error', 'Register Error', err)}"
       />
     </v-dialog>
 
@@ -95,27 +95,25 @@
         v-model="login"
         width="400"
     >
-      <login-dialog @close-dialog="login=false" @open-register="register=true"/>
+      <login-dialog
+          @close-dialog="login=false"
+          @open-register="register=true"
+          @login-success="onLogin"
+          @login-error="(err) => {showAlert('error', 'Login Error', err)}"
+      />
     </v-dialog>
 
     <v-main>
       <v-container class="d-flex justify-center mt-2">
         <Alert
-            type="success"
-            :value="alertShown === 'registerSuccess'"
+            :type="alertShown"
+            :value="alertShown !== ''"
             :width="alertWidth"
-            title="Register Success"
-            :text="alertText"
-        />
-        <Alert
-            type="error"
-            :value="alertShown === 'registerError'"
-            :width="alertWidth"
-            title="Register Error"
+            :title="alertTitle"
             :text="alertText"
         />
       </v-container>
-      <v-container fluid>
+      <v-container fluid :key="reRender">
         <router-view :key="$route.fullPath" @open-register="register=true"/>
       </v-container>
     </v-main>
@@ -127,32 +125,37 @@ import Vue from "vue"
 import RegisterDialog from "@/components/Dialogs/RegisterDialog.vue";
 import LoginDialog from "@/components/Dialogs/LoginDialog.vue";
 import Alert from "@/components/Alerts/Alert.vue";
+import {BasicUser} from "../cs6131-backend/types/user";
+import {AlertError, onLogin} from "@/api";
 
 if (process.env.NODE_ENV === 'production') {
   console.log("Running in production")
   Vue.prototype.$apilink = 'https://cs6131-backend-rpllssu76q-as.a.run.app';
-}
-else {
+} else {
   console.log("Running locally")
   Vue.prototype.$apilink = 'http://localhost:3000'
 }
-
 
 export default Vue.extend({
   name: 'App',
   components: {Alert: Alert, LoginDialog, RegisterDialog},
   data() {
     return {
-      username: "",
+      user: {} as BasicUser,
+      alertTitle: "",
       alertText: "",
       alertShown: "",
       drawer: false,
       register: false,
       login: false,
       windowWidth: window.innerWidth,
+      reRender: 0,
     }
   },
   computed: {
+    userExists(): boolean {
+      return Object.keys(this.user).length === 0;
+    },
     routes(): Array<{
       name: string;
       route: string;
@@ -194,7 +197,6 @@ export default Vue.extend({
     isMobile(): boolean {
       return this.windowWidth <= 480
     },
-
     isNotMobile(): boolean {
       return this.windowWidth > 480
     },
@@ -207,18 +209,32 @@ export default Vue.extend({
       this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
       window.localStorage.setItem("dark", this.$vuetify.theme.dark.toString())
     },
-    showAlert(alertName: string, alertText: string) {
+    showAlert(alertType: string, alertTitle: string, alertText: string) {
+      this.alertTitle = alertTitle;
       this.alertText = alertText;
-      this.alertShown = alertName;
+      this.alertShown = alertType;
       setTimeout(() => {
         this.alertShown = ""
       }, 3000)
+    },
+    onLogin() {
+      onLogin((err: AlertError, user: BasicUser) => {
+        if (err) this.showAlert(err.errorType, err.errorTitle, err.errorText);
+        else {
+          this.user = user;
+          this.reRender++; // Re-renders router view so that user login is reflected.
+        }
+      })
     }
   },
   mounted() {
     window.onresize = () => {
       this.windowWidth = window.innerWidth;
     }
-  }
+    onLogin((err: AlertError, user: BasicUser) => {
+      if(err) this.showAlert(err.errorType, err.errorTitle, err.errorText)
+      else this.user = user;
+    })
+  },
 });
 </script>

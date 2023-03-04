@@ -130,7 +130,10 @@ export default Vue.extend({
       userExists(registeringUser.username).then(res => {
         if (!res) {
           register(registeringUser).then(res => {
-            if (res.status === 200) res.json().then(data => {this.$emit('register-success', data.message)});
+            // eslint-disable-next-line no-unused-vars
+            if (res.status === 200) res.json().then(data => {
+              this.$emit('register-success')
+            });
             else if (res.status === 400) this.$emit('register-error', res.statusText);
             else this.$emit('register-error', "Unknown error, please try again")
           })

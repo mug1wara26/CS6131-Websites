@@ -70,10 +70,10 @@ userRouter.post('/login', async (req, res) => {
         loginWithUsername(username, password, (err: Error, token: String) => {
             if (err) {
                 console.log(err);
-                return res.status(400).json({"error": err})
+                res.statusMessage = err.message;
+                return res.status(400).end()
             }
             else {
-
                 return res.status(200).json({"token": token})
             }
         })

@@ -58,7 +58,7 @@ export const findOne = (username: String, callback: Function) => {
 
 export const loginWithUsername = (username: string, password: string, callback: Function) => {
     findOne(username, (err: Error, user: User) => {
-        if (err) callback(err);
+        if (err) callback(new Error("Username does not exist"));
         else {
             bcrypt.compare(password, user.hash, (err, res) => {
                 if (err) callback(err);

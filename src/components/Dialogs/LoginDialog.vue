@@ -10,19 +10,28 @@
         <a @click="openRegister">Don't have an account?</a>
         <v-form ref="form">
           <v-text-field autofocus v-model="user.username" label="Username*" required/>
-          <v-text-field v-model="user.password" label="Password*" required type="password"/>
+          <v-text-field
+              v-model="user.password"
+              label="Password*"
+              required
+              :type="showPass ? '' : 'password'"
+              :append-icon="showPass? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
+              @click:append="showPass = !showPass"
+          />
         </v-form>
       </v-card-text>
 
       <v-card-actions>
-        <v-btn color="warning" left @click="close">Close</v-btn>
+        <v-btn color="warning" left @click.stop="onClose">Close</v-btn>
 
         <v-spacer/>
 
         <v-btn
             color="primary"
             right
-            @click="login"
+            @click.stop="login"
+            :loading="loading"
+            :disabled="loading || !clean"
         >
           Login
         </v-btn>
@@ -34,6 +43,7 @@
 <script lang="ts">
 import Vue from "vue";
 import {login} from "@/api";
+import { setCookie } from "typescript-cookie"
 
 export default Vue.extend({
   data() {
@@ -42,7 +52,8 @@ export default Vue.extend({
         username: "",
         password: "",
       },
-      loading: false
+      loading: false,
+      showPass: false,
     }
   },
   computed: {
@@ -60,7 +71,16 @@ export default Vue.extend({
     },
     login() {
       this.loading = true;
-      login(this.user.username, this.user.password).then(res => console.log(res))
+      login(this.user.username, this.user.password).then(res => {
+        setCookie('token', res, {sameSite: "lax"});
+        this.$emit('login-success')
+      }).catch(reason => {
+        this.$emit('login-error', reason)
+      }).finally( () => {
+            this.loading = false;
+            (this.$refs.form as any).reset();
+            this.onClose();
+      });
     }
   }
 })
