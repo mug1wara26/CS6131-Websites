@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container fluid v-if="userExists">
     <p v-if="user === undefined"> User login not implemented yet, click on a user in search to view their page</p>
     <template v-else>
       <v-row>
@@ -29,7 +29,7 @@
 <script lang="ts">
 import Vue from "vue";
 import {BasicUser} from "../../cs6131-backend/types/user";
-import {getUser} from "@/api";
+import {AlertError, getUser, onLogin} from "@/api";
 
 export default Vue.extend({
   name: "Users",
@@ -38,11 +38,24 @@ export default Vue.extend({
       user: {} as BasicUser
     }
   },
+  computed: {
+    userExists(): boolean {
+      return Object.keys(this.user).length !== 0;
+    },
+  },
   async created() {
     const username = this.$route.params.username;
-    await getUser(username).then(user => {
-      this.user = user as BasicUser
-    }).catch(err => console.log(err))
+    if (username) {
+      await getUser(username).then(user => {
+        this.user = user as BasicUser
+      }).catch(err => console.log(err))
+    }
+    else {
+      onLogin((err: AlertError, user: BasicUser) => {
+        if (Object.keys(user).length === 0) this.$emit("open-login");
+        else this.user = user;
+      })
+    }
   }
 })
 </script>

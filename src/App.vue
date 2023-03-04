@@ -24,7 +24,7 @@
           CTF Notes
         </v-toolbar-title>
 
-        <v-btn text class="ml-auto" @click="toggleDark">
+        <v-btn text class="ml-auto mr-2" @click="toggleDark">
           <v-icon v-if="this.$vuetify.theme.dark">
             mdi-lightbulb-on
           </v-icon>
@@ -32,8 +32,13 @@
             mdi-lightbulb-off
           </v-icon>
         </v-btn>
+        <v-btn v-if="userExists" text class="mr-2" to="users">
+          <v-icon>
+            mdi-account
+          </v-icon>
+        </v-btn>
 
-        <v-btn v-if="userExists" outlined @click="login=true" class="mx-2">
+        <v-btn v-if="!userExists" outlined @click="login=true" class="mr-2">
           Login
           <v-icon>mdi-login</v-icon>
         </v-btn>
@@ -114,7 +119,11 @@
         />
       </v-container>
       <v-container fluid :key="reRender">
-        <router-view :key="$route.fullPath" @open-register="register=true"/>
+        <router-view
+            :key="$route.fullPath"
+            @open-register="register=true"
+            @open-login="login=true"
+        />
       </v-container>
     </v-main>
   </v-app>
@@ -154,7 +163,7 @@ export default Vue.extend({
   },
   computed: {
     userExists(): boolean {
-      return Object.keys(this.user).length === 0;
+      return Object.keys(this.user).length !== 0;
     },
     routes(): Array<{
       name: string;

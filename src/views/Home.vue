@@ -2,7 +2,7 @@
   <v-container fluid class="flex-column align-center d-flex mt-8">
     <h1>Any requests made to the backend server will not work until closer to the project due date because google cloud costs money 💀</h1>
 
-    <h1 v-if="userExists"> Organise your CTF experience</h1>
+    <h1 v-if="!userExists"> Organise your CTF experience</h1>
     <h1 v-else> Welcome back, {{user.displayName}}</h1>
     <i>For the regular CTF player who loses track of the challenges they are working on</i>
     <ul class="mt-2">
@@ -18,7 +18,7 @@
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
 
-      <v-btn v-if="userExists" outlined class="mr-4 mb-2" @click="registerDialog">
+      <v-btn v-if="!userExists" outlined class="mr-4 mb-2" @click="registerDialog">
         Register
         <v-icon>mdi-login</v-icon>
       </v-btn>
@@ -45,7 +45,7 @@ export default Vue.extend({
   },
   computed: {
     userExists(): boolean {
-      return Object.keys(this.user).length === 0;
+      return Object.keys(this.user).length !== 0;
     }
   },
   methods: {

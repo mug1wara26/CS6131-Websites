@@ -6,7 +6,6 @@
       </v-card-title>
 
       <v-card-text>
-        Note: Logging in does nothing as of now <br/>
         <a @click="openRegister">Don't have an account?</a>
         <v-form ref="form">
           <v-text-field autofocus v-model="user.username" label="Username*" required/>
