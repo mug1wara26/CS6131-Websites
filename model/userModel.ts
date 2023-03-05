@@ -1,4 +1,4 @@
-import {BasicUser, User} from "../types/user";
+import {BasicUser, User} from "../types/userTypes";
 import {db} from "../db";
 import {OkPacket, RowDataPacket} from "mysql2";
 import bcrypt from "bcrypt";

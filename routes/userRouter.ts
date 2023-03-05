@@ -1,9 +1,8 @@
 import express, {Request, Response} from "express";
-import * as userModel from "../model/user"
-import {BasicUser, RegisteringUser, User} from "../types/user";
+import * as userModel from "../model/userModel"
+import {BasicUser, RegisteringUser, User} from "../types/userTypes";
 import {validate} from "class-validator";
 import bcrypt from "bcrypt"
-import {loginWithUsername} from "../model/user";
 
 const userRouter = express.Router();
 
@@ -32,11 +31,12 @@ userRouter.post("/register", async (req: Request, res: Response) => {
 
     validate(registerUser).then(errors => {
         if (errors.length > 0) {
-            const responseMessage = {"message" : ''}
-            if (errors.filter(e => e.property === 'email').length > 0) responseMessage.message = "Email not valid"
-            else responseMessage.message = "Check the information provided"
+            let responseMessage = ''
+            if (errors.filter(e => e.property === 'email').length > 0) responseMessage = "Email not valid"
+            else responseMessage = "Check the information provided"
+            console.log(errors);
 
-            res.statusMessage = responseMessage.message
+            res.statusMessage = responseMessage
             return res.status(400).end()
         }
 
@@ -67,7 +67,7 @@ userRouter.post('/login', async (req, res) => {
     const password = req.body.password
 
     if (username && password) {
-        loginWithUsername(username, password, (err: Error, token: String) => {
+        userModel.loginWithUsername(username, password, (err: Error, token: String) => {
             if (err) {
                 console.log(err);
                 res.statusMessage = err.message;
