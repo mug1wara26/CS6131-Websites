@@ -8,11 +8,10 @@
       <v-card-text>
         <a @click="openRegister">Don't have an account?</a>
         <v-form ref="form">
-          <v-text-field autofocus v-model="user.username" label="Username*" required/>
+          <v-text-field autofocus v-model="user.username" label="Username*"/>
           <v-text-field
               v-model="user.password"
               label="Password*"
-              required
               :type="showPass ? '' : 'password'"
               :append-icon="showPass? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
               @click:append="showPass = !showPass"
