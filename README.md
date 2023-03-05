@@ -1,29 +1,20 @@
 # assignment1
 
-## Project plans
-Ideas:
-1. CTF hosting site
-2. CTF notes site
-
-## Project setup
+Follow the steps below to self host this app.
+First run
 ```
 npm install
 ```
-
-### Compiles and hot-reloads for development
+In /cs6131-backend, create a .env file and add the following env vars and populate them with the appropriate values
+```
+DB_HOST=""
+DB_USER=""
+DB_PASSWORD=""
+DB_NAME=""
+JWT_SECRET_KEY=""
+```
+In both /cs6131-backend and /, run:
 ```
 npm run serve
 ```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+The app should be running for development, building the app should be trivial but the scripts are not included in the package.json
