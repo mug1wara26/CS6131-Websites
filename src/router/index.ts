@@ -8,6 +8,7 @@ import Teams from "@/views/Teams.vue";
 import WriteUps from "@/views/WriteUps.vue";
 import CTF from "@/views/CTF.vue";
 import flag from "@/views/flag.vue";
+import Team from "@/views/Team.vue";
 
 Vue.use(VueRouter)
 
@@ -41,6 +42,11 @@ const routes = [
         path: '/teams',
         name: 'teams',
         component: Teams
+    },
+    {
+        path: '/teams/:teamName',
+        name: 'team',
+        component: Team
     },
     {
         path: '/writeups',

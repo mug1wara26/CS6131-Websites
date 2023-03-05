@@ -1,20 +1,17 @@
-const teams: Array<{
-    name: string,
-    tid: string,
-    description?: string,
-    users: Array<string>
-}> = [
+import {Team} from "../../cs6131-backend/types/teamTypes";
+
+const teams: Array<Team> = [
     {
-        name: "NUSHMallows",
-        tid: "1",
+        name: "Nushmallows",
         description: "burden bear",
-        users: ["1","2"]
+        pfp: "https://dummyimage.com/578x701",
+        owner: "leblancmichelle"
     },
     {
-        name: "slight_smile",
-        tid: "2",
+        name: "Slight Smile",
         description: "maybe_maybe_not",
-        users: ["3"]
+        pfp: "https://placekitten.com/789/639",
+        owner: "xpena"
     }
 ]
 
