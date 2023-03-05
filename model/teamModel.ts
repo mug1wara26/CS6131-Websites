@@ -6,6 +6,7 @@ export const findUserTeams = (username: string, callback: Function) => {
 SELECT name, description, pfp, owner
 FROM team left join member on team.name = member.teamName
 WHERE username = ?
+ORDER BY name
     `
 
     db.query(
