@@ -3,7 +3,7 @@ import {RowDataPacket} from "mysql2";
 
 export const findUserTeams = (username: string, callback: Function) => {
     const queryString = `
-SELECT teamName, description, pfp, owner
+SELECT name, description, pfp, owner
 FROM team left join member on team.name = member.teamName
 WHERE username = ?
     `
