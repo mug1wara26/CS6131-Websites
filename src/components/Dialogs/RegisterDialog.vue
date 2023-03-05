@@ -45,8 +45,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {register, userExists} from "@/api";
-import {RegisteringUser} from "@/../cs6131-backend/types/user";
+import {register, userExists} from "@/api/userApi";
+import {RegisteringUser} from "@/../cs6131-backend/types/userTypes";
 
 export default Vue.extend({
   data() {

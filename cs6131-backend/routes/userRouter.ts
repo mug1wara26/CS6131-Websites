@@ -1,9 +1,8 @@
 import express, {Request, Response} from "express";
-import * as userModel from "../model/user"
-import {BasicUser, RegisteringUser, User} from "../types/user";
+import * as userModel from "../model/userModel"
+import {BasicUser, RegisteringUser, User} from "../types/userTypes";
 import {validate} from "class-validator";
 import bcrypt from "bcrypt"
-import {loginWithUsername} from "../model/user";
 
 const userRouter = express.Router();
 
@@ -68,7 +67,7 @@ userRouter.post('/login', async (req, res) => {
     const password = req.body.password
 
     if (username && password) {
-        loginWithUsername(username, password, (err: Error, token: String) => {
+        userModel.loginWithUsername(username, password, (err: Error, token: String) => {
             if (err) {
                 console.log(err);
                 res.statusMessage = err.message;

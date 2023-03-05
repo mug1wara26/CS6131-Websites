@@ -109,7 +109,7 @@
     </v-dialog>
 
     <v-main>
-      <v-container class="d-flex justify-center mt-2">
+      <v-container class="d-flex justify-center">
         <Alert
             :type="alertShown"
             :value="alertShown !== ''"
@@ -134,8 +134,8 @@ import Vue from "vue"
 import RegisterDialog from "@/components/Dialogs/RegisterDialog.vue";
 import LoginDialog from "@/components/Dialogs/LoginDialog.vue";
 import Alert from "@/components/Alerts/Alert.vue";
-import {BasicUser} from "../cs6131-backend/types/user";
-import {AlertError, login, onLogin} from "@/api";
+import {BasicUser} from "../cs6131-backend/types/userTypes";
+import {AlertError, login, onLogin} from "@/api/userApi";
 import {setCookie} from "typescript-cookie";
 
 if (process.env.NODE_ENV === 'production') {

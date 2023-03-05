@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {login} from "@/api";
+import {login} from "@/api/userApi";
 import { setCookie } from "typescript-cookie"
 
 export default Vue.extend({

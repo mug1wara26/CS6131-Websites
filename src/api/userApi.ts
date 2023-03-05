@@ -1,4 +1,4 @@
-import {BasicUser, RegisteringUser} from "../cs6131-backend/types/user";
+import {BasicUser, RegisteringUser} from "../../cs6131-backend/types/userTypes";
 import Vue from "vue";
 import {getCookie, removeCookie} from "typescript-cookie";
 import jwt_decode from "jwt-decode";

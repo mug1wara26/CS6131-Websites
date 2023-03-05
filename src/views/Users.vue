@@ -28,8 +28,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {BasicUser} from "../../cs6131-backend/types/user";
-import {AlertError, getUser, onLogin} from "@/api";
+import {BasicUser} from "../../cs6131-backend/types/userTypes";
+import {AlertError, getUser, onLogin} from "@/api/userApi";
 
 export default Vue.extend({
   name: "Users",
