@@ -91,7 +91,7 @@
       <register-dialog
           @close-dialog="register=false"
           @open-login="login=true"
-          @register-success="showAlert('success', 'Register Successful','Please login with your registered info')"
+          @register-success="(data) => {onRegister(data.username, data.password, data.displayName)}"
           @register-error="(err) => {showAlert('error', 'Register Error', err)}"
       />
     </v-dialog>
@@ -135,7 +135,8 @@ import RegisterDialog from "@/components/Dialogs/RegisterDialog.vue";
 import LoginDialog from "@/components/Dialogs/LoginDialog.vue";
 import Alert from "@/components/Alerts/Alert.vue";
 import {BasicUser} from "../cs6131-backend/types/user";
-import {AlertError, onLogin} from "@/api";
+import {AlertError, login, onLogin} from "@/api";
+import {setCookie} from "typescript-cookie";
 
 if (process.env.NODE_ENV === 'production') {
   console.log("Running in production")
@@ -182,22 +183,17 @@ export default Vue.extend({
           icon: "mdi-magnify",
         },
         {
-          name: "User",
-          route: "/users",
-          icon: "mdi-account",
-        },
-        {
-          name: "Teams",
+          name: "My Teams",
           route: "/teams",
           icon: "mdi-account-group",
         },
         {
-          name: "CTFs",
+          name: "My CTFs",
           route: "/ctfs",
           icon: "mdi-flag",
         },
         {
-          name: "Write Ups",
+          name: "My Write Ups",
           route: "/writeups",
           icon: "mdi-file-document",
         },
@@ -225,6 +221,15 @@ export default Vue.extend({
       setTimeout(() => {
         this.alertShown = ""
       }, 3000)
+    },
+    onRegister(username: string, password: string, displayName: string) {
+      login(username, password).then(res => {
+        setCookie('token', res, {sameSite: "lax"});
+        this.onLogin();
+        this.showAlert('success', 'Register Successful',`Welcome ${displayName}`)
+      }).catch(() => {
+        this.showAlert("error", "Login Error","Please try logging in again")
+      })
     },
     onLogin() {
       onLogin((err: AlertError, user: BasicUser) => {

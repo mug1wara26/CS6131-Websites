@@ -32,11 +32,12 @@ userRouter.post("/register", async (req: Request, res: Response) => {
 
     validate(registerUser).then(errors => {
         if (errors.length > 0) {
-            const responseMessage = {"message" : ''}
-            if (errors.filter(e => e.property === 'email').length > 0) responseMessage.message = "Email not valid"
-            else responseMessage.message = "Check the information provided"
+            let responseMessage = ''
+            if (errors.filter(e => e.property === 'email').length > 0) responseMessage = "Email not valid"
+            else responseMessage = "Check the information provided"
+            console.log(errors);
 
-            res.statusMessage = responseMessage.message
+            res.statusMessage = responseMessage
             return res.status(400).end()
         }
 

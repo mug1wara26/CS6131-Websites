@@ -95,5 +95,5 @@ export const onLogin = (callback: Function) => {
             callback({errorType: "error", errorTitle: "Login Error", errorText: "Please login again"} as AlertError);
         }
     }
-    callback(null, {} as BasicUser)
+    else callback(null, {} as BasicUser)
 }

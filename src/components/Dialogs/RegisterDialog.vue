@@ -92,8 +92,7 @@ export default Vue.extend({
           (password: string | null) => (password && password.length < 1024) || 'Password too long',
           (password: string | null) => (password && /[A-Z]/.test(password)) || 'Password must contain at least one uppercase letter',
           (password: string | null) => (password && /[a-z]/.test(password)) || 'Password must contain at least one lowercase letter',
-          (password: string | null) => (password && /\d/.test(password)) || 'Password must contain at least one number',
-          (password: string | null) => (password && /[@$!%*#?&]/.test(password)) || 'Password must contain at least one special character (@$!%*#?&)',
+          (password: string | null) => (password && /\d/.test(password)) || 'Password must contain at least one number'
         ],
         emailRules: [
           (email: string | null) => !!email || 'Email is required',
@@ -102,18 +101,19 @@ export default Vue.extend({
         ],
         displayNameRules: [
           (displayName: string | null) => !!displayName || 'Display name is required',
-          (displayName: string | null) => (displayName && displayName.length >= 3 && displayName.length < 32) || 'Display name must be between 3 and 32 characters'
+          (displayName: string | null) => (displayName && displayName.length >= 3 && displayName.length < 32) || 'Display name must be between 3 and 32 characters',
+          (displayName: string | null) => (displayName && /^[a-zA-Z0-9_]*$/.test(displayName) || 'Only alphanumeric characters are allowed')
         ],
         usernameRules: [
           (username: string | null) => !!username || 'Username is required',
-          (username: string | null) => (username && username.length > 6 && username.length < 32) || 'Username must be between 6 and 32 characters'
+          (username: string | null) => (username && username.length > 6 && username.length < 32) || 'Username must be between 6 and 32 characters',
+          (username: string | null) => (username && /^[a-zA-Z0-9_]*$/.test(username) || 'Only alphanumeric characters are allowed')
         ],
       };
 
       this.$nextTick(() => {
         //NOW trigger validation
         if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
-          console.log(JSON.stringify(this.user))
           this.register();
         }
       })
@@ -130,15 +130,17 @@ export default Vue.extend({
         if (!res) {
           register(registeringUser).then(res => {
             // eslint-disable-next-line no-unused-vars
-            if (res.status === 200) res.json().then(data => {
-              this.$emit('register-success')
-            });
+            if (res.status === 200) {
+              this.$emit('register-success', {username: registeringUser.username, password: registeringUser.password, displayName: registeringUser.displayName});
+            }
             else if (res.status === 400) this.$emit('register-error', res.statusText);
-            else this.$emit('register-error', "Unknown error, please try again")
+            else this.$emit('register-error', "Unknown error, please try again");
+            this.onClose();
           })
+        } else {
+          this.$emit('register-error', 'Username taken');
+          this.onClose();
         }
-        else this.$emit('register-error', 'Username taken')
-        this.onClose();
       })
     }
   },
