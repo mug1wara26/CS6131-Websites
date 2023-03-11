@@ -10,8 +10,7 @@ userRouter.get("/:username", async (req: Request, res: Response) => {
     const username = req.params.username;
     userModel.findOne(username, (err: Error, user: User) => {
         if (err) {
-            res.statusMessage = 'User does not exist'
-            return res.status(400).end();
+            return res.status(200).json({'data': {}});
         }
         else {
             const {hash, ...basicUser} = user;
