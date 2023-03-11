@@ -55,6 +55,7 @@ export default Vue.extend({
   mounted() {
     onLogin((_: AlertData, user: BasicUser) => {
       if (user) this.user = user;
+      else this.user = {} as BasicUser
     })
   }
 })

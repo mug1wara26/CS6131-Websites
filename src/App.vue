@@ -32,7 +32,7 @@
             mdi-lightbulb-off
           </v-icon>
         </v-btn>
-        <v-btn v-if="userExists" text class="mr-2" to="users">
+        <v-btn v-if="userExists" text class="mr-2" to="/users">
           <v-icon>
             mdi-account
           </v-icon>
@@ -80,7 +80,31 @@
           </template>
           <span>{{ item.name }}</span>
         </v-tooltip>
+
       </v-list>
+
+      <template v-slot:append v-if="userExists">
+        <div class="pa-2">
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                  text
+                  auto-height
+                  depressed
+                  rounded
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="logout"
+              >
+                <v-icon>
+                  mdi-logout
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>Logout</span>
+          </v-tooltip>
+        </div>
+      </template>
     </v-navigation-drawer>
 
 
@@ -111,11 +135,11 @@
     <v-main>
       <v-container class="d-flex justify-center">
         <Alert v-if="alertShown !== ''"
-            :type="alertShown"
-            :value="alertShown !== ''"
-            :width="alertWidth"
-            :title="alertTitle"
-            :text="alertText"
+               :type="alertShown"
+               :value="alertShown !== ''"
+               :width="alertWidth"
+               :title="alertTitle"
+               :text="alertText"
         />
       </v-container>
       <v-container fluid :key="reRender">
@@ -136,7 +160,7 @@ import LoginDialog from "@/components/Dialogs/LoginDialog.vue";
 import Alert from "@/components/Alerts/Alert.vue";
 import {BasicUser} from "../cs6131-backend/types/userTypes";
 import {login, onLogin} from "@/api/userApi";
-import {setCookie} from "typescript-cookie";
+import {removeCookie, setCookie} from "typescript-cookie";
 import {AlertData} from "@/schemas/alertData";
 
 if (process.env.NODE_ENV === 'production') {
@@ -227,9 +251,9 @@ export default Vue.extend({
       login(username, password).then(res => {
         setCookie('token', res, {sameSite: "lax"});
         this.onLogin();
-        this.showAlert('success', 'Register Successful',`Welcome ${displayName}`)
+        this.showAlert('success', 'Register Successful', `Welcome ${displayName}`)
       }).catch(() => {
-        this.showAlert("error", "Login Error","Please try logging in again")
+        this.showAlert("error", "Login Error", "Please try logging in again")
       })
     },
     onLogin() {
@@ -240,6 +264,12 @@ export default Vue.extend({
           this.reRender++; // Re-renders router view so that user login is reflected.
         }
       })
+    },
+    logout() {
+      removeCookie('token')
+      this.user = {} as BasicUser
+      this.$router.push({ path: 'home' })
+      this.reRender++
     }
   },
   mounted() {
@@ -247,7 +277,7 @@ export default Vue.extend({
       this.windowWidth = window.innerWidth;
     }
     onLogin((err: AlertData, user: BasicUser) => {
-      if(err) this.showAlert(err.alertType, err.alertTitle, err.alertText)
+      if (err) this.showAlert(err.alertType, err.alertTitle, err.alertText)
       else this.user = user;
     })
   },
