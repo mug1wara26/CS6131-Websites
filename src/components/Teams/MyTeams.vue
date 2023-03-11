@@ -1,13 +1,16 @@
 <template>
-  <v-container fluid v-if="teams.length !== 0">
+  <v-container fluid>
 
-    <v-btn color="green" @click="create = true" :disabled="teams.length >= 10">
+    <v-btn color="green" @click="create = true" :disabled="teams.length >= 10 || !loaded">
       Create <v-icon class="ml-1">group_add</v-icon>
     </v-btn>
 
-    <v-btn color="primary" class="ml-3" >
+    <v-btn color="primary" class="ml-3" to="/search?q=teams">
       Search <v-icon>mdi-magnify</v-icon>
     </v-btn>
+
+    <p v-if="teams.length === 0 && loaded" class="d-flex justify-center">You are not part of any teams, consider creating one or searching for one to join</p>
+    <v-progress-circular v-if="!loaded" indeterminate class="d-flex justify-center mx-auto"/>
 
     <v-row class="mt-2">
       <v-col lg="10" sm="12">
@@ -48,6 +51,7 @@ export default Vue.extend({
     return {
       teams: [] as Array<Team>,
       create: false,
+      loaded: false,
     }
   },
   methods: {
@@ -62,9 +66,10 @@ export default Vue.extend({
       }
     }
   },
-  async created() {
-    await getUserTeams().then(data => {
+  created() {
+    getUserTeams().then(data => {
       this.teams = data
+      this.loaded = true
     });
   }
 });
