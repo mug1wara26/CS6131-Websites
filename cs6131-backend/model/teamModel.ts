@@ -64,19 +64,25 @@ export const create = (team: Team, callback: Function) => {
         else {
             exists(team.name, (teamName: string) => {
                 if (!teamName) {
-                    const querystring = `
+                    findUserTeams(team.owner, (err: Error, teams: Array<Team>) => {
+                        if (err) callback(err)
+                        else if (teams.length >= 10) callback(new Error('User has reached max number of teams'))
+                        else {
+                            const querystring = `
 INSERT INTO team
 VALUES(?,?,?,?,?);
                     `
 
-                    db.query(
-                        querystring,
-                        [team.name, team.description, team.pfp, team.public, team.owner],
-                        (err, result) => {
-                            if (err) callback(err);
-                            else callback(null)
+                            db.query(
+                                querystring,
+                                [team.name, team.description, team.pfp, team.public, team.owner],
+                                (err, result) => {
+                                    if (err) callback(err);
+                                    else callback(null)
+                                }
+                            )
                         }
-                    )
+                    })
                 }
                 else callback(new Error('Team Name already exists'))
             })

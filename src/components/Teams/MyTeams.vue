@@ -1,11 +1,11 @@
 <template>
   <v-container fluid v-if="teams.length !== 0">
 
-    <v-btn color="green" @click="create = true">
+    <v-btn color="green" @click="create = true" :disabled="teams.length >= 10">
       Create <v-icon class="ml-1">group_add</v-icon>
     </v-btn>
 
-    <v-btn color="primary" class="ml-3">
+    <v-btn color="primary" class="ml-3" >
       Search <v-icon>mdi-magnify</v-icon>
     </v-btn>
 
@@ -52,7 +52,14 @@ export default Vue.extend({
   },
   methods: {
     onCreate(team: Team) {
-      this.teams.push(team)
+      for (const key in this.teams) {
+        console.log(key)
+        if (this.teams[key].name.localeCompare(team.name) > 0) {
+          this.teams.splice(parseInt(key), 0, team)
+          break
+        }
+        if (parseInt(key) === this.teams.length - 1) this.teams.push(team)
+      }
     }
   },
   async created() {
