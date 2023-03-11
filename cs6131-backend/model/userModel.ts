@@ -26,7 +26,7 @@ export const findOne = (username: String, callback: Function) => {
     const queryString = `
     SELECT *
     from user
-    where username=?
+    where BINARY username=?
     `
 
     db.query(

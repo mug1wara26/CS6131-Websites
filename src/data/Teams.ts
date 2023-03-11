@@ -5,13 +5,15 @@ const teams: Array<Team> = [
         name: "Nushmallows",
         description: "burden bear",
         pfp: "https://dummyimage.com/578x701",
-        owner: "leblancmichelle"
+        public: true,
+        owner: "hrivera"
     },
     {
         name: "Slight Smile",
         description: "maybe_maybe_not",
         pfp: "https://placekitten.com/789/639",
-        owner: "xpena"
+        public: true,
+        owner: "crawfordscott"
     }
 ]
 

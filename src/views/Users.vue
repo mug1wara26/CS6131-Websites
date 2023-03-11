@@ -29,7 +29,8 @@
 <script lang="ts">
 import Vue from "vue";
 import {BasicUser} from "../../cs6131-backend/types/userTypes";
-import {AlertError, getUser, onLogin} from "@/api/userApi";
+import {getUser, onLogin} from "@/api/userApi";
+import {AlertData} from "@/schemas/alertData";
 
 export default Vue.extend({
   name: "Users",
@@ -51,7 +52,7 @@ export default Vue.extend({
       }).catch(err => console.log(err))
     }
     else {
-      onLogin((err: AlertError, user: BasicUser) => {
+      onLogin((err: AlertData, user: BasicUser) => {
         if (Object.keys(user).length === 0) this.$emit("open-login");
         else this.user = user;
       })

@@ -22,10 +22,11 @@
 <script lang="ts">
 import Vue from "vue";
 import {BasicUser} from "../../cs6131-backend/types/userTypes";
-import {AlertError, onLogin} from "@/api/userApi";
+import {onLogin} from "@/api/userApi";
 import MyTeams from "@/components/Teams/MyTeams.vue";
 import RequestingTeams from "@/components/Teams/RequestingTeams.vue";
 import InvitedTeams from "@/components/Teams/InvitedTeams.vue";
+import {AlertData} from "@/schemas/alertData";
 
 export default Vue.extend({
   name: "Teams",
@@ -48,7 +49,7 @@ export default Vue.extend({
     },
   },
   async created() {
-    onLogin((err: AlertError, user: BasicUser) => {
+    onLogin((err: AlertData, user: BasicUser) => {
       if (Object.keys(user).length === 0) this.$emit("open-login");
       else this.user = user;
     })

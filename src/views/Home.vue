@@ -32,8 +32,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {AlertError, onLogin} from "@/api/userApi";
+import {onLogin} from "@/api/userApi";
 import {BasicUser} from "../../cs6131-backend/types/userTypes";
+import {AlertData} from "@/schemas/alertData";
 
 export default Vue.extend({
   data() {
@@ -52,7 +53,7 @@ export default Vue.extend({
     }
   },
   mounted() {
-    onLogin((_: AlertError, user: BasicUser) => {
+    onLogin((_: AlertData, user: BasicUser) => {
       if (user) this.user = user;
     })
   }

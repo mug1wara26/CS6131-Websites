@@ -1,12 +1,12 @@
 // @ts-nocheck
-import {Length, IsEmail, IsUrl, IsOptional, IsAlphanumeric, IsStrongPassword} from "class-validator"
+import {Length, IsEmail, IsUrl, IsOptional, IsStrongPassword, Matches} from "class-validator"
 
 export class BasicUser {
     @Length(6, 32)
-    @IsAlphanumeric()
+    @Matches(/^[A-Za-z0-9_]*$/)
     username: string;
     @Length(3,32)
-    @IsAlphanumeric()
+    @Matches(/^[A-Za-z0-9_\s]*$/)
     displayName: string;
     @IsEmail()
     email: string;

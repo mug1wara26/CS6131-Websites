@@ -2,6 +2,7 @@ import {BasicUser, RegisteringUser} from "../../cs6131-backend/types/userTypes";
 import Vue from "vue";
 import {getCookie, removeCookie} from "typescript-cookie";
 import jwt_decode from "jwt-decode";
+import {AlertData} from "@/schemas/alertData";
 
 export const register = (user: RegisteringUser): Promise<Response> => {
     return new Promise<Response>((resolve, reject) => {
@@ -37,10 +38,9 @@ export const getUser = (username: string): Promise<BasicUser> => {
 
 export const userExists = (username: string): Promise<boolean> => {
     return new Promise<boolean>(resolve => {
-        getUser(username).then(_ => {
-            resolve(true)
-        }).catch(_ => {
-            return resolve(false)
+        getUser(username).then(data => {
+            if (Object.keys(data).length === 0) resolve(false)
+            else resolve(true)
         })
     });
 }
@@ -68,12 +68,6 @@ export const login = (username: string, password: string): Promise<string> => {
     });
 }
 
-export interface AlertError {
-    errorType: string;
-    errorTitle: string;
-    errorText: string;
-}
-
 export const onLogin = (callback: Function) => {
     const token = getCookie('token');
     if (token) {
@@ -87,12 +81,12 @@ export const onLogin = (callback: Function) => {
             }
             else {
                 removeCookie('token')
-                callback({errorType: "error", errorTitle: "Login Error", errorText: "Please login again"} as AlertError);
+                callback({alertType: "error", alertTitle: "Login Error", alertText: "Please login again"} as AlertData);
             }
         }
         catch {
             removeCookie('token')
-            callback({errorType: "error", errorTitle: "Login Error", errorText: "Please login again"} as AlertError);
+            callback({alertType: "error", alertTitle: "Login Error", alertText: "Please login again"} as AlertData);
         }
     }
     else callback(null, {} as BasicUser)

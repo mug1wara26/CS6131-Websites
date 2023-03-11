@@ -110,7 +110,7 @@
 
     <v-main>
       <v-container class="d-flex justify-center">
-        <Alert
+        <Alert v-if="alertShown !== ''"
             :type="alertShown"
             :value="alertShown !== ''"
             :width="alertWidth"
@@ -135,8 +135,9 @@ import RegisterDialog from "@/components/Dialogs/RegisterDialog.vue";
 import LoginDialog from "@/components/Dialogs/LoginDialog.vue";
 import Alert from "@/components/Alerts/Alert.vue";
 import {BasicUser} from "../cs6131-backend/types/userTypes";
-import {AlertError, login, onLogin} from "@/api/userApi";
+import {login, onLogin} from "@/api/userApi";
 import {setCookie} from "typescript-cookie";
+import {AlertData} from "@/schemas/alertData";
 
 if (process.env.NODE_ENV === 'production') {
   console.log("Running in production")
@@ -232,8 +233,8 @@ export default Vue.extend({
       })
     },
     onLogin() {
-      onLogin((err: AlertError, user: BasicUser) => {
-        if (err) this.showAlert(err.errorType, err.errorTitle, err.errorText);
+      onLogin((err: AlertData, user: BasicUser) => {
+        if (err) this.showAlert(err.alertType, err.alertTitle, err.alertText);
         else {
           this.user = user;
           this.reRender++; // Re-renders router view so that user login is reflected.
@@ -245,9 +246,14 @@ export default Vue.extend({
     window.onresize = () => {
       this.windowWidth = window.innerWidth;
     }
-    onLogin((err: AlertError, user: BasicUser) => {
-      if(err) this.showAlert(err.errorType, err.errorTitle, err.errorText)
+    onLogin((err: AlertData, user: BasicUser) => {
+      if(err) this.showAlert(err.alertType, err.alertTitle, err.alertText)
       else this.user = user;
+    })
+  },
+  created() {
+    this.$root.$on('showAlert', (alertData: AlertData) => {
+      this.showAlert(alertData.alertType, alertData.alertTitle, alertData.alertText)
     })
   },
 });

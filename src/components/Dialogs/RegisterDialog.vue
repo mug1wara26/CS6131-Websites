@@ -102,12 +102,12 @@ export default Vue.extend({
         displayNameRules: [
           (displayName: string | null) => !!displayName || 'Display name is required',
           (displayName: string | null) => (displayName && displayName.length >= 3 && displayName.length < 32) || 'Display name must be between 3 and 32 characters',
-          (displayName: string | null) => (displayName && /^[a-zA-Z0-9_]*$/.test(displayName) || 'Only alphanumeric characters are allowed')
+          (displayName: string | null) => (displayName && /^[a-zA-Z0-9_\s]*$/.test(displayName) || 'Only alphanumeric characters, underscores and spaces are allowed')
         ],
         usernameRules: [
           (username: string | null) => !!username || 'Username is required',
           (username: string | null) => (username && username.length > 6 && username.length < 32) || 'Username must be between 6 and 32 characters',
-          (username: string | null) => (username && /^[a-zA-Z0-9_]*$/.test(username) || 'Only alphanumeric characters are allowed')
+          (username: string | null) => (username && /^[a-zA-Z0-9_]*$/.test(username) || 'Only alphanumeric characters and underscores are allowed')
         ],
       };
 
@@ -129,7 +129,6 @@ export default Vue.extend({
       userExists(registeringUser.username).then(res => {
         if (!res) {
           register(registeringUser).then(res => {
-            // eslint-disable-next-line no-unused-vars
             if (res.status === 200) {
               this.$emit('register-success', {username: registeringUser.username, password: registeringUser.password, displayName: registeringUser.displayName});
             }

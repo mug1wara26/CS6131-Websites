@@ -27,6 +27,8 @@
     >
       <CreateTeamDialog
           :teamsProp="teams"
+          @close-dialog="create = false"
+          @on-create="(team) => onCreate(team)"
       />
     </v-dialog>
   </v-container>
@@ -37,7 +39,7 @@ import Vue from "vue";
 import {getUserTeams} from "@/api/teamApi";
 import {Team} from "../../../cs6131-backend/types/teamTypes";
 import TeamSearchCard from "@/components/SearchCards/TeamSearchCard.vue";
-import CreateTeamDialog from "@/components/Alerts/CreateTeamDialog.vue";
+import CreateTeamDialog from "@/components/Dialogs/CreateTeamDialog.vue";
 
 export default Vue.extend({
   name: "MyTeams",
@@ -46,6 +48,11 @@ export default Vue.extend({
     return {
       teams: [] as Array<Team>,
       create: false,
+    }
+  },
+  methods: {
+    onCreate(team: Team) {
+      this.teams.push(team)
     }
   },
   async created() {
