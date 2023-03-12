@@ -5,8 +5,7 @@ import {BasicUser, User} from "../types/userTypes";
 import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
 import {validate} from "class-validator";
-import {findOne} from "../model/userModel";
-import {create} from "../model/teamModel";
+import {create, findUserTeams} from "../model/teamModel";
 dotenv.config();
 
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
@@ -58,8 +57,30 @@ teamRouter.post('/create', async (req: Request, res: Response) => {
 
 teamRouter.get("/:name", async (req: Request, res: Response) => {
     const name = req.params.name
-    teamModel.exists(name, (name: string) => {
-        return res.status(200).json({'teamName': name})
+    teamModel.findOne(name, (err: Error, team: Team) => {
+        if (team) {
+            if (team.public) return res.status(200).json(team);
+            else {
+                const token = req.header('Authorization')
+                if (token) {
+                    jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+                        if (err) return res.status(400).end()
+                        else {
+                            const user = decoded as BasicUser;
+                            findUserTeams(user.username, (err: Error, teams: Array<Team>) => {
+                                if (err) return res.status(400).end()
+                                else {
+                                    if (teams.filter(team => team.name === name).length !== 0) return res.status(200).json(team)
+                                    else return res.status(200).json({name: team.name, hasAccess: false})
+                                }
+                            })
+                        }
+                    })
+                }
+                else return res.status(200).json({name: team.name, hasAccess: false})
+            }
+        }
+        else return res.status(400).end();
     })
 })
 

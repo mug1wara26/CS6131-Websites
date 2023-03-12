@@ -50,6 +50,7 @@ export default Vue.extend({
   },
   async created() {
     onLogin((err: AlertData, user: BasicUser) => {
+      if (err) this.$root.$emit('alert', err)
       if (Object.keys(user).length === 0) this.$emit("open-login");
       else this.user = user;
     })

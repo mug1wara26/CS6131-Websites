@@ -1,6 +1,7 @@
 import {RegisteringTeam, Team} from "../../cs6131-backend/types/teamTypes";
 import Vue from "vue";
 import {getCookie} from "typescript-cookie";
+import team from "@/views/Team.vue";
 
 export const getUserTeams = (): Promise<Array<Team>> => {
     return new Promise<Array<Team>>((resolve, reject) => {
@@ -20,16 +21,16 @@ export const getUserTeams = (): Promise<Array<Team>> => {
     })
 }
 
-export const teamExists = (name: string): Promise<string> => {
-    return new Promise<string>(resolve => {
+export const teamExists = (name: string): Promise<boolean> => {
+    return new Promise<boolean>(resolve => {
         fetch(`${Vue.prototype.$apilink}/teams/${name}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             }
-        }).then(res => res.json()).then(value => {
-            if (value === {}) resolve("")
-            else resolve(value.teamName)
+        }).then(res => {
+            if (res.status === 200) resolve(true);
+            else resolve(false)
         })
     })
 }
@@ -45,5 +46,25 @@ export const createTeam = (team: RegisteringTeam, token: string): Promise<Respon
             },
             body: JSON.stringify(team)
         }).then(res => resolve(res))
+    })
+}
+
+export const getTeam = (name: string, token?: string): Promise<Team> => {
+    const headers: Record<string, any> = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+    }
+    if (token) headers['Authorization'] = token
+    return new Promise<Team>(resolve => {
+        fetch(`${Vue.prototype.$apilink}/teams/${name}`, {
+            method: 'GET',
+            headers: headers
+        }).then(res => {
+            if (res.status === 200) return res.json()
+            else resolve({} as Team)
+        }).then(data => {
+            if (data.hasAccess === false) resolve({} as Team)
+            else resolve(data as Team)
+        })
     })
 }

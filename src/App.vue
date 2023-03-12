@@ -147,6 +147,7 @@
             :key="$route.fullPath"
             @open-register="register=true"
             @open-login="login=true"
+            @alert="(alertData) => showAlert(alertData.alertType, alertData.alertTitle, alertData.alertText)"
         />
       </v-container>
     </v-main>
@@ -282,7 +283,7 @@ export default Vue.extend({
     })
   },
   created() {
-    this.$root.$on('showAlert', (alertData: AlertData) => {
+    this.$root.$on('alert', (alertData: AlertData) => {
       this.showAlert(alertData.alertType, alertData.alertTitle, alertData.alertText)
     })
   },

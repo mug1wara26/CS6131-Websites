@@ -1,6 +1,6 @@
 import {db} from "../db";
 import {RowDataPacket} from "mysql2";
-import {findOne} from "./userModel";
+import * as userModel from "./userModel";
 import {User} from "../types/userTypes";
 import {Team} from "../types/teamTypes";
 
@@ -24,11 +24,11 @@ ORDER BY name
     )
 }
 
-export const findOnePublic = (name: string, callback: Function) => {
+export const findOne = (name: string, callback: Function) => {
     const queryString = `
 SELECT *
 FROM team
-where name = ? and public
+where BINARY name = ?
     `
 
     db.query(
@@ -52,14 +52,14 @@ WHERE BINARY name = ?
         name,
         (err, result) => {
             const name = (<RowDataPacket> result)[0];
-            if (name) callback(name.name)
+            if (name) callback(name)
             else callback("")
         }
     )
 }
 
 export const create = (team: Team, callback: Function) => {
-    findOne(team.owner, (err: Error, user: User) => {
+    userModel.findOne(team.owner, (err: Error, user: User) => {
         if (err) callback(new Error('User does not exist'))
         else {
             exists(team.name, (teamName: string) => {

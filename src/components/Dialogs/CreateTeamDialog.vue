@@ -68,7 +68,10 @@ export default Vue.extend({
       this.loading = false
       this.nameRules.length = 0;
       this.$emit('close-dialog');
-      (this.$refs.form as any).reset()
+      // Note that we cant just reset the form otherwise it clears the radio group as well
+      this.name = ''
+      this.description = ''
+      this.link = ''
     },
     onCreate() {
       this.loading = true;
@@ -81,7 +84,7 @@ export default Vue.extend({
       ];
 
       teamExists(this.name).then(value => {
-        if (value) this.existingTeams.push(value)
+        if (value) this.existingTeams.push(this.name)
       }).finally(() => {
         this.$nextTick(() => {
           if((this.$refs.form as Vue & { validate: () => boolean }).validate()) this.createTeam();
@@ -99,9 +102,9 @@ export default Vue.extend({
       const token = getCookie('token')
 
       if (token) createTeam(team as RegisteringTeam, token).then(res => {
-        if (res.status === 400) this.$root.$emit('showAlert', {alertType: 'error', alertTitle: 'Error creating team', alertText: res.statusText})
+        if (res.status === 400) this.$root.$emit('alert', {alertType: 'error', alertTitle: 'Error creating team', alertText: res.statusText})
         else {
-          this.$root.$emit('showAlert', {alertType: 'success', alertTitle: `${team.name} created`})
+          this.$root.$emit('alert', {alertType: 'success', alertTitle: `${team.name} created`})
           team.owner = JSON.parse(atob(token.split('.')[1])).username
           this.$emit('on-create', team as Team)
         }
