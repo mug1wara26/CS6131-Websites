@@ -5,7 +5,6 @@ import {BasicUser, User} from "../types/userTypes";
 import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
 import {validate} from "class-validator";
-import {create, findUserTeams} from "../model/teamModel";
 dotenv.config();
 
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
@@ -40,7 +39,7 @@ teamRouter.post('/create', async (req: Request, res: Response) => {
                        return res.status(400).end()
                    }
                    else {
-                       create(team, (err: Error) => {
+                       teamModel.create(team, (err: Error) => {
                            if (err) {
                                res.statusMessage = err.message;
                                return res.status(400).end()
@@ -67,7 +66,7 @@ teamRouter.get("/:name", async (req: Request, res: Response) => {
                         if (err) return res.status(400).end()
                         else {
                             const user = decoded as BasicUser;
-                            findUserTeams(user.username, (err: Error, teams: Array<Team>) => {
+                            teamModel.findUserTeams(user.username, (err: Error, teams: Array<Team>) => {
                                 if (err) return res.status(400).end()
                                 else {
                                     if (teams.filter(team => team.name === name).length !== 0) return res.status(200).json(team)
@@ -84,7 +83,8 @@ teamRouter.get("/:name", async (req: Request, res: Response) => {
     })
 })
 
-teamRouter.post("/userTeams", async (req: Request, res: Response) => {
+// TODO: If no token given, return all teams that are public
+teamRouter.get("/userTeams/:username", async (req: Request, res: Response) => {
     const token = req.header('Authorization')
     if (token) {
         jwt.verify(token, SECRET_KEY!, (err, decoded) => {
