@@ -14,7 +14,7 @@
               </v-avatar>
               <h3 class="ml-4"> {{ user.username }} </h3>
             </v-card-title>
-            <v-card-subtitle class="mt-2"> {{ user.email }} </v-card-subtitle>
+            <v-card-subtitle class="mt-2"> {{ user.email }}</v-card-subtitle>
             <v-divider/>
             <v-card-text>
               <p> {{ user.bio }} </p>
@@ -50,8 +50,7 @@ export default Vue.extend({
       await getUser(username).then(user => {
         this.user = user as BasicUser
       }).catch(err => console.log(err))
-    }
-    else {
+    } else {
       onLogin((err: AlertData, user: BasicUser) => {
         if (Object.keys(user).length === 0) this.$emit("open-login");
         else this.user = user;

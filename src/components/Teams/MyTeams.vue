@@ -46,9 +46,13 @@ import {getUserTeams} from "@/api/teamApi";
 import {Team} from "../../../cs6131-backend/types/teamTypes";
 import TeamSearchCard from "@/components/SearchCards/TeamSearchCard.vue";
 import CreateTeamDialog from "@/components/Dialogs/CreateTeamDialog.vue";
+import {BasicUser} from "../../../cs6131-backend/types/userTypes";
 
 export default Vue.extend({
   name: "MyTeams",
+  props: {
+    'user': BasicUser,
+  },
   components: {CreateTeamDialog, TeamSearchCard},
   data() {
     return {
@@ -70,7 +74,7 @@ export default Vue.extend({
     }
   },
   created() {
-    getUserTeams().then(data => {
+    getUserTeams(this.user.username).then(data => {
       this.teams = data
       this.loaded = true
     });

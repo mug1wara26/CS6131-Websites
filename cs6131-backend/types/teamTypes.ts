@@ -1,7 +1,7 @@
 // @ts-nocheck
 import {IsOptional, IsUrl, Length, Matches, ValidateIf} from "class-validator";
 
-export class RegisteringTeam {
+export class BasicTeam {
     @Length(3, 32)
     @Matches(/^[A-Za-z0-9_\s]*$/)
     name: string;
@@ -15,7 +15,7 @@ export class RegisteringTeam {
     public: boolean;
 }
 
-export class Team extends RegisteringTeam {
+export class Team extends BasicTeam {
     @Length(6, 32)
     @Matches(/^[A-Za-z0-9_]*$/)
     owner: string;

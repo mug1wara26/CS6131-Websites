@@ -15,7 +15,7 @@
           </v-btn-toggle>
         </v-toolbar>
     </v-container>
-    <component :is="selectedComponent" :userObject="user"></component>
+    <component :is="selectedComponent" :user="user"></component>
   </v-container>
 </template>
 

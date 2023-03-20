@@ -1,17 +1,17 @@
 import express from "express";
 import * as bodyParser from "body-parser";
 import {userRouter} from "./routes/userRouter";
-// @ts-ignore
 import cors from "cors";
-import {create, findUserTeams} from "./model/teamModel";
 import {teamRouter} from "./routes/teamRouter";
+import {ctfRouter} from "./routes/ctfRouter";
 
 
 const app = express();
 app.use(bodyParser.json());
 app.use(cors())
 app.use("/users", userRouter);
-app.use("/teams", teamRouter)
+app.use("/teams", teamRouter);
+app.use("/ctfs", ctfRouter)
 
 const port = process.env.PORT || 3000;
 

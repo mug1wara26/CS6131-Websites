@@ -37,7 +37,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {RegisteringTeam, Team} from "../../../cs6131-backend/types/teamTypes";
+import {BasicTeam, Team} from "../../../cs6131-backend/types/teamTypes";
 import {createTeam, teamExists} from "@/api/teamApi";
 import {getCookie} from "typescript-cookie";
 
@@ -101,7 +101,7 @@ export default Vue.extend({
       }
       const token = getCookie('token')
 
-      if (token) createTeam(team as RegisteringTeam, token).then(res => {
+      if (token) createTeam(team as BasicTeam, token).then(res => {
         if (res.status === 400) this.$root.$emit('alert', {alertType: 'error', alertTitle: 'Error creating team', alertText: res.statusText})
         else {
           this.$root.$emit('alert', {alertType: 'success', alertTitle: `${team.name} created`})

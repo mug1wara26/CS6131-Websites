@@ -1,13 +1,13 @@
-import {RegisteringTeam, Team} from "../../cs6131-backend/types/teamTypes";
+import {BasicTeam, Team} from "../../cs6131-backend/types/teamTypes";
 import Vue from "vue";
 import {getCookie} from "typescript-cookie";
 import team from "@/views/Team.vue";
 
-export const getUserTeams = (): Promise<Array<Team>> => {
+export const getUserTeams = (username: string): Promise<Array<Team>> => {
     return new Promise<Array<Team>>((resolve, reject) => {
         const token = getCookie('token') || '';
-        fetch(`${Vue.prototype.$apilink}/teams/userTeams`, {
-            method: 'POST',
+        fetch(`${Vue.prototype.$apilink}/teams/userTeams/${username}`, {
+            method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
@@ -35,7 +35,7 @@ export const teamExists = (name: string): Promise<boolean> => {
     })
 }
 
-export const createTeam = (team: RegisteringTeam, token: string): Promise<Response> => {
+export const createTeam = (team: BasicTeam, token: string): Promise<Response> => {
     return new Promise<Response>(resolve => {
         fetch(`${Vue.prototype.$apilink}/teams/create`, {
             method: 'POST',
