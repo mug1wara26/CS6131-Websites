@@ -8,7 +8,7 @@ export const findUserTeams = (username: string, callback: Function) => {
     const queryString = `
 SELECT *
 FROM team left join member on team.name = member.teamName
-WHERE username = ?
+WHERE BINARY username = ?
 ORDER BY name
     `
 
