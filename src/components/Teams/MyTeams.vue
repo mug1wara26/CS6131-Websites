@@ -63,13 +63,16 @@ export default Vue.extend({
   },
   methods: {
     onCreate(team: Team) {
-      for (const key in this.teams) {
-        console.log(key)
-        if (this.teams[key].name.localeCompare(team.name) > 0) {
-          this.teams.splice(parseInt(key), 0, team)
-          break
+      if (this.teams.length === 0) this.teams.push(team)
+      else {
+        for (const key in this.teams) {
+          console.log(key)
+          if (this.teams[key].name.localeCompare(team.name) > 0) {
+            this.teams.splice(parseInt(key), 0, team)
+            break
+          }
+          if (parseInt(key) === this.teams.length - 1) this.teams.push(team)
         }
-        if (parseInt(key) === this.teams.length - 1) this.teams.push(team)
       }
     }
   },
