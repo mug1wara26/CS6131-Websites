@@ -38,7 +38,7 @@
           </v-btn-toggle>
         </v-toolbar>
       </v-container>
-      <component :is="selectedComponent" :userObject="user"></component>
+      <component :is="selectedComponent" :team="team"></component>
     </v-container>
   </v-container>
 </template>
@@ -64,7 +64,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      team: {} as Team,
+      team: new Team(),
       user: {} as BasicUser,
       loading: true,
       toolbar_items: {'Team CTFs': 'TeamCTFs', 'Participating CTFs': 'TeamParticipate', 'Members': 'TeamMembers'},
@@ -92,7 +92,7 @@ export default Vue.extend({
         if (Object.keys(user).length !== 0) this.user = user
         const token = getCookie('token')
         getTeam(name, token).then(team => {
-          this.team = team;
+          Object.assign(this.team, team);
           this.loading = false;
           console.log(team.pfp ? team.pfp : '../../public/assets/default-pfp.webp')
         })

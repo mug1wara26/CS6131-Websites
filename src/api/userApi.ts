@@ -77,7 +77,7 @@ export const onLogin = (callback: Function) => {
             if(Object.keys(new BasicUser()).every((key) => decodedKeys.includes(key))) {
                 // eslint-disable-next-line no-unused-vars
                 const {iat, exp, ...user} =decoded as any;
-                callback(null, user);
+                callback(null, user as BasicUser);
             }
             else {
                 removeCookie('token')

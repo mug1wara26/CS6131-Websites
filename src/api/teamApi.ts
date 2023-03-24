@@ -1,7 +1,6 @@
 import {BasicTeam, Team} from "../../cs6131-backend/types/teamTypes";
 import Vue from "vue";
 import {getCookie} from "typescript-cookie";
-import team from "@/views/Team.vue";
 
 export const getUserTeams = (username: string): Promise<Array<Team>> => {
     return new Promise<Array<Team>>((resolve, reject) => {

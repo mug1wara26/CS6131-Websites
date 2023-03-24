@@ -37,7 +37,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      user: {} as BasicUser,
+      user: new BasicUser(),
       toolbar_items: {"My Teams": "MyTeams", "Requesting": "RequestingTeams", "Invited": "InvitedTeams"},
       selected: "My Teams",
       selectedComponent: "MyTeams"
@@ -52,7 +52,7 @@ export default Vue.extend({
     onLogin((err: AlertData, user: BasicUser) => {
       if (err) this.$root.$emit('alert', err)
       if (Object.keys(user).length === 0) this.$emit("open-login");
-      else this.user = user;
+      else Object.assign(this.user, user)
     })
   }
 })

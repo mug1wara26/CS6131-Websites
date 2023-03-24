@@ -32,9 +32,14 @@
 import Vue from "vue";
 import {ctf} from "../../../cs6131-backend/types/ctfTypes";
 import CTFSearchCard from "@/components/SearchCards/CTFSearchCard.vue";
+import {Team} from "../../../cs6131-backend/types/teamTypes";
+import {getTeamCTFs} from "@/api/ctfApi";
 
 export default Vue.extend({
   name: "TeamCTFs",
+  props: {
+    'team': Team,
+  },
   components: {'CTFSearchCard': CTFSearchCard},
   data() {
     return {
@@ -43,9 +48,12 @@ export default Vue.extend({
       create: false
     }
   },
+  created() {
+    getTeamCTFs(this.team.name).then(data => {
+      console.log(data[0])
+      this.ctfs = data;
+      this.loaded = true;
+    })
+  }
 });
 </script>
-
-<style scoped>
-
-</style>
