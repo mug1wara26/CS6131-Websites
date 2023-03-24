@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-btn color="green" @click="create = true" :disabled="ctfs.length >= 10 || !loaded">
+    <v-btn color="green" @click="create = true" :disabled="ctfs.length >= 10 || !loaded || team.owner !== user.username">
       Create
       <v-icon class="ml-1">group_add</v-icon>
     </v-btn>
@@ -25,6 +25,17 @@
         </v-row>
       </v-col>
     </v-row>
+
+
+    <v-dialog
+        v-model="create"
+        width="400"
+    >
+      <CreateCTFDialog
+          :ctfs="ctfs"
+          @close-dialog="create = false"
+      />
+    </v-dialog>
   </v-container>
 </template>
 
@@ -34,13 +45,16 @@ import {ctf} from "../../../cs6131-backend/types/ctfTypes";
 import CTFSearchCard from "@/components/SearchCards/CTFSearchCard.vue";
 import {Team} from "../../../cs6131-backend/types/teamTypes";
 import {getTeamCTFs} from "@/api/ctfApi";
+import {BasicUser} from "../../../cs6131-backend/types/userTypes";
+import CreateCTFDialog from "@/components/Dialogs/CreateCTFDialog.vue";
 
 export default Vue.extend({
   name: "TeamCTFs",
   props: {
     'team': Team,
+    'user': BasicUser
   },
-  components: {'CTFSearchCard': CTFSearchCard},
+  components: {CreateCTFDialog, 'CTFSearchCard': CTFSearchCard},
   data() {
     return {
       loaded: false,
@@ -50,7 +64,6 @@ export default Vue.extend({
   },
   created() {
     getTeamCTFs(this.team.name).then(data => {
-      console.log(data[0])
       this.ctfs = data;
       this.loaded = true;
     })

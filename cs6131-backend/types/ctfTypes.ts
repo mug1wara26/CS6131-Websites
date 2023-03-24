@@ -3,7 +3,7 @@ export class ctf {
     id: string;
     name: string;
     teamCreator: string;
-    date: number;
+    date: string;
     format: string;
     url: string;
     description: string;
