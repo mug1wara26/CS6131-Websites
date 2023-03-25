@@ -29,11 +29,13 @@
 
     <v-dialog
         v-model="create"
-        width="400"
+        width="500"
     >
       <CreateCTFDialog
           :ctfs="ctfs"
+          :team="team"
           @close-dialog="create = false"
+          @ctf-created="(ctf) => ctfs.push(ctf)"
       />
     </v-dialog>
   </v-container>
@@ -41,7 +43,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {ctf} from "../../../cs6131-backend/types/ctfTypes";
+import {CTF} from "../../../cs6131-backend/types/ctfTypes";
 import CTFSearchCard from "@/components/SearchCards/CTFSearchCard.vue";
 import {Team} from "../../../cs6131-backend/types/teamTypes";
 import {getTeamCTFs} from "@/api/ctfApi";
@@ -58,7 +60,7 @@ export default Vue.extend({
   data() {
     return {
       loaded: false,
-      ctfs: [] as Array<ctf>,
+      ctfs: [] as Array<CTF>,
       create: false
     }
   },

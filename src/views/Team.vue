@@ -92,7 +92,6 @@ export default Vue.extend({
         if (Object.keys(user).length !== 0) Object.assign(this.user, user)
         const token = getCookie('token')
         getTeam(name, token).then(team => {
-          console.log(JSON.stringify(team))
           Object.assign(this.team, team);
           this.loading = false;
         })

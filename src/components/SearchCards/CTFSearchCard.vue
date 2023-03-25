@@ -2,7 +2,7 @@
   <v-card class="pa-4 fill-height d-flex flex-column" elevation="4" outlined>
     <v-card-title> <a> {{ item.name }} </a> </v-card-title>
     <v-card-text>
-      Date: {{ new Date(item.date).toLocaleString() }} <br/>
+      Date: {{ new Date(item.date*1000).toLocaleString() }} <br/>
       Format: {{ item.format }} <br/>
       Location: {{ item.location }} <br/>
       <a v-bind:href="item.link">{{item.link}}</a>
