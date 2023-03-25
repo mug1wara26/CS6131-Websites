@@ -4,6 +4,8 @@ import {userRouter} from "./routes/userRouter";
 import cors from "cors";
 import {teamRouter} from "./routes/teamRouter";
 import {ctfRouter} from "./routes/ctfRouter";
+import {BasicCTF} from "./types/ctfTypes";
+import {validate} from "class-validator";
 
 
 const app = express();
@@ -14,6 +16,7 @@ app.use("/teams", teamRouter);
 app.use("/ctfs", ctfRouter)
 
 const port = process.env.PORT || 3000;
+
 
 
 app.listen(port, () => {

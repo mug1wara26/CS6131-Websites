@@ -5,7 +5,7 @@ export class BasicTeam {
     @Length(3, 32)
     @Matches(/^[A-Za-z0-9_\s]*$/)
     name: string;
-    @Length(0, 32)
+    @Length(0, 200)
     @IsOptional()
     description?: string;
     @ValidateIf(t => t.pfp !== '')
