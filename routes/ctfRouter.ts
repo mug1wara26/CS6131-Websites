@@ -8,8 +8,6 @@ import {Team} from "../types/teamTypes";
 import {validate} from "class-validator";
 import {createCTF} from "../model/ctfModel";
 import {v4 as uuidv4} from 'uuid'
-import {teamRouter} from "./teamRouter";
-
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
 const ctfRouter = express.Router();
 

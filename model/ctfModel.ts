@@ -1,6 +1,7 @@
 import {db} from "../db";
 import {RowDataPacket} from "mysql2";
-import {BasicCTF, CTF} from "../types/ctfTypes";
+import {CTF} from "../types/ctfTypes";
+import {Challenge} from "../types/chalTypes";
 
 export const findTeamCTFs = (teamName: string, callback: Function) => {
     const queryString = `
@@ -81,6 +82,22 @@ INSERT INTO ctf VALUES
         (err, result) => {
             if (err) callback(err)
             else callback(null)
+        }
+    )
+}
+
+export const compete = (username: string, teamName: string, ctfid: string, callback: Function) => {
+    const queryString = `
+INSERT INTO competitor VALUES
+(?,?,?)
+    `
+
+    db.query(
+        queryString,
+        [ctfid,teamName,username],
+        (err, result) => {
+            if (err) callback(err)
+            else callback(null, result)
         }
     )
 }
