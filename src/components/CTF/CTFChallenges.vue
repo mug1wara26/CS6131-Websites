@@ -9,7 +9,7 @@
         </v-btn>
       </v-col>
       <v-col cols="2">
-        <v-text-field :disabled="!loaded" prepend-icon="mdi-magnify"></v-text-field>
+        <v-text-field autofocus v-model="search" prepend-icon="mdi-magnify" label="Search"></v-text-field>
       </v-col>
     </v-row>
 
@@ -20,6 +20,9 @@
 import Vue from "vue";
 import {CTF} from "../../../cs6131-backend/types/ctfTypes";
 import {BasicUser} from "../../../cs6131-backend/types/userTypes";
+import {Challenge} from "../../../cs6131-backend/types/chalTypes";
+import {Team} from "../../../cs6131-backend/types/teamTypes";
+import {getUserTeams} from "@/api/teamApi";
 
 export default Vue.extend({
   name: "CTF Challenges",
@@ -31,12 +34,20 @@ export default Vue.extend({
     return {
       create: false,
       loaded: false,
-      challenges: Array
+      challenges: [] as Array<Challenge>,
+      userTeams: [] as Array<Team>,
+      search: ''
     }
+  },
+  computed: {
+    canCompete(): boolean {
+      return this.ctf?.public || this.userTeams.filter(team => this.ctf?.teamCreator === team.name).length > 0
+    }
+  },
+  created() {
+    getUserTeams(this.user?.username).then(teams => {
+      this.userTeams = teams
+    })
   }
 });
 </script>
-
-<style scoped>
-
-</style>
