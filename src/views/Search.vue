@@ -79,7 +79,7 @@ import users from "@/data/Users";
 import teams from "@/data/Teams";
 import ctfs from "@/data/CTFs";
 import writeUps from "@/data/WriteUps";
-import NoteSearchCard from "@/components/SearchCards/NoteSearchCard.vue";
+import NoteSearchCard from "@/components/SearchCards/ChallengeSearchCard.vue";
 import UserSearchCard from "@/components/SearchCards/UserSearchCard.vue";
 import TeamSearchCard from "@/components/SearchCards/TeamSearchCard.vue";
 import CTFSearchCard from "@/components/SearchCards/CTFSearchCard.vue";

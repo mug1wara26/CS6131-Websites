@@ -278,7 +278,7 @@ export default Vue.extend({
 
       console.log(this.existingCTFs)
       if (!this.formData.isPrivate) {
-        ctfAPI.ctfExists(this.formData.name).then(value => {
+        ctfAPI.ctfNameExists(this.formData.name).then(value => {
           if (value) this.existingCTFs.push(this.formData.name)
         }).finally(() => {
           this.$nextTick(() => {

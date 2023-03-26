@@ -48,12 +48,12 @@ export const createTeam = (team: BasicTeam, token: string): Promise<Response> =>
     })
 }
 
-export const getTeam = (name: string, token?: string): Promise<Team> => {
+export const getTeam = (name: string): Promise<Team> => {
     const headers: Record<string, any> = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
+        'Authorization': getCookie('token') || ''
     }
-    if (token) headers['Authorization'] = token
     return new Promise<Team>(resolve => {
         fetch(`${Vue.prototype.$apilink}/teams/${name}`, {
             method: 'GET',
@@ -62,6 +62,7 @@ export const getTeam = (name: string, token?: string): Promise<Team> => {
             if (res.status === 200) return res.json()
             else resolve({} as Team)
         }).then(data => {
+            // data.hasAccess is only there if user does not have access so this has to be checked first
             if (data.hasAccess === false) resolve({} as Team)
             else resolve(data as Team)
         })

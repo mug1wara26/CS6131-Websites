@@ -25,7 +25,7 @@
       </v-row>
       <v-container class="d-flex">
         <v-toolbar floating class="justify-center" color="transparent" elevation="0">
-          <v-btn-toggle borderless rounded group v-model="selected">
+          <v-btn-toggle borderless rounded group mandatory v-model="selected">
             <v-btn
                 :value="item"
                 text
@@ -49,7 +49,6 @@ import {Team} from "../../cs6131-backend/types/teamTypes";
 import {BasicUser} from "../../cs6131-backend/types/userTypes";
 import {onLogin} from "@/api/userApi";
 import {AlertData} from "@/schemas/alertData";
-import {getCookie} from "typescript-cookie";
 import {getTeam} from "@/api/teamApi";
 import TeamCTFs from "@/components/Team/TeamCTFs.vue";
 import TeamMembers from "@/components/Team/TeamMembers.vue";
@@ -90,8 +89,7 @@ export default Vue.extend({
           this.loading = false;
         }
         if (Object.keys(user).length !== 0) Object.assign(this.user, user)
-        const token = getCookie('token')
-        getTeam(name, token).then(team => {
+        getTeam(name).then(team => {
           Object.assign(this.team, team);
           this.loading = false;
         })

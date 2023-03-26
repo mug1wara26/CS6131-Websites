@@ -209,17 +209,17 @@ export default Vue.extend({
           icon: "mdi-magnify",
         },
         {
-          name: "My Teams",
+          name: "Teams",
           route: "/teams",
           icon: "mdi-account-group",
         },
         {
-          name: "My CTFs",
+          name: "CTFs",
           route: "/ctfs",
           icon: "mdi-flag",
         },
         {
-          name: "My Write Ups",
+          name: "Write Ups",
           route: "/writeups",
           icon: "mdi-file-document",
         },

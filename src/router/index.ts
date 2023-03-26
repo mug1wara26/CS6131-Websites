@@ -4,9 +4,10 @@ import Home from '../views/Home.vue'
 import Feedback from '../views/Feedback.vue'
 import Search from "../views/Search.vue"
 import Users from "@/views/Users.vue";
-import Teams from "@/views/Teams.vue";
+import Teams from "@/views/UserTeams.vue";
 import WriteUps from "@/views/WriteUps.vue";
-import CTF from "@/views/CTF.vue";
+import UserCTF from "@/views/UserCTFs.vue";
+import CTF from "@/views/CTF.vue"
 import flag from "@/views/flag.vue";
 import Team from "@/views/Team.vue";
 
@@ -55,7 +56,12 @@ const routes = [
     },
     {
         path: '/ctfs',
-        name: 'ctfs',
+        name: 'UserCTFs',
+        component: UserCTF
+    },
+    {
+        path: '/ctfs/:id',
+        name: 'CTF',
         component: CTF
     },
     {

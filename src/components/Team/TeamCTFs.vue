@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-btn color="green" @click="create = true" :disabled="ctfs.length >= 10 || !loaded || team.owner !== user.username">
       Create
-      <v-icon class="ml-1">group_add</v-icon>
+      <v-icon class="ml-1">flag</v-icon>
     </v-btn>
 
     <v-btn color="primary" class="ml-3" to="/search?q=ctfs">
@@ -18,7 +18,7 @@
       <v-col lg="10" sm="12">
         <v-row>
           <v-col cols="12" lg="4" md="8"
-                 v-for="(item, index) in ctfs"
+                 v-for="(item, index) in ctfsSorted"
                  :key="index">
             <CTFSearchCard :item="item"/>
           </v-col>
@@ -62,6 +62,11 @@ export default Vue.extend({
       loaded: false,
       ctfs: [] as Array<CTF>,
       create: false
+    }
+  },
+  computed: {
+    ctfsSorted(): Array<CTF> {
+      return [...this.ctfs].sort((a,b) => a.name.localeCompare(b.name))
     }
   },
   created() {

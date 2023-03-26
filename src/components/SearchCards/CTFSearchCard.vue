@@ -1,6 +1,6 @@
 <template>
   <v-card class="pa-4 fill-height d-flex flex-column" elevation="4" outlined>
-    <v-card-title> <a> {{ item.name }} </a> </v-card-title>
+    <v-card-title> <a :href="`/ctfs/${item.id}`"> {{ item.name }} </a> <span v-if="!item.public" class="font-weight-light text-subtitle-1">&nbsp;(private)</span> </v-card-title>
     <v-card-text>
       Date: {{ new Date(item.date*1000).toLocaleString() }} <br/>
       Format: {{ item.format }} <br/>
