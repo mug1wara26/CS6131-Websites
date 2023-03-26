@@ -19,6 +19,23 @@ export const findTeamCTFs = (teamName: string, callback: Function) => {
     )
 }
 
+export const findOne = (id: string, callback: Function) => {
+    const queryString = `
+SELECT *
+FROM ctf
+WHERE BINARY id=?
+    `
+
+    db.query(
+        queryString,
+        id,
+        (err, result) => {
+            if (err) callback(err)
+            else callback(null, (<RowDataPacket> result)[0])
+        }
+    )
+}
+
 export const publicExists = (name: string, callback: Function) => {
     const queryString = `
 SELECT name

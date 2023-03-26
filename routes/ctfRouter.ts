@@ -43,6 +43,43 @@ ctfRouter.get("/teamCTFs/:teamName", async (req: Request, res: Response) => {
     })
 })
 
+ctfRouter.get("/:id", async (req, res) => {
+    const token = req.header('Authorization')
+    const id = req.params.id
+
+    console.log(token)
+
+    if (id) {
+        ctfModel.findOne(id, (err: Error, ctf: CTF) => {
+            if (ctf) {
+                if (ctf.public) return res.status(200).json(ctf)
+                else {
+                    if (token) {
+                        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+                            if (err) return res.status(400).end()
+                            else {
+                                const user = decoded as BasicUser
+                                console.log(user)
+                                teamModel.findUserTeams(user.username, (err: Error, teams: Array<Team>) => {
+                                    console.log(teams)
+                                    if (err) return res.status(400).end()
+                                    else {
+                                        if (teams.filter(team => team.name === ctf.teamCreator).length !== 0) return res.status(200).json(ctf)
+                                        else return res.status(200).json({id: ctf.id, hasAccess: false})
+                                    }
+                                })
+                            }
+                        })
+                    }
+                    else return res.status(200).json({id: ctf.id, hasAccess: false})
+                }
+            }
+            else return res.status(400).end()
+        })
+    }
+    else return res.status(400).end()
+})
+
 ctfRouter.get("/public/:name", async (req, res) => {
     const name = req.params.name
     ctfModel.publicExists(name, (ctfName: string) => {

@@ -4,8 +4,8 @@ import {userRouter} from "./routes/userRouter";
 import cors from "cors";
 import {teamRouter} from "./routes/teamRouter";
 import {ctfRouter} from "./routes/ctfRouter";
-import {BasicCTF} from "./types/ctfTypes";
-import {validate} from "class-validator";
+import {db} from "./db"
+import {RowDataPacket} from "mysql2";
 
 
 const app = express();
@@ -17,7 +17,13 @@ app.use("/ctfs", ctfRouter)
 
 const port = process.env.PORT || 3000;
 
-
+db.query(
+    'SHOW TABLES;',
+    (err, res) => {
+        console.log(err)
+        console.log(<RowDataPacket> res)
+    }
+)
 
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
