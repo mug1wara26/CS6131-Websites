@@ -3,7 +3,7 @@ import * as ctfModel from '../model/ctfModel'
 import express, {Request, Response} from "express";
 import jwt from "jsonwebtoken";
 import {BasicUser} from "../types/userTypes";
-import {validate} from "class-validator";
+import {IsOptional, validate} from "class-validator";
 import {Challenge} from "../types/chalTypes";
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
 const chalRouter = express.Router();
@@ -22,6 +22,7 @@ chalRouter.post('/create', async (req, res) => {
                 const user = decoded as BasicUser
                 const chal = new Challenge()
                 Object.assign(chal, req.body.challenge)
+                console.log(chal)
 
                 validate(chal).then(errors => {
                     if (errors.length > 0) return res.status(400).json(errors)
@@ -30,7 +31,10 @@ chalRouter.post('/create', async (req, res) => {
                             if (status === 200) {
                                 chalModel.create(chal, (err: Error) => {
                                     if (err) return res.status(400).end()
-                                    else return res.status(200).json(chal)
+                                    else {
+                                        const {flag, ...basicChal} = chal
+                                        return res.status(200).json(basicChal)
+                                    }
                                 })
                             }
                             else {
@@ -54,3 +58,5 @@ const validateChalCreation = (chal: Challenge, username: string, callback: Funct
         else return callback(400, 'Bad request')
     })
 }
+
+export {chalRouter}
