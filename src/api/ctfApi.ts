@@ -1,8 +1,6 @@
 import {getCookie} from "typescript-cookie";
 import {BasicCTF, CTF} from "../../cs6131-backend/types/ctfTypes";
 import Vue from "vue";
-import {Team} from "../../cs6131-backend/types/teamTypes";
-import {BasicChallenge} from "../../cs6131-backend/types/chalTypes";
 
 export const getTeamCTFs = (teamName: string): Promise<Array<CTF>> => {
     return new Promise<Array<CTF>>((resolve, reject) => {

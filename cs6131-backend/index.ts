@@ -1,9 +1,10 @@
 import express from "express";
 import * as bodyParser from "body-parser";
 import {userRouter} from "./routes/userRouter";
-import cors from "cors";
 import {teamRouter} from "./routes/teamRouter";
 import {ctfRouter} from "./routes/ctfRouter";
+import {chalRouter} from "./routes/chalRouter"
+import cors from "cors";
 import {db} from "./db"
 import {RowDataPacket} from "mysql2";
 import * as chalModel from "./model/chalModel";
@@ -16,6 +17,7 @@ app.use(cors())
 app.use("/users", userRouter);
 app.use("/teams", teamRouter);
 app.use("/ctfs", ctfRouter)
+app.use("/chals", chalRouter)
 
 const port = process.env.PORT || 3000;
 

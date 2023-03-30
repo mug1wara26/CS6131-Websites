@@ -39,6 +39,7 @@
             :chals="challenges"
             :ctf="ctf"
             @close-dialog="create = false"
+            @chal-created="(chal) => this.challenges.push(chal)"
         />
       </v-dialog>
     </div>
@@ -87,9 +88,7 @@ export default Vue.extend({
       // TODO: Let user create chals
       getCTFChals(this.ctf.id).then(res => {
         if (res.status === 200) res.json().then(data => {
-          console.log(data)
           this.challenges = data
-          this.challenges = [{name: 'test', ctfid: 'test', difficulty: 'Easy', category: 'Web', points: 100} as BasicChallenge]
           this.loaded = true
         })
         else {

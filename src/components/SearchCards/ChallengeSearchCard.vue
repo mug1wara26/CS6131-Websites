@@ -3,8 +3,8 @@
     <v-card-title> <a> {{ item.name }} </a> </v-card-title>
     <v-card-subtitle class="font-weight-bold">{{item.category}}</v-card-subtitle>
     <v-card-text>
-      Difficulty: {{ item.difficulty }} <br/>
-      Points: {{ item.points }}
+      {{item.difficulty ? `Difficulty:  ${item.difficulty}` : 'No difficulty'}}<br/>
+      {{item.points ? `Points:  ${item.points}` : 'No points'}}<br/>
       <p class="text-truncate">{{ item.description }}</p>
     </v-card-text>
   </v-card>

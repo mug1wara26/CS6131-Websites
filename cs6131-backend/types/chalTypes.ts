@@ -6,21 +6,21 @@ export class BasicChallenge {
     name: string;
     @Length(36)
     ctfid: string;
+    @IsOptional()
     @Length(1,20)
-    @IsOptional()
     difficulty: string;
-    @Length(1,32)
     @IsOptional()
+    @Length(1,32)
     category: string;
+    @IsOptional()
     @IsNumber()
     @Max(10000)
-    @IsOptional()
     points: number;
 }
 
 export class Challenge extends BasicChallenge {
+    @IsOptional()
     @IsAscii()
     @Length(0,256)
-    @IsOptional()
     flag: string;
 }

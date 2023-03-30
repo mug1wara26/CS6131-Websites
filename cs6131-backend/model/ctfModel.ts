@@ -125,7 +125,7 @@ export const memberOfTeamCreator = (username: string, ctfid: string, callback: F
     const queryString = `
 SELECT *
 FROM ctf, member
-WHERE ctfid = ? AND teamCreator = teamName AND username = ?
+WHERE id = ? AND teamCreator = teamName AND username = ?
     `
 
     db.query(

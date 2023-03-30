@@ -239,7 +239,7 @@ export default Vue.extend({
   },
   computed: {
     clean(): boolean {
-      return Object.values(this.formData).every((v) => (typeof v === 'string') && v !== '') && (this.online || this.formData.optional.location !== '')
+      return Object.values(this.formData).every(v => (typeof v !== 'string') || v !== '') && (this.online || this.formData.optional.location !== '')
     }
   },
   methods: {
@@ -272,7 +272,6 @@ export default Vue.extend({
         (v: string | null) => v && !this.existingCTFs.includes(v) || 'CTF Name taken',
       ];
 
-      console.log(this.existingCTFs)
       if (!this.formData.isPrivate) {
         ctfAPI.ctfNameExists(this.formData.name).then(value => {
           if (value) this.existingCTFs.push(this.formData.name)
@@ -316,7 +315,7 @@ export default Vue.extend({
           }).finally(() => {this.onClose();})
         }
         else {
-          this.$root.$emit('alert', {alertType: 'error', alertTitle: 'Error creating team', alertText: res.statusText})
+          this.$root.$emit('alert', {alertType: 'error', alertTitle: `${res.status} Error`, alertText: res.statusText})
           this.onClose();
         }
       })
