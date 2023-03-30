@@ -1,13 +1,14 @@
 import express, {Request, Response} from "express";
 import * as ctfModel from '../model/ctfModel'
 import * as teamModel from '../model/teamModel'
+import * as chalModel from '../model/chalModel'
 import {BasicCTF, CTF} from "../types/ctfTypes";
 import jwt from "jsonwebtoken";
 import {BasicUser} from "../types/userTypes";
 import {Team} from "../types/teamTypes";
 import {validate} from "class-validator";
-import {createCTF} from "../model/ctfModel";
 import {v4 as uuidv4} from 'uuid'
+import {BasicChallenge, Challenge} from "../types/chalTypes";
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
 const ctfRouter = express.Router();
 
@@ -45,8 +46,6 @@ ctfRouter.get("/:id", async (req, res) => {
     const token = req.header('Authorization')
     const id = req.params.id
 
-    console.log(token)
-
     if (id) {
         ctfModel.findOne(id, (err: Error, ctf: CTF) => {
             if (ctf) {
@@ -57,9 +56,7 @@ ctfRouter.get("/:id", async (req, res) => {
                             if (err) return res.status(400).end()
                             else {
                                 const user = decoded as BasicUser
-                                console.log(user)
                                 teamModel.findUserTeams(user.username, (err: Error, teams: Array<Team>) => {
-                                    console.log(teams)
                                     if (err) return res.status(400).end()
                                     else {
                                         if (teams.filter(team => team.name === ctf.teamCreator).length !== 0) return res.status(200).json(ctf)
@@ -86,7 +83,7 @@ ctfRouter.get("/public/:name", async (req, res) => {
     })
 })
 ctfRouter.post("/create", async (req, res) => {
-    if (!req.body.ctf) res.status(400).end();
+    if (!req.body.ctf) return res.status(400).end();
     const token = req.header('Authorization')
     if (token) {
         jwt.verify(token, SECRET_KEY!, (err, decoded) => {
@@ -103,23 +100,20 @@ ctfRouter.post("/create", async (req, res) => {
                         let responseMessage = ''
                         if (errors.filter(e => e.property === 'url').length > 0) responseMessage = "CTF Link not valid"
                         else responseMessage = 'Check your information provided'
-                        console.log(errors)
 
                         res.statusMessage = responseMessage
                         return res.status(400).end()
                     } else {
                         validateCTFCreation(basicCTF, user.username, (err: Error) => {
-                            console.log(err)
                             if (err) {
                                 res.statusMessage = err.message
                                 return res.status(400).end()
                             } else {
                                 const ctf = new CTF();
                                 Object.assign(ctf, basicCTF)
-                                console.log(ctf)
                                 ctf.id = uuidv4()
 
-                                createCTF(ctf, (err: Error) => {
+                                ctfModel.createCTF(ctf, (err: Error) => {
                                     if (err) res.status(500).end();
                                     else res.status(200).json(ctf);
                                 })
@@ -130,6 +124,33 @@ ctfRouter.post("/create", async (req, res) => {
             }
         })
     }
+})
+
+ctfRouter.get('/chals/:id', async (req, res) => {
+    const id = req.params.id;
+    const token = req.header('Authorization')
+    ctfModel.findOne(id, (err: Error, ctf: CTF) => {
+        if (err) return res.status(500).end()
+        if (ctf) {
+            chalModel.findCTFChals(id, (err: Error, tempChals: Array<Challenge>) => {
+                const chals = tempChals.map(({flag, ...chal}) => chal)
+                if (err) return  res.status(500).end()
+                else {
+                    if (ctf.public) return res.status(200).json(chals)
+                    else {
+                        canViewChals(token, ctf, (status: number, statusMessage: string) => {
+                            if (status === 200) return res.status(200).json(chals)
+                            else {
+                                res.statusMessage = statusMessage
+                                return res.status(status).end()
+                            }
+                        })
+                    }
+                }
+            })
+        }
+        else return res.status(400).end()
+    })
 })
 
 const validateCTFCreation = (ctf: BasicCTF, username: string, callback: Function) => {
@@ -160,6 +181,29 @@ const validateCTFCreation = (ctf: BasicCTF, username: string, callback: Function
             } else return callback(new Error('Only team owner can create new CTFs'))
         } else return callback(new Error('Team does not exist'))
     })
+}
+
+const canViewChals = (token: string | undefined, ctf: CTF, callback: Function) => {
+    if (token) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) return callback(400, 'Invalid token')
+            else {
+                const user = decoded as BasicUser
+                teamModel.findUserTeams(user.username, (err: Error, teams: Array<Team>) => {
+                    if (err) return callback(500, 'Internal server error')
+                    if (teams.filter(team => team.name === ctf.teamCreator).length !== 0) return callback(200)
+                    else {
+                        ctfModel.isCompeting(user.username, ctf.id, (err: Error, isCompeting: boolean) => {
+                            if (err) return callback(500, 'Internal server error')
+                            if (isCompeting) return callback(200)
+                            else return callback(400, 'Bad request')
+                        })
+                    }
+                })
+            }
+        })
+    }
+    else return  callback(400, 'Bad request')
 }
 
 export {ctfRouter}
