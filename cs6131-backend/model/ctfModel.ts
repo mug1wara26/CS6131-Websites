@@ -86,7 +86,7 @@ INSERT INTO ctf VALUES
     )
 }
 
-export const compete = (username: string, teamName: string, ctfid: string, callback: Function) => {
+export const createCompetitor = (username: string, teamName: string, ctfid: string, callback: Function) => {
     const queryString = `
 INSERT INTO competitor VALUES
 (?,?,?)
@@ -98,6 +98,42 @@ INSERT INTO competitor VALUES
         (err, result) => {
             if (err) callback(err)
             else callback(null, result)
+        }
+    )
+}
+
+export const isCompeting = (username: string, ctfid: string, callback: Function) => {
+    const queryString = `
+SELECT *
+FROM competitor
+WHERE BINARY ctfid = ? and BINARY username = ?
+    `
+
+    db.query(
+        queryString,
+        [ctfid, username],
+        (err, result) => {
+            if (err) callback(err)
+            else {
+                callback(null, Boolean((<RowDataPacket> result)[0]))
+            }
+        }
+    )
+}
+
+export const memberOfTeamCreator = (username: string, ctfid: string, callback: Function) => {
+    const queryString = `
+SELECT *
+FROM ctf, member
+WHERE ctfid = ? AND teamCreator = teamName AND username = ?
+    `
+
+    db.query(
+        queryString,
+        [ctfid, username],
+        (err, result) => {
+            if (err) callback(err)
+            else callback(null, Boolean((<RowDataPacket> result)[0]))
         }
     )
 }

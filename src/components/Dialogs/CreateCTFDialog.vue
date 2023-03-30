@@ -1,8 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      Create Team
-
+      Create CTF
     </v-card-title>
     <v-card-text>
       {{ ctfs.length }}/10 CTFs
@@ -92,13 +91,10 @@
             <v-text-field v-model="formData.optional.location" label="Location" :disabled="online"/>
           </v-col>
 
-          <v-switch
-              v-model="formData.isPrivate"
-              :disabled="!team.public"
-              :hint="team.public ? (formData.isPrivate ? 'Only your team can view this CTF' : 'Other users can join this CTF and see the challenges') : 'Team must be public before making a public CTF'"
-              :label="formData.isPrivate ? 'Private' : 'Public'"
-              persistent-hint
-          />
+          <v-radio-group v-model="formData.isPrivate" :label="team.public ? '' : 'Private team cannot create public CTF'">
+            <v-radio :autofocus="team.public" label="Public" value="0" :disabled="!team.public"/>
+            <v-radio :autofocus="!team.public" label="Private" value="1"/>
+          </v-radio-group>
         </v-row>
       </v-form>
     </v-card-text>
@@ -143,9 +139,9 @@ export default Vue.extend({
         optional: {
           link: null,
           description: null,
-          location: null
+          location: ''
         },
-        isPrivate: true
+        isPrivate: '1'
       },
       loading: false,
       menu: false,
@@ -243,7 +239,7 @@ export default Vue.extend({
   },
   computed: {
     clean(): boolean {
-      return Object.values(this.formData).every((v) => v && v !== '') && (this.online || this.formData.optional.location !== '')
+      return Object.values(this.formData).every((v) => (typeof v === 'string') && v !== '') && (this.online || this.formData.optional.location !== '')
     }
   },
   methods: {
@@ -260,9 +256,9 @@ export default Vue.extend({
         optional: {
           link: null,
           description: null,
-          location: null
+          location: ''
         },
-        isPrivate: true
+        isPrivate: '1'
       };
       this.online = true;
     },
@@ -308,7 +304,7 @@ export default Vue.extend({
         url: this.formData.optional.link,
         description: this.formData.optional.description,
         location: this.formData.optional.location ? this.formData.optional.location : 'Online',
-        public: !this.formData.isPrivate
+        public: this.formData.isPrivate !== '1'
       })
 
       ctfAPI.createCTF(CTF).then(res => {

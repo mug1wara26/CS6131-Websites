@@ -2,6 +2,7 @@ import {getCookie} from "typescript-cookie";
 import {BasicCTF, CTF} from "../../cs6131-backend/types/ctfTypes";
 import Vue from "vue";
 import {Team} from "../../cs6131-backend/types/teamTypes";
+import {BasicChallenge} from "../../cs6131-backend/types/chalTypes";
 
 export const getTeamCTFs = (teamName: string): Promise<Array<CTF>> => {
     return new Promise<Array<CTF>>((resolve, reject) => {
@@ -46,12 +47,12 @@ export const getCTF = (id: string): Promise<CTF> => {
                 'Authorization': getCookie('token') || ''
             }
         }).then(res => {
-            if (res.status === 200) return res.json()
+            if (res.status === 200) res.json().then(data => {
+                // data.hasAccess is only there if user does not have access so this has to be checked first
+                if (data.hasAccess === false) resolve({} as CTF)
+                else resolve(data as CTF)
+            })
             else resolve({} as CTF)
-        }).then(data => {
-            // data.hasAccess is only there if user does not have access so this has to be checked first
-            if (data.hasAccess === false) resolve({} as CTF)
-            else resolve(data as CTF)
         })
     })
 }
@@ -69,4 +70,18 @@ export const createCTF = (ctf: BasicCTF): Promise<Response> => {
             body: JSON.stringify({'ctf': ctf})
         }).then(res => resolve(res))
     });
+}
+
+export const getCTFChals = (ctfid: string): Promise<Response> => {
+    return new Promise<Response>(resolve => {
+        const token = getCookie('token') || '';
+        fetch(`${Vue.prototype.$apilink}/ctfs/chals/${ctfid}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        }).then(res => resolve(res))
+    })
 }

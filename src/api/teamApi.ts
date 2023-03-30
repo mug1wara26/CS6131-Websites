@@ -59,12 +59,13 @@ export const getTeam = (name: string): Promise<Team> => {
             method: 'GET',
             headers: headers
         }).then(res => {
-            if (res.status === 200) return res.json()
+            if (res.status === 200) res.json().then(data => {
+
+                // data.hasAccess is only there if user does not have access so this has to be checked first
+                if (data.hasAccess === false) resolve({} as Team)
+                else resolve(data as Team)
+            })
             else resolve({} as Team)
-        }).then(data => {
-            // data.hasAccess is only there if user does not have access so this has to be checked first
-            if (data.hasAccess === false) resolve({} as Team)
-            else resolve(data as Team)
         })
     })
 }

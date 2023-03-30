@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-btn color="green" @click="create = true" :disabled="ctfs.length >= 10 || !loaded || team.owner !== user.username">
       Create
-      <v-icon class="ml-1">flag</v-icon>
+      <v-icon class="ml-1">mdi-flag</v-icon>
     </v-btn>
 
     <v-btn color="primary" class="ml-3" to="/search?q=ctfs">

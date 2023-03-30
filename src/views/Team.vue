@@ -90,8 +90,9 @@ export default Vue.extend({
         }
         if (Object.keys(user).length !== 0) Object.assign(this.user, user)
         getTeam(name).then(team => {
-          Object.assign(this.team, team);
-          this.loading = false;
+          if (Object.keys(team).length !== 0) Object.assign(this.team, team);
+          else this.team = {} as Team
+          this.loading = false
         })
       })
     }
