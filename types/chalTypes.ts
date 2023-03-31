@@ -6,10 +6,8 @@ export class BasicChallenge {
     name: string;
     @Length(36)
     ctfid: string;
-    @IsOptional()
     @Length(1,20)
     difficulty: string;
-    @IsOptional()
     @Length(1,32)
     category: string;
     @IsOptional()
