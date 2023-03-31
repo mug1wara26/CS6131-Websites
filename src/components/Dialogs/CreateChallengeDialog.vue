@@ -143,8 +143,8 @@ export default Vue.extend({
           const chal = Object.assign(new Challenge(), {
             name: this.formData.name,
             ctfid: this.ctf?.id,
-            difficulty: this.formData.optional.difficulty || null,
-            category: this.formData.optional.category || null,
+            difficulty: this.formData.optional.difficulty || 'No Difficulty',
+            category: this.formData.optional.category || 'No Category',
             points: this.formData.optional.points ? parseInt(this.formData.optional.points) : null,
             flag: this.formData.optional.flag || null
           })

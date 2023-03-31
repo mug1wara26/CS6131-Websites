@@ -18,11 +18,19 @@
               v-model="orderBy"
               :items="orderItems"
               label="Order by"
-              @change="resetOrderedChals"
           />
         </v-col>
 
         <v-col cols="1">
+          <v-autocomplete
+              auto-select-first
+              hide-no-data
+              v-model="sortBy"
+              :items="sortItems"
+              label="Order by"
+              :append-outer-icon="ascending ? 'mdi-arrow-down' : 'mdi-arrow-up'"
+              @click:append-outer="ascending = !ascending"
+          />
         </v-col>
         <!-- This is just here to center align the next v-col -->
         <v-col cols="2"/>
@@ -34,11 +42,11 @@
       <p v-if="challenges.length === 0 && loaded" class="d-flex justify-center">This CTF has no challenges</p>
 
 
-      <v-row v-if="orderBy === 'Name'" class="mt-2">
+      <v-row v-if="orderBy === 'Name' || orderBy === 'Points'" class="mt-2">
         <v-col lg="10" sm="12">
           <v-row>
             <v-col cols="12" lg="4" md="8"
-                   v-for="(item, index) in sortedChalsByName"
+                   v-for="(item, index) in sortedChals"
                    :key="index">
               <ChallengeSearchCard :item="item"/>
             </v-col>
@@ -46,9 +54,9 @@
         </v-col>
       </v-row>
 
-      <v-expansion-panels v-else accordion multiple flat :value="[...Array(orderPanels(orderBy).length).keys()]">
+      <v-expansion-panels v-else accordion multiple flat :value="[...Array(orderPanels.length).keys()]">
         <v-expansion-panel
-            v-for="(panelTitle, i) in orderPanels(orderBy)"
+            v-for="(panelTitle, i) in orderPanels.filter(panel => orderedChals[panel].length !== 0)"
             :key="i"
         >
           <v-expansion-panel-header :color="expansionPanelColor">{{panelTitle}}</v-expansion-panel-header>
@@ -57,7 +65,7 @@
               <v-col lg="10" sm="12">
                 <v-row>
                   <v-col cols="12" lg="4" md="8"
-                         v-for="(item, index) in filterChalByProperty(orderBy, panelTitle)"
+                         v-for="(item, index) in orderedChals[panelTitle]"
                          :key="index">
                     <ChallengeSearchCard :item="item"/>
                   </v-col>
@@ -66,7 +74,7 @@
             </v-row>
           </v-expansion-panel-content>
 
-          <v-divider v-if="i !== orderPanels(orderBy).length - 1"/>
+          <v-divider v-if="i !== orderPanels.length - 1"/>
         </v-expansion-panel>
       </v-expansion-panels>
 
@@ -79,7 +87,7 @@
             :chals="challenges"
             :ctf="ctf"
             @close-dialog="create = false"
-            @chal-created="(chal) => this.challenges.push(chal)"
+            @chal-created="(chal) => challenges.push(chal)"
         />
       </v-dialog>
     </div>
@@ -95,7 +103,6 @@ import {getCTFChals} from "@/api/ctfApi";
 import CreateChallengeDialog from "@/components/Dialogs/CreateChallengeDialog.vue";
 import ChallengeSearchCard from "@/components/SearchCards/ChallengeSearchCard.vue";
 
-let orderedChals = [] as Array<BasicChallenge>
 export default Vue.extend({
   name: "CTFChallenges",
   components: {CreateChallengeDialog, ChallengeSearchCard},
@@ -110,50 +117,66 @@ export default Vue.extend({
       challenges: [] as Array<BasicChallenge>,
       search: '',
       orderBy: 'Category',
-      orderItems: ['Category', 'Difficulty', 'Points', 'Name'],
+      orderItems: ['Category', 'Difficulty'],
+      sortBy: 'Points',
+      sortItems: ['Points', 'Name'],
       panelModel: [] as Array<number>,
+      ascending: true
     }
   },
   computed: {
-    sortedChalsByName(): Array<BasicChallenge> {
-      return [...this.challenges].sort((a,b) => a.name.localeCompare(b.name)).filter(chal => chal.name.toLowerCase().includes(this.search.toLowerCase()))
+    searchedChals(): Array<BasicChallenge> {
+      return [...this.challenges].filter(chal => chal.name.toLowerCase().includes(this.search.toLowerCase()))
+    },
+    sortedChals(): Array<BasicChallenge> {
+      let sortedChals = [] as Array<BasicChallenge>;
+      if (this.sortBy === 'Name') {
+        sortedChals = [...this.searchedChals].sort((a,b) => {
+          return a.name.localeCompare(b.name)
+        })
+      }
+      if (this.sortBy === 'Points') {
+        sortedChals = [...this.searchedChals].sort((a,b) => {
+          return a.points - b.points
+        })
+      }
+
+      if (!this.ascending) sortedChals.reverse()
+
+      return sortedChals
     },
     expansionPanelColor(): string {
       return this.$vuetify.theme.dark ? '#121212' : 'white'
+    },
+    orderPanels(): Array<string> {
+      // This is to preserve the order of difficulties
+      const cats = ['Web', 'Crypto', 'Forensics', 'Misc', 'OSINT', 'Reverse Engineering', 'Pwn'].sort()
+      const diffs = ['Easy', 'Medium', 'Hard', 'Insane']
+
+      this.challenges.forEach(chal => {
+        if (chal.category && !cats.includes(chal.category)) cats.push(chal.category);
+        if (chal.difficulty && !diffs.includes(chal.difficulty)) diffs.push(chal.difficulty)
+      })
+
+      // Use this instead of ternary in case need to add more in future
+      const panels = {
+        'Category': cats,
+        'Difficulty': diffs,
+      } as Record<string,Array<string>>
+
+      return panels[this.orderBy]
+    },
+    orderedChals(): Record<string,Array<BasicChallenge>> {
+      const orderedChals = {} as Record<string, Array<BasicChallenge>>
+      this.orderPanels.forEach(panel => {
+        if (this.orderBy === 'Category') orderedChals[panel] = this.sortedChals.filter(chal => chal.category === panel)
+        if (this.orderBy === 'Difficulty') orderedChals[panel] = this.sortedChals.filter(chal => chal.difficulty === panel)
+      })
+
+      return orderedChals
     }
   },
   methods: {
-    orderPanels(orderBy: string) {
-      const panels = {
-        // Ugly way of getting unique values, array.from is needed to reduce boilerplate when compiling typescript
-        'Category': [...Array.from(new Set(this.challenges.filter(chal => chal.category).map(chal => chal.category)))],
-        'Difficulty': [...Array.from(new Set(this.challenges.filter(chal => chal.difficulty).map(chal => chal.difficulty)))],
-      } as Record<string,Array<string>>
-
-      const panel = panels[orderBy]
-      panel.push(`No ${orderBy}`)
-
-      return panel
-    },
-    filterChalByProperty(property: string, value: string) {
-      const filteredChals = {
-        'Category': this.challenges.filter(chal => chal.category === value),
-        'Difficulty': this.challenges.filter(chal => chal.difficulty === value),
-      } as Record<string, Array<BasicChallenge>>
-
-      const chals = filteredChals[property]
-      if (chals.length !== 0) {
-        orderedChals.push(...chals)
-      }
-      else {
-        return this.challenges.filter(chal=> !orderedChals.map(chal => chal.name).includes(chal.name))
-      }
-
-      return chals
-    },
-    resetOrderedChals() {
-      orderedChals = []
-    }
   },
   created() {
     if (this.ctf.public) {
