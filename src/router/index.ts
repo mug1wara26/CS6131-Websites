@@ -10,6 +10,7 @@ import UserCTF from "@/views/UserCTFs.vue";
 import CTF from "@/views/CTF.vue"
 import flag from "@/views/flag.vue";
 import Team from "@/views/Team.vue";
+import Challenge from "@/views/Challenge.vue";
 
 Vue.use(VueRouter)
 
@@ -63,6 +64,11 @@ const routes = [
         path: '/ctfs/:id',
         name: 'CTF',
         component: CTF
+    },
+    {
+        path: '/ctfs/:id/:name',
+        name: 'Challenge',
+        component: Challenge
     },
     {
         path: '/flag',

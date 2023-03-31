@@ -13,6 +13,14 @@ export const setLocalStorage = (key: string, data: any) => {
     localStorage.setItem('expiry', JSON.stringify(expiryTimes))
 }
 
+export const setLocalStorageWithJsonKey = (localStorageKey: string, jsonKey: string, data: any) => {
+    const localStorageData = getFromLocalStorage(localStorageKey)
+    if (localStorageData) {
+        localStorageData[jsonKey] = data
+        setLocalStorage(localStorageKey, localStorageData)
+    }
+}
+
 export const getFromLocalStorage = (key: string) => {
     const expiryTimesTemp = localStorage.getItem('expiry')
     if (expiryTimesTemp) {

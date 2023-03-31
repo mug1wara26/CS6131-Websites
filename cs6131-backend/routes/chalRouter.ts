@@ -4,7 +4,7 @@ import express, {Request, Response} from "express";
 import jwt from "jsonwebtoken";
 import {BasicUser} from "../types/userTypes";
 import {IsOptional, validate} from "class-validator";
-import {Challenge} from "../types/chalTypes";
+import {BasicChallenge, Challenge} from "../types/chalTypes";
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
 const chalRouter = express.Router();
 
@@ -45,6 +45,32 @@ chalRouter.post('/create', async (req, res) => {
                     }
                 })
 
+            }
+        })
+    }
+    else return res.status(400).end()
+})
+
+chalRouter.get('/:ctfid/:name', async (req, res) => {
+    const id = req.params.ctfid
+    const name = req.params.name
+    const token = req.header('Authorization')
+
+    if (token) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) {
+                res.statusMessage = 'Invalid token'
+                return res.status(400).end()
+            }
+            else {
+                const user = decoded as BasicUser
+                // Whether user can get challenge is covered by the sql query
+                chalModel.findOneByUser(id, name, user.username, (err: Error, chal: BasicChallenge) => {
+                    console.log(err)
+                    console.log(chal)
+                    if (err) return res.status(500).end()
+                    else return res.status(200).json({challenge: chal})
+                })
             }
         })
     }
