@@ -5,7 +5,7 @@
     <div v-else>
       <v-row class="d-flex align-center">
         <v-col cols="1">
-          <v-btn color="green" @click="create = true" :disabled="challenges.length >= 10 || !loaded">
+          <v-btn color="green" @click="create = true" :disabled="challenges.length >= 100 || !loaded">
             Create
             <v-icon class="ml-1">mdi-plus</v-icon>
           </v-btn>
@@ -102,6 +102,7 @@ import {BasicChallenge} from "../../../cs6131-backend/types/chalTypes";
 import {getCTFChals} from "@/api/ctfApi";
 import CreateChallengeDialog from "@/components/Dialogs/CreateChallengeDialog.vue";
 import ChallengeSearchCard from "@/components/SearchCards/ChallengeSearchCard.vue";
+import {getFromLocalStorage, setLocalStorage} from "@/api/api";
 
 export default Vue.extend({
   name: "CTFChallenges",
@@ -179,6 +180,11 @@ export default Vue.extend({
   methods: {
   },
   created() {
+    const chals = getFromLocalStorage(`${this.ctf?.id}_chals`)
+    if (chals) {
+      this.challenges = chals;
+      this.loaded = true;
+    }
     if (this.ctf.public) {
       // TODO: Display CTFs
       // TODO: CTF Dialog
@@ -187,11 +193,10 @@ export default Vue.extend({
     }
     else {
       // CTF is private so we can assume that the user viewing the CTF can create and view all challenges
-      // TODO: Display all challenges
-      // TODO: Let user create chals
       getCTFChals(this.ctf.id).then(res => {
         if (res.status === 200) res.json().then(data => {
           this.challenges = data
+          setLocalStorage(`${this.ctf?.id}_chals`, JSON.stringify(data))
           this.loaded = true
         })
         else {

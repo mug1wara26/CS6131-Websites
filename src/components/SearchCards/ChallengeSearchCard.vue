@@ -1,6 +1,6 @@
 <template>
   <v-card class="pa-4 fill-height d-flex flex-column" elevation="4" outlined>
-    <v-card-title> <a> {{ item.name }} </a> </v-card-title>
+    <v-card-title> <a :href="`/ctfs/${item.ctfid}/${item.name}`"> {{ item.name }} </a> </v-card-title>
     <v-card-subtitle class="font-weight-bold">{{item.category}}</v-card-subtitle>
     <v-card-text>
       {{item.difficulty ? `Difficulty:  ${item.difficulty}` : 'No difficulty'}}<br/>
