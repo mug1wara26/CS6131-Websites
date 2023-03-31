@@ -54,7 +54,12 @@ chalRouter.post('/create', async (req, res) => {
 const validateChalCreation = (chal: Challenge, username: string, callback: Function) => {
     ctfModel.memberOfTeamCreator(username, chal.ctfid, (err: Error, isMember: boolean) => {
         if (err) return callback(500, 'Internal server error')
-        if (isMember) return callback(200)
+        if (isMember) {
+            chalModel.findCTFChals(chal.ctfid, (err: Error, chals: Array<Challenge>) => {
+                if (chals.length >= 100) return callback(400, 'Bad request')
+                else return callback(200)
+            })
+        }
         else return callback(400, 'Bad request')
     })
 }
