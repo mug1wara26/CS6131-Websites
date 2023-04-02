@@ -97,7 +97,7 @@ INSERT INTO competitor VALUES
         [ctfid,teamName,username],
         (err, result) => {
             if (err) callback(err)
-            else callback(null, result)
+            else callback(null)
         }
     )
 }
