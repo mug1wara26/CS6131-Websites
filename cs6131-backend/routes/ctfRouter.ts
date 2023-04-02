@@ -42,7 +42,7 @@ ctfRouter.get("/teamCTFs/:teamName", async (req: Request, res: Response) => {
     })
 })
 
-ctfRouter.get("/:id", async (req, res) => {
+ctfRouter.get("/get/:id", async (req, res) => {
     const token = req.header('Authorization')
     const id = req.params.id
 
@@ -136,16 +136,13 @@ ctfRouter.get('/chals/:id', async (req, res) => {
                 const chals = tempChals.map(({flag, ...chal}) => chal)
                 if (err) return  res.status(500).end()
                 else {
-                    if (ctf.public) return res.status(200).json(chals)
-                    else {
-                        canViewChals(token, ctf, (status: number, statusMessage: string) => {
-                            if (status === 200) return res.status(200).json(chals)
-                            else {
-                                res.statusMessage = statusMessage
-                                return res.status(status).end()
-                            }
-                        })
-                    }
+                    canViewChals(token, ctf, (status: number, statusMessage: string, isMember: boolean, canView: boolean) => {
+                        if (status === 200) return res.status(200).json({canView: canView, challenges: canView ? chals : [], isMember: isMember})
+                        else {
+                            res.statusMessage = statusMessage
+                            return res.status(status).end()
+                        }
+                    })
                 }
             })
         }
@@ -183,20 +180,21 @@ const validateCTFCreation = (ctf: BasicCTF, username: string, callback: Function
     })
 }
 
+
 const canViewChals = (token: string | undefined, ctf: CTF, callback: Function) => {
     if (token) {
         jwt.verify(token, SECRET_KEY!, (err, decoded) => {
             if (err) return callback(400, 'Invalid token')
             else {
                 const user = decoded as BasicUser
-                teamModel.findUserTeams(user.username, (err: Error, teams: Array<Team>) => {
-                    if (err) return callback(500, 'Internal server error')
-                    if (teams.filter(team => team.name === ctf.teamCreator).length !== 0) return callback(200)
+                ctfModel.memberOfTeamCreator(user.username, ctf.id, (err: Error, isMember: boolean) => {
+                    if (err) return callback(500, 'Internal server error');
+                    if (isMember) return callback(200, null, true)
                     else {
                         ctfModel.isCompeting(user.username, ctf.id, (err: Error, isCompeting: boolean) => {
                             if (err) return callback(500, 'Internal server error')
-                            if (isCompeting) return callback(200)
-                            else return callback(400, 'Bad request')
+                            if (isCompeting) return callback(200, null, false, true)
+                            else return callback(200, null, false, false)
                         })
                     }
                 })

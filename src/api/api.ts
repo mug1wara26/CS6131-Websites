@@ -25,7 +25,7 @@ export const getFromLocalStorage = (key: string) => {
     const expiryTimesTemp = localStorage.getItem('expiry')
     if (expiryTimesTemp) {
         const expiryTimes = JSON.parse(expiryTimesTemp)
-        for (key in expiryTimes) {
+        for (const key in expiryTimes) {
             if (expiryTimes[key] < new Date().getTime()) localStorage.removeItem(key)
         }
     }

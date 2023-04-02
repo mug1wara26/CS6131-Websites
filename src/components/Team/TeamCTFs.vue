@@ -10,8 +10,7 @@
       <v-icon>mdi-magnify</v-icon>
     </v-btn>
 
-    <p v-if="ctfs.length === 0 && loaded" class="d-flex justify-center">You are not part of any ctfs, consider
-      creating one or searching for one to join</p>
+    <p v-if="ctfs.length === 0 && loaded" class="d-flex justify-center">This team has no CTFs</p>
     <v-progress-circular v-if="!loaded" indeterminate class="d-flex justify-center mx-auto"/>
 
     <v-row class="mt-2">

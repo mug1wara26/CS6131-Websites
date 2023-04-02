@@ -37,7 +37,7 @@ export const ctfNameExists = (name: string): Promise<boolean> => {
 
 export const getCTF = (id: string): Promise<CTF> => {
     return new Promise<CTF>(resolve => {
-        fetch(`${Vue.prototype.$apilink}/ctfs/${id}`, {
+        fetch(`${Vue.prototype.$apilink}/ctfs/get/${id}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',

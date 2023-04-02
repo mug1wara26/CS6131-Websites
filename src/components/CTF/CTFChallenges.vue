@@ -2,10 +2,10 @@
   <v-container fluid>
     <!-- TODO: Do not display if user is not part of team that created it -->
     <v-progress-circular v-if="!loaded" indeterminate class="d-flex justify-center mx-auto"/>
-    <div v-else>
+    <div v-else-if="canView">
       <v-row class="d-flex align-center">
         <v-col cols="1">
-          <v-btn color="green" @click="create = true" :disabled="challenges.length >= 100 || !loaded">
+          <v-btn v-if="canCreate" color="green" @click="create = true" :disabled="challenges.length >= 100 || !loaded">
             Create
             <v-icon class="ml-1">mdi-plus</v-icon>
           </v-btn>
@@ -91,6 +91,18 @@
         />
       </v-dialog>
     </div>
+    <div v-else class="d-flex justify-center">
+      <v-btn color="green" @click="compete = true" :disabled="!canCompete">Compete</v-btn>
+
+      <v-dialog
+          v-model="compete"
+          width="400"
+      >
+        <CompeteDialog
+            :teams="teams"
+        />
+      </v-dialog>
+    </div>
   </v-container>
 </template>
 
@@ -100,13 +112,16 @@ import {CTF} from "../../../cs6131-backend/types/ctfTypes";
 import {BasicUser} from "../../../cs6131-backend/types/userTypes";
 import {BasicChallenge} from "../../../cs6131-backend/types/chalTypes";
 import {getCTFChals} from "@/api/ctfApi";
+import * as teamApi from "@/api/teamApi"
 import CreateChallengeDialog from "@/components/Dialogs/CreateChallengeDialog.vue";
 import ChallengeSearchCard from "@/components/SearchCards/ChallengeSearchCard.vue";
 import {getFromLocalStorage, setLocalStorage} from "@/api/api";
+import CompeteDialog from "@/components/Dialogs/CompeteDialog.vue";
+import {Team} from "../../../cs6131-backend/types/teamTypes";
 
 export default Vue.extend({
   name: "CTFChallenges",
-  components: {CreateChallengeDialog, ChallengeSearchCard},
+  components: {CompeteDialog, CreateChallengeDialog, ChallengeSearchCard},
   props: {
     'ctf': CTF,
     'user': BasicUser
@@ -116,13 +131,17 @@ export default Vue.extend({
       create: false,
       loaded: false,
       challenges: [] as Array<BasicChallenge>,
+      teams: [] as Array<Team>,
       search: '',
       orderBy: 'Category',
       orderItems: ['Category', 'Difficulty'],
       sortBy: 'Points',
       sortItems: ['Points', 'Name'],
       panelModel: [] as Array<number>,
-      ascending: true
+      ascending: true,
+      canCreate: false,
+      canView: false,
+      compete: false
     }
   },
   computed: {
@@ -154,10 +173,12 @@ export default Vue.extend({
       const cats = ['Web', 'Crypto', 'Forensics', 'Misc', 'OSINT', 'Reverse Engineering', 'Pwn'].sort()
       const diffs = ['Easy', 'Medium', 'Hard', 'Insane']
 
-      this.challenges.forEach(chal => {
+      for (const key in this.challenges) {
+        const chal = this.challenges[key]
+
         if (chal.category && !cats.includes(chal.category)) cats.push(chal.category);
         if (chal.difficulty && !diffs.includes(chal.difficulty)) diffs.push(chal.difficulty)
-      })
+      }
 
       // Use this instead of ternary in case need to add more in future
       const panels = {
@@ -175,35 +196,40 @@ export default Vue.extend({
       })
 
       return orderedChals
+    },
+    canCompete(): boolean {
+      return this.teams.length > 0
     }
-  },
-  methods: {
   },
   created() {
     const chals = getFromLocalStorage(`${this.ctf?.id}_chals`)
     if (chals) {
       this.challenges = chals;
       this.loaded = true;
+      this.canView = true
     }
-    if (this.ctf.public) {
-      // TODO: Display CTFs
-      // TODO: CTF Dialog
-      // TODO: Mark chals as solved
-      console.log('public')
-    }
-    else {
-      // CTF is private so we can assume that the user viewing the CTF can create and view all challenges
-      getCTFChals(this.ctf.id).then(res => {
-        if (res.status === 200) res.json().then(data => {
-          this.challenges = data
-          setLocalStorage(`${this.ctf?.id}_chals`, JSON.stringify(data))
-          this.loaded = true
-        })
-        else {
-          this.$root.$emit('alert', {alertType: 'error', alertTitle: `Error ${res.status}`, alertText: res.statusText})
+
+    getCTFChals(this.ctf.id).then(res => {
+      if (res.status === 200) res.json().then(data => {
+        if (this.challenges.length > 0) {
+          this.challenges = data.challenges as Array<BasicChallenge>
+          setLocalStorage(`${this.ctf?.id}_chals`, JSON.stringify(data.challenges))
+        }
+
+        this.canView = data.canView
+        this.canCreate = data.isMember
+        this.loaded = true
+
+        if (!data.canView) {
+          teamApi.getUserTeams(this.user?.username).then(teams => {
+            this.teams = teams
+          })
         }
       })
-    }
+      else {
+        this.$root.$emit('alert', {alertType: 'error', alertTitle: `Error ${res.status}`, alertText: res.statusText})
+      }
+    })
   }
 });
 </script>
