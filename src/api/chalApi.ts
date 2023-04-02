@@ -36,3 +36,49 @@ export const getChal = (name: string, ctfid: string): Promise<BasicChallenge> =>
         })
     })
 }
+
+export const solve = (ctfid: string, chalName: string, flag: string): Promise<boolean> => {
+    return new Promise<boolean>(resolve => {
+        const token = getCookie('token') || '';
+        fetch(`${Vue.prototype.$apilink}/chals/solve`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({ctfid: ctfid, chalName: chalName, flag: flag})
+        }).then(res => {
+            if (res.status === 200) res.json().then(data => {
+                if (data.solved) resolve(true)
+                else resolve(false)
+            })
+            else resolve(false)
+        })
+    })
+}
+
+interface ChalUserData {
+    challenge: BasicChallenge,
+    isPublic: boolean,
+    isSolved: boolean
+}
+export const getChalUserData = (ctfid: string, chalName: string): Promise<ChalUserData> => {
+    return new Promise<ChalUserData>(resolve => {
+        const token = getCookie('token') || '';
+        fetch(`${Vue.prototype.$apilink}/chals/getChalUserData`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({ctfid: ctfid, chalName: chalName})
+        }).then(res => {
+            if (res.status === 200) res.json().then(data => {
+                resolve(data)
+            })
+            else resolve({} as ChalUserData)
+        })
+    })
+}

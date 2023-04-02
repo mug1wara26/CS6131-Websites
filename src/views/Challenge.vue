@@ -14,7 +14,14 @@
                     <b>{{chal.category}}</b> <br/>
                     <span>{{chal.difficulty}}</span> <br/> <br/>
                     <span class="text-h4">{{chal.points ? `${chal.points} Points` : ''}}</span>
+
+                    <v-form ref="form">
+                      <v-text-field v-if="isPublic" label="Submit flag" v-model="flag" class="text-body-1" :rules="flagRules"/>
+                    </v-form>
                   </v-card-text>
+                  <v-card-actions class="d-flex justify-center">
+                    <v-btn v-if="isPublic" color="green" :disabled="!clean" :loading="loading" @click="submitFlag">Submit</v-btn>
+                  </v-card-actions>
                 </v-card>
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -63,7 +70,6 @@ import * as chalApi from "@/api/chalApi"
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 
-// use
 Vue.use(mavonEditor)
 export default Vue.extend({
   name: "Challenge",
@@ -73,15 +79,49 @@ export default Vue.extend({
       ctfid: '',
       loaded: false,
       chal: {} as BasicChallenge,
+      isPublic: false,
       panel: 0,
       selected: 0,
       items: ['Note 1', 'Note 2', 'Note 3'],
       value: '',
+      flag: '',
+      loading: false,
+      flagRules: [] as Array<Function>,
+      solved: true
     }
   },
   computed: {
     chalExists(): boolean {
       return Object.keys(this.chal).length !== 0
+    },
+    clean() : boolean {
+      return this.flag !== '' && !this.solved
+    },
+  },
+  methods: {
+    submitFlag() {
+      this.loading = true;
+
+      this.flagRules = [
+        (v: string | null) => v && v.length <= 256 || 'Max 256 characters',
+        (v: string | null) => v && v.length >= 3 || 'Min 3 characters',
+        (v: string | null) => v && /^[A-Za-z0-9_@./#&+\-!?]*$/.test(v) || 'Flag can only contain alphanumeric and special characters',
+      ]
+
+
+      this.$nextTick(() => {
+        if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+          chalApi.solve(this.ctfid, this.name, this.flag).then(val => {
+            this.flagRules = []
+            this.loading = false;
+            this.solved = val;
+            this.flag = ''
+            if (val) this.$root.$emit('alert', {alertType: 'success', alertTitle: `${this.name} solved`})
+            else this.$root.$emit('alert', {alertType: 'error', alertTitle: `Wrong flag`})
+          })
+        }
+        else this.loading = false
+      })
     }
   },
   created() {
@@ -94,10 +134,12 @@ export default Vue.extend({
       this.loaded = true
     }
 
-
-    chalApi.getChal(this.name, this.ctfid).then(chal => {
-      this.chal = chal as BasicChallenge
-      this.loaded = true
+    chalApi.getChalUserData(this.ctfid, this.name).then(data => {
+      if (Object.keys(data).length !== 0) {
+        this.chal = data.challenge
+        this.isPublic = data.isPublic
+        this.solved = data.isSolved
+      }
     })
   },
 });

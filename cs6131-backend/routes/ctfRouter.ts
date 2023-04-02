@@ -126,6 +126,7 @@ ctfRouter.post("/create", async (req, res) => {
     }
 })
 
+
 ctfRouter.get('/chals/:id', async (req, res) => {
     const id = req.params.id;
     const token = req.header('Authorization')
@@ -176,6 +177,33 @@ ctfRouter.get('/compete/:ctfid/:teamName', async (req, res) => {
                         else {
                             return res.status(400).end()
                         }
+                    }
+                })
+            }
+        })
+    }
+    else return res.status(400).end()
+})
+
+ctfRouter.get('/competingctfs/:teamName', async (req, res) => {
+    const teamName = req.params.teamName
+    const token = req.header('Authorization')
+
+    if (token) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) {
+                res.statusMessage = 'Invalid token'
+                return res.status(400).end()
+            }
+            else {
+                const user = decoded as BasicUser
+
+                ctfModel.findCompetingCTFs(user.username, teamName, (err: Error, ctfs: Array<CTF>) => {
+                    console.log(err)
+                    console.log(ctfs)
+                    if (err) return res.status(500).end()
+                    else {
+                        return res.status(200).json({ctfs: ctfs})
                     }
                 })
             }

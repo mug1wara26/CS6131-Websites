@@ -121,6 +121,23 @@ WHERE BINARY ctfid = ? and BINARY competitorName = ?
     )
 }
 
+export const findCompetingCTFs = (username: string, teamName: string, callback: Function) => {
+    const queryString = `
+SELECT ctf.*
+FROM competitor c, ctf
+WHERE c.ctfid = ctf.id AND BINARY c.teamName = ? AND BINARY c.competitorName = ?
+    `
+
+    db.query(
+        queryString,
+        [teamName, username],
+        (err, result) => {
+            if (err) callback(err)
+            else callback(null, <RowDataPacket> result)
+        }
+    )
+}
+
 export const memberOfTeamCreator = (username: string, ctfid: string, callback: Function) => {
     const queryString = `
 SELECT *

@@ -134,7 +134,7 @@ export default Vue.extend({
         this.flagRules = [
           (v: string | null) => v && v.length <= 256 || 'Max 256 characters',
           (v: string | null) => v && v.length >= 3 || 'Min 3 characters',
-          (v: string | null) => v && /^[A-Za-z0-9_]*$/.test(v) || 'Flag can only contain alphanumeric characters and underscores',
+          (v: string | null) => v && /^[A-Za-z0-9_@./#&+\-!?]*$/.test(v) || 'Flag can only contain alphanumeric and special characters',
         ]
       }
 

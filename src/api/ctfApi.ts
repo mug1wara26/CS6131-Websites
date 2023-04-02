@@ -20,6 +20,25 @@ export const getTeamCTFs = (teamName: string): Promise<Array<CTF>> => {
     })
 }
 
+export const getCompetingCTFs = (teamName: string): Promise<Array<CTF>> => {
+    return new Promise<Array<CTF>>(resolve => {
+        const token = getCookie('token') || '';
+        fetch(`${Vue.prototype.$apilink}/ctfs/competingctfs/${teamName}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        }).then(res => {
+            if (res.status === 200) res.json().then(data => {
+                resolve(data.ctfs)
+            });
+            else resolve([])
+        })
+    })
+}
+
 export const ctfNameExists = (name: string): Promise<boolean> => {
     return new Promise<boolean>(resolve => {
         fetch(`${Vue.prototype.$apilink}/ctfs/public/${name}`, {
