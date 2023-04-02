@@ -75,3 +75,30 @@ export const loginWithUsername = (username: string, password: string, callback: 
         }
     })
 }
+
+export const editUser = (user: BasicUser, callback: Function) => {
+    let queryString = `
+UPDATE user
+SET displayName = ?, email = ?`
+
+    const input = [user.displayName, user.email]
+    if (user.pfp) {
+        queryString += ', pfp = ?'
+        input.push(user.pfp)
+    }
+    if (user.bio) {
+        queryString += ', bio = ? '
+        input.push(user.bio)
+    }
+
+    queryString += '\nWHERE username = ?'
+    input.push(user.username)
+
+    db.query(
+        queryString,
+        input,
+        (err, result) => {
+            callback(err)
+        }
+    )
+}

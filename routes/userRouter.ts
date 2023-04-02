@@ -3,6 +3,11 @@ import * as userModel from "../model/userModel"
 import {BasicUser, RegisteringUser, User} from "../types/userTypes";
 import {validate} from "class-validator";
 import bcrypt from "bcrypt"
+import jwt, {JwtPayload} from "jsonwebtoken";
+import * as dotenv from "dotenv"
+dotenv.config()
+
+const SECRET_KEY = process.env.JWT_SECRET_KEY;
 
 const userRouter = express.Router();
 
@@ -77,6 +82,41 @@ userRouter.post('/login', async (req, res) => {
             }
         })
     }
+})
+
+userRouter.post('/edit', async (req, res) => {
+    if (!req.body.user) return res.status(400).end();
+    const token = req.header('Authorization')
+    if (token) {
+        jwt.verify(token, SECRET_KEY!, (err: jwt.VerifyErrors | null, decoded: JwtPayload | string | undefined) => {
+            if (err) {
+                res.statusMessage = 'Invalid Token'
+                return res.status(400).end()
+            }
+            else {
+                const user = decoded as BasicUser
+                const editingUser = Object.assign(new BasicUser(), req.body.user)
+                if (user.username === editingUser.username) {
+                    validate(editingUser).then(errors => {
+                        if (errors.length > 0) return res.status(400).json(errors)
+                        else {
+                            userModel.editUser(editingUser, (err: Error) => {
+                                if (err) return res.status(500).end()
+                                else {
+                                    const token = jwt.sign({...editingUser}, SECRET_KEY!, {
+                                        expiresIn: '31d'
+                                    });
+                                    return res.status(200).json({token: token})
+                                }
+                            })
+                        }
+                    })
+                }
+                else return res.status(400).end()
+            }
+        })
+    }
+    else return res.status(400).end()
 })
 
 export {userRouter};

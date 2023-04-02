@@ -10,12 +10,12 @@ export class BasicUser {
     displayName: string;
     @IsEmail()
     email: string;
-    @IsUrl()
     @IsOptional()
-    pfp?: string;
+    @IsUrl({require_valid_protocol: true, require_tld: true, require_protocol: true})
+    pfp: string;
+    @IsOptional()
     @Length(0,200)
-    @IsOptional()
-    bio?: string;
+    bio: string;
 }
 
 export class RegisteringUser extends BasicUser {
