@@ -83,3 +83,20 @@ export const getCTFChals = (ctfid: string): Promise<Response> => {
         }).then(res => resolve(res))
     })
 }
+
+export const compete = (ctfid: string, teamName: string): Promise<boolean> => {
+    return new Promise<boolean>(resolve => {
+        const token = getCookie('token') || '';
+        fetch(`${Vue.prototype.$apilink}/ctfs/compete/${ctfid}/${teamName}`, {
+            method: "GET",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        }).then(res => {
+            if (res.status === 200) resolve(true)
+            else resolve(false)
+        })
+    })
+}

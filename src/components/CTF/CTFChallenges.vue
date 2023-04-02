@@ -4,8 +4,8 @@
     <v-progress-circular v-if="!loaded" indeterminate class="d-flex justify-center mx-auto"/>
     <div v-else-if="canView">
       <v-row class="d-flex align-center">
-        <v-col cols="1">
-          <v-btn v-if="canCreate" color="green" @click="create = true" :disabled="challenges.length >= 100 || !loaded">
+        <v-col cols="1" v-if="canCreate">
+          <v-btn color="green" @click="create = true" :disabled="challenges.length >= 100 || !loaded">
             Create
             <v-icon class="ml-1">mdi-plus</v-icon>
           </v-btn>
@@ -33,7 +33,7 @@
           />
         </v-col>
         <!-- This is just here to center align the next v-col -->
-        <v-col cols="2"/>
+        <v-col :cols="canCreate ? 2 : 3"/>
         <v-col cols="2">
           <v-text-field autofocus v-model="search" prepend-icon="mdi-magnify" label="Search"></v-text-field>
         </v-col>
@@ -100,6 +100,8 @@
       >
         <CompeteDialog
             :teams="teams"
+            @close-dialog="compete = false"
+            @compete="(teamName) => onCompete(teamName)"
         />
       </v-dialog>
     </div>
@@ -111,7 +113,7 @@ import Vue from "vue";
 import {CTF} from "../../../cs6131-backend/types/ctfTypes";
 import {BasicUser} from "../../../cs6131-backend/types/userTypes";
 import {BasicChallenge} from "../../../cs6131-backend/types/chalTypes";
-import {getCTFChals} from "@/api/ctfApi";
+import * as ctfApi from "@/api/ctfApi";
 import * as teamApi from "@/api/teamApi"
 import CreateChallengeDialog from "@/components/Dialogs/CreateChallengeDialog.vue";
 import ChallengeSearchCard from "@/components/SearchCards/ChallengeSearchCard.vue";
@@ -201,6 +203,14 @@ export default Vue.extend({
       return this.teams.length > 0
     }
   },
+  methods: {
+    onCompete(teamName: string) {
+      ctfApi.compete(this.ctf?.id, teamName).then(val => {
+        if (val) this.canView = true;
+        else this.$root.$emit('alert', {alertType: 'error', alertTitle: 'Error competing in CTF', alertText: 'Please try again later'})
+      })
+    }
+  },
   created() {
     const chals = getFromLocalStorage(`${this.ctf?.id}_chals`)
     if (chals) {
@@ -209,9 +219,9 @@ export default Vue.extend({
       this.canView = true
     }
 
-    getCTFChals(this.ctf.id).then(res => {
+    ctfApi.getCTFChals(this.ctf.id).then(res => {
       if (res.status === 200) res.json().then(data => {
-        if (this.challenges.length > 0) {
+        if (data.challenges.length > 0) {
           this.challenges = data.challenges as Array<BasicChallenge>
           setLocalStorage(`${this.ctf?.id}_chals`, JSON.stringify(data.challenges))
         }

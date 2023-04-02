@@ -46,10 +46,11 @@ export default Vue.extend({
   },
   methods: {
     onClose() {
-      
+      this.$emit('close-dialog')
     },
     compete() {
-
+      this.$emit('compete', this.competingTeam)
+      this.onClose()
     }
   }
 })

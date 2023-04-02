@@ -150,6 +150,40 @@ ctfRouter.get('/chals/:id', async (req, res) => {
     })
 })
 
+ctfRouter.get('/compete/:ctfid/:teamName', async (req, res) => {
+    const ctfid = req.params.ctfid
+    const teamName = req.params.teamName
+    const token = req.header('Authorization')
+
+    if (token) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) {
+                res.statusMessage = 'Invalid token'
+                return res.status(400).end()
+            }
+            else {
+                const user = decoded as BasicUser
+
+                teamModel.findUserTeams(user.username, (err: Error, teams: Array<Team>) => {
+                    if (err) return res.status(500).end()
+                    else {
+                        if (teams.filter(team => team.name === teamName).length > 0) {
+                            ctfModel.createCompetitor(user.username, teamName, ctfid, (err: Error) => {
+                                if (err) return res.status(400).end()
+                                else return res.status(200).end()
+                            })
+                        }
+                        else {
+                            return res.status(400).end()
+                        }
+                    }
+                })
+            }
+        })
+    }
+    else return res.status(400).end()
+})
+
 const validateCTFCreation = (ctf: BasicCTF, username: string, callback: Function) => {
     teamModel.findOne(ctf.teamCreator, (err: Error, team: Team) => {
         // Check if team exists
@@ -189,7 +223,7 @@ const canViewChals = (token: string | undefined, ctf: CTF, callback: Function) =
                 const user = decoded as BasicUser
                 ctfModel.memberOfTeamCreator(user.username, ctf.id, (err: Error, isMember: boolean) => {
                     if (err) return callback(500, 'Internal server error');
-                    if (isMember) return callback(200, null, true)
+                    if (isMember) return callback(200, null, true, true)
                     else {
                         ctfModel.isCompeting(user.username, ctf.id, (err: Error, isCompeting: boolean) => {
                             if (err) return callback(500, 'Internal server error')
