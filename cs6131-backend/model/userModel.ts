@@ -79,19 +79,19 @@ export const loginWithUsername = (username: string, password: string, callback: 
 export const editUser = (user: BasicUser, callback: Function) => {
     let queryString = `
 UPDATE user
-SET displayName = ?, email = ?`
+SET BINARY displayName = ?, BINARY email = ?`
 
     const input = [user.displayName, user.email]
     if (user.pfp) {
-        queryString += ', pfp = ?'
+        queryString += ', BINARY pfp = ?'
         input.push(user.pfp)
     }
     if (user.bio) {
-        queryString += ', bio = ? '
+        queryString += ', BINARY bio = ? '
         input.push(user.bio)
     }
 
-    queryString += '\nWHERE username = ?'
+    queryString += '\nWHERE BINARY username = ?'
     input.push(user.username)
 
     db.query(
@@ -99,6 +99,21 @@ SET displayName = ?, email = ?`
         input,
         (err, result) => {
             callback(err)
+        }
+    )
+}
+
+export const deleteAccount = (username: string, callBack: Function) => {
+    const queryString = `
+DELETE FROM user
+WHERE BINARY username = ?
+    `
+
+    db.query(
+        queryString,
+        username,
+        (err, result) => {
+            callBack(err)
         }
     )
 }

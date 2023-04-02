@@ -119,4 +119,24 @@ userRouter.post('/edit', async (req, res) => {
     else return res.status(400).end()
 })
 
+userRouter.get('/delete/:username', async (req, res) => {
+    const token = req.header('Authorization')
+    if (token) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) return res.status(500).end()
+            else {
+                const user = decoded as BasicUser
+                if (user.username === req.params.username) {
+                    userModel.deleteAccount(user.username, (err: Error) => {
+                        if (err) return res.status(500).end()
+                        else return res.status(200).end()
+                    })
+                }
+                else return res.status(400).end()
+            }
+        })
+    }
+    else return res.status(400).end()
+})
+
 export {userRouter};

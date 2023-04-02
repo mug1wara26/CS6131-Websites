@@ -286,6 +286,11 @@ export default Vue.extend({
     this.$root.$on('alert', (alertData: AlertData) => {
       this.showAlert(alertData.alertType, alertData.alertTitle, alertData.alertText)
     })
+    this.$root.$on('account-delete', () => {
+      this.showAlert('success', 'Account deleted successfully', '')
+      this.user = {} as BasicUser
+      this.reRender++
+    })
   },
 });
 </script>

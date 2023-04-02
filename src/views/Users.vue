@@ -2,7 +2,7 @@
   <v-container fluid v-if="userExists">
     <v-row>
       <v-col cols="3">
-        <v-card>
+        <v-card class="pb-4">
           <template v-if="!edit">
             <v-card-title>
               <v-avatar size="56">
@@ -39,10 +39,23 @@
               <v-spacer/>
               <v-btn color="primary" @click="saveEdit" :loading="editLoading" :disabled="!editClean">Save</v-btn>
             </v-card-actions>
+            <div class="d-flex justify-center mt-4">
+              <v-btn color="error" @click="deleteAccount = true">Delete account</v-btn>
+            </div>
           </template>
         </v-card>
       </v-col>
     </v-row>
+
+    <v-dialog
+        v-model="deleteAccount"
+        width="500"
+    >
+      <DeleteAccountDialog
+          :username="user.username"
+          @close-dialog="deleteAccount = false"
+      />
+    </v-dialog>
   </v-container>
 </template>
 
@@ -53,9 +66,11 @@ import {editUser, getUser, onLogin} from "@/api/userApi";
 import {AlertData} from "@/schemas/alertData";
 import {setCookie} from "typescript-cookie";
 import {ValidationError} from "class-validator";
+import DeleteAccountDialog from "@/components/Dialogs/DeleteAccountDialog.vue";
 
 export default Vue.extend({
   name: "Users",
+  components: {DeleteAccountDialog},
   data() {
     return {
       user: {} as BasicUser,
@@ -72,6 +87,7 @@ export default Vue.extend({
       emailRules: [] as Array<Function>,
       defaultImage: require("../../public/assets/default-pfp.webp"),
       profileLinkError: '',
+      deleteAccount: false,
     }
   },
   computed: {

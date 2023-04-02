@@ -108,3 +108,20 @@ export const editUser = (user: BasicUser): Promise<Response> => {
         })
     })
 }
+
+export const deleteAccount = (username: string): Promise<boolean> => {
+    return new Promise<boolean>(resolve => {
+        const token = getCookie('token') || ''
+        fetch(`${Vue.prototype.$apilink}/users/delete/${username}`, {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": token
+            }
+        }).then(res => {
+            if (res.status===200) resolve(true)
+            else resolve(false)
+        })
+    })
+}
