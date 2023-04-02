@@ -106,7 +106,7 @@ export const isCompeting = (username: string, ctfid: string, callback: Function)
     const queryString = `
 SELECT *
 FROM competitor
-WHERE BINARY ctfid = ? and BINARY username = ?
+WHERE BINARY ctfid = ? and BINARY competitorName = ?
     `
 
     db.query(
