@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import {BasicUser} from "../types/userTypes";
 import {IsOptional, validate} from "class-validator";
 import {BasicChallenge, Challenge} from "../types/chalTypes";
+import {CTF} from "../types/ctfTypes";
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
 const chalRouter = express.Router();
 
@@ -22,7 +23,6 @@ chalRouter.post('/create', async (req, res) => {
                 const user = decoded as BasicUser
                 const chal = new Challenge()
                 Object.assign(chal, req.body.challenge)
-                console.log(chal)
 
                 validate(chal).then(errors => {
                     if (errors.length > 0) return res.status(400).json(errors)
@@ -66,10 +66,77 @@ chalRouter.get('/:ctfid/:name', async (req, res) => {
                 const user = decoded as BasicUser
                 // Whether user can get challenge is covered by the sql query
                 chalModel.findOneByUser(id, name, user.username, (err: Error, chal: BasicChallenge) => {
-                    console.log(err)
-                    console.log(chal)
                     if (err) return res.status(500).end()
                     else return res.status(200).json({challenge: chal})
+                })
+            }
+        })
+    }
+    else return res.status(400).end()
+})
+
+chalRouter.post('/getChalUserData', async (req, res) => {
+    const ctfid = req.body.ctfid
+    const chalName = req.body.chalName
+    const token = req.header('Authorization')
+
+    if (token && ctfid && chalName) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) {
+                res.statusMessage = 'Invalid token'
+                return res.status(400).end()
+            }
+            else {
+                const user = decoded as BasicUser
+
+                chalModel.findOneByUser(ctfid, chalName, user.username, (err: Error, chal: BasicChallenge) => {
+                    if (err) return res.status(500).end()
+                    else if (chal) {
+                        ctfModel.findOne(ctfid, (err: Error, ctf: CTF) => {
+                            if (err) return res.status(500).end()
+                            else if (ctf) {
+                                chalModel.isSolved(ctfid, chalName, user.username, (err: Error, isSolved: boolean) => {
+                                    return res.status(200).json({challenge: chal, isPublic: ctf.public, isSolved: isSolved})
+                                })
+                            }
+                            else return res.status(400).end()
+                        })
+                    }
+                    else return res.status(400).end()
+                })
+            }
+        })
+    }
+    else return res.status(400).end()
+})
+
+chalRouter.post('/solve', async (req, res) => {
+    const ctfid = req.body.ctfid
+    const chalName = req.body.chalName
+    const submittedFlag = req.body.flag
+    const token = req.header('Authorization')
+
+    if (token && ctfid && chalName && submittedFlag) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) {
+                res.statusMessage = 'Invalid token'
+                return res.status(400).end()
+            }
+            else {
+                const user = decoded as BasicUser
+
+                chalModel.getFlag(ctfid, chalName, user.username, (err: Error, flag: string) => {
+                    if (err) return res.status(500).end();
+                    else if (flag) {
+                        if (flag === submittedFlag) {
+                            chalModel.solve(ctfid, chalName, user.username, (err:Error) => {
+                                if (err) return res.status(500).end()
+                                else return res.status(200).json({solved: true})
+                            })
+                        }
+                        else return res.status(200).json({solved: false})
+                    }
+                    else return res.status(400).end()
                 })
             }
         })

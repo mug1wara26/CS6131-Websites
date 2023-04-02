@@ -35,7 +35,7 @@ FROM challenge chal, competitor comp
 WHERE chal.ctfid = comp.ctfid
 and binary chal.ctfid = ?
 and binary chal.name = ?
-and comp.competitorName = ?
+and BINARY comp.competitorName = ?
     `
 
     db.query(
@@ -44,6 +44,65 @@ and comp.competitorName = ?
         (err, result) => {
             if (err) callback(err)
             else callback(null, (<RowDataPacket> result)[0])
+        }
+    )
+}
+
+export const getFlag = (ctfid: string, chalName: string, username: string, callback: Function) => {
+    const queryString = `
+SELECT flag
+FROM challenge chal, competitor comp
+WHERE chal.ctfid = comp.ctfid
+and binary chal.ctfid = ?
+and binary chal.name = ?
+and BINARY comp.competitorName = ?
+    `
+
+    db.query(
+        queryString,
+        [ctfid, chalName, username],
+        (err, result) => {
+            if (err) callback(err)
+            else callback(null, (<RowDataPacket> result)[0].flag)
+        }
+    )
+}
+
+export const solve = (ctfid: string, chalName: string, username: string, callback: Function) => {
+    const queryString = `
+INSERT INTO solve 
+SELECT chal.name, chal.ctfid, comp.teamName, comp.competitorName
+FROM challenge chal, competitor comp
+WHERE chal.ctfid = comp.ctfid
+and binary chal.ctfid = ?
+and binary chal.name = ?
+and BINARY comp.competitorName = ?
+    `
+
+    db.query(
+        queryString,
+        [ctfid, chalName, username],
+        (err, result) => {
+            if (err) callback(err)
+            else callback(null)
+        }
+    )
+}
+
+export const isSolved = (ctfid: string, chalName: string, username: string, callback: Function) => {
+    const queryString = `
+SELECT *
+FROM solve
+WHERE binary ctfid = ?
+and binary chalName = ?
+and binary username = ?
+    `
+
+    db.query(
+        queryString,
+        [ctfid, chalName, username],
+        (err, result) => {
+            callback(err, Boolean((<RowDataPacket> result)[0]))
         }
     )
 }
