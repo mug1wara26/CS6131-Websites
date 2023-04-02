@@ -5,10 +5,6 @@ import {teamRouter} from "./routes/teamRouter";
 import {ctfRouter} from "./routes/ctfRouter";
 import {chalRouter} from "./routes/chalRouter"
 import cors from "cors";
-import {db} from "./db"
-import {RowDataPacket} from "mysql2";
-import * as chalModel from "./model/chalModel";
-import {BasicChallenge, Challenge} from "./types/chalTypes";
 
 
 const app = express();

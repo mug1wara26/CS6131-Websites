@@ -91,3 +91,20 @@ export const onLogin = (callback: Function) => {
     }
     else callback(null, {} as BasicUser)
 }
+
+export const editUser = (user: BasicUser): Promise<Response> => {
+    return new Promise<Response>((resolve) => {
+        const token = getCookie('token') || ''
+        fetch(`${Vue.prototype.$apilink}/users/edit`, {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": token
+            },
+            body: JSON.stringify({user: user})
+        }).then(res => {
+            resolve(res)
+        })
+    })
+}
