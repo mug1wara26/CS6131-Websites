@@ -20,3 +20,10 @@ export class Team extends BasicTeam {
     @Matches(/^[A-Za-z0-9_]*$/)
     owner: string;
 }
+
+export interface MemberStat {
+    username: string,
+    num_competing: number,
+    num_solves: number,
+    total_points?: string
+}

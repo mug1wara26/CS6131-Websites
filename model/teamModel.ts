@@ -89,3 +89,52 @@ VALUES(?,?,?,?,?);
         }
     })
 }
+
+export const findMembers = (name: string, callback: Function) => {
+    const queryString = `
+SELECT member.username, team.public
+FROM team, member
+WHERE BINARY team.name = member.teamName AND BINARY team.name = ?
+    `
+
+    db.query(
+        queryString,
+        name,
+        (err, result) => {
+            if (err) callback(err)
+            else {
+                const rows = <RowDataPacket[]> result
+                callback(err, rows.map(row => row.username), rows[0].public)
+            }
+        }
+    )
+}
+
+// Get num_competing, num_solves, total_points of all public ctfs that each member has competed in
+export const findMemberStats = (teamName: string, callback: Function) => {
+    const queryString = `
+SELECT m.username, count(c.ctfid) num_competing, count(s.ctfid) num_solves, sum(chal.points) total_points
+from member m
+left join competitor c on m.username = c.competitorName and m.teamName = c.teamName
+left join solve s on c.ctfid = s.ctfid
+left join challenge chal on chal.name = s.chalName and chal.ctfid = s.ctfid
+left join ctf on c.ctfid = ctf.id and ctf.public
+where m.teamName = ?
+group by m.username
+    `
+
+    db.query(
+        queryString,
+        teamName,
+        (err, result) => {
+            if (err) callback(err)
+            else {
+                const rows = (<RowDataPacket[]> result)
+                for (const rowsKey in rows) {
+                    const totalPoints = rows[rowsKey].total_points
+                    rows[rowsKey].total_points = totalPoints !== null ? parseInt(totalPoints) : 0
+                }
+                callback(null, rows)
+            }
+    })
+}
