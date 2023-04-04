@@ -20,5 +20,6 @@ export class Challenge extends BasicChallenge {
     @IsOptional()
     @IsAscii()
     @Length(0,256)
+    @Matches(/^[A-Za-z0-9_@./#&+\-!?{}()]*$/)
     flag: string;
 }

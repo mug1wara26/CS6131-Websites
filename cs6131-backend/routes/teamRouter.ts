@@ -1,10 +1,11 @@
-import express, {Request, Response}  from "express";
+import express, {Request, Response} from "express";
 import * as teamModel from "../model/teamModel";
-import {Team} from "../types/teamTypes";
-import {BasicUser, User} from "../types/userTypes";
+import {MemberStat, Team} from "../types/teamTypes";
+import {BasicUser} from "../types/userTypes";
 import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
 import {validate} from "class-validator";
+
 dotenv.config();
 
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
@@ -14,44 +15,40 @@ teamRouter.post('/create', async (req: Request, res: Response) => {
     const token = req.header('Authorization')
     if (token) {
         jwt.verify(token, SECRET_KEY!, (err, decoded) => {
-           if (err) {
-               res.statusMessage = 'Invalid token'
-               return res.status(400).end()
-           }
-           else {
-               const user = decoded as BasicUser;
-               const team = Object.assign(new Team(), {
-                   name: req.body.name,
-                   description: req.body.description,
-                   pfp: req.body.pfp,
-                   public: req.body.public,
-                   owner: user.username
-               })
+            if (err) {
+                res.statusMessage = 'Invalid token'
+                return res.status(400).end()
+            } else {
+                const user = decoded as BasicUser;
+                const team = Object.assign(new Team(), {
+                    name: req.body.name,
+                    description: req.body.description,
+                    pfp: req.body.pfp,
+                    public: req.body.public,
+                    owner: user.username
+                })
 
-               validate(team).then(errors => {
-                   if (errors.length > 0) {
-                       let responseMessage = ''
-                       if (errors.filter(e => e.property === 'pfp').length > 0) responseMessage = "Profile link not valid"
-                       else responseMessage = 'Check your information provided'
-                       console.log(errors)
+                validate(team).then(errors => {
+                    if (errors.length > 0) {
+                        let responseMessage = ''
+                        if (errors.filter(e => e.property === 'pfp').length > 0) responseMessage = "Profile link not valid"
+                        else responseMessage = 'Check your information provided'
+                        console.log(errors)
 
-                       res.statusMessage = responseMessage
-                       return res.status(400).end()
-                   }
-                   else {
-                       teamModel.create(team, (err: Error) => {
-                           if (err) {
-                               res.statusMessage = err.message;
-                               return res.status(400).end()
-                           }
-                           else return res.status(200).end()
-                       })
-                   }
-               })
-           }
+                        res.statusMessage = responseMessage
+                        return res.status(400).end()
+                    } else {
+                        teamModel.create(team, (err: Error) => {
+                            if (err) {
+                                res.statusMessage = err.message;
+                                return res.status(400).end()
+                            } else return res.status(200).end()
+                        })
+                    }
+                })
+            }
         })
-    }
-    else return res.status(400).end()
+    } else return res.status(400).end()
 })
 
 teamRouter.get("/:name", async (req: Request, res: Response) => {
@@ -75,39 +72,89 @@ teamRouter.get("/:name", async (req: Request, res: Response) => {
                             })
                         }
                     })
-                }
-                else return res.status(200).json({name: team.name, hasAccess: false})
+                } else return res.status(200).json({name: team.name, hasAccess: false})
             }
-        }
-        else return res.status(400).end();
+        } else return res.status(400).end();
     })
 })
 
 // TODO: If no token given, return all teams that are public
 teamRouter.get("/userTeams/:username", async (req: Request, res: Response) => {
     const token = req.header('Authorization')
+    const username = req.params.username
+
+    teamModel.findUserTeams(username, (err: Error, teams: Array<Team>) => {
+        if (err) return res.status(500).end()
+        else if (token) {
+            jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+                if (err) {
+                    res.statusMessage = 'Invalid Token'
+                    res.status(400).end();
+                } else {
+                    const user = decoded as BasicUser
+                    if (username === user.username) return res.status(200).json({teams: teams, isPublic: false})
+                    else return res.status(200).json({teams: teams.filter(team => team.public), isPublic: true})
+                }
+            })
+
+        } else return res.status(200).json({teams: teams.filter(team => team.public), isPublic: true})
+    })
+})
+
+teamRouter.get('/members/:name', async (req, res) => {
+    const token = req.header('Authorization')
+    const teamName = req.params.name
+
+    teamModel.findMembers(teamName, (err: Error, result: Array<string>, isPublic: boolean) => {
+        if (err) return res.status(500).end()
+        if (isPublic) return res.status(200).json(result)
+        else {
+            isMember(token, result, (status: number, message: string) => {
+                if(status === 200) return res.status(200).json(result)
+                else {
+                    res.statusMessage = message;
+                    return res.status(status).end()
+                }
+            })
+        }
+    })
+})
+
+
+teamRouter.get('/getMemberStats/:teamName', async (req, res) => {
+    const token = req.header('Authorization')
+    const teamName = req.params.teamName
+
+
+    teamModel.findMembers(teamName, (err: Error, members: Array<string>, isPublic: boolean) => {
+        if (err) return res.status(500).end()
+        teamModel.findMemberStats(teamName, (err: Error, memberStats: Array<MemberStat>) => {
+            if (err) return res.status(500).end()
+            if (isPublic) return res.status(200).json(memberStats)
+            isMember(token, members, (status: number, message: string) => {
+                if (status===200) return res.status(200).json(memberStats)
+                else {
+                    res.statusMessage = message;
+                    return res.status(status).end()
+                }
+            })
+        })
+    })
+})
+
+const isMember = (token: string | undefined, members: Array<string>, callback: Function) => {
     if (token) {
         jwt.verify(token, SECRET_KEY!, (err, decoded) => {
-            if (err) {
-                res.statusMessage = 'Invalid Token'
-                res.status(400).end();
-            }
+            if (err) return callback(400, 'Invalid token')
             else {
                 const user = decoded as BasicUser
 
-                teamModel.findUserTeams(user.username, (err: Error, teams: Array<Team>) => {
-                    if (err) {
-                        res.statusMessage = err.message;
-                        res.status(400).end();
-                    } else {
-                        res.status(200).json(teams);
-                    }
-                })
+                if (members.includes(user.username)) return callback(200)
+                else return callback(400, 'Bad request')
             }
         })
-
     }
-    else return res.status(400).end();
-})
+    else return callback(400, 'Bad request')
+}
 
 export {teamRouter};

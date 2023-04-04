@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
 
-    <v-btn color="green" @click="create = true" :disabled="teams.length >= 10 || !loaded">
+    <v-btn v-if="!isPublic" color="green" @click="create = true" :disabled="teams.length >= 10 || !loaded">
       Create
       <v-icon class="ml-1">group_add</v-icon>
     </v-btn>
@@ -59,6 +59,7 @@ export default Vue.extend({
       teams: [] as Array<Team>,
       create: false,
       loaded: false,
+      isPublic: true
     }
   },
   methods: {
@@ -76,9 +77,14 @@ export default Vue.extend({
     }
   },
   created() {
-    getUserTeams(this.user.username).then(data => {
-      this.teams = data
-      this.loaded = true
+    getUserTeams(this.user.username).then(res => {
+      if(res.status === 200) {
+        res.json().then(data => {
+          this.teams = data.teams
+          this.isPublic = data.isPublic
+          this.loaded = true
+        })
+      }
     });
   }
 });

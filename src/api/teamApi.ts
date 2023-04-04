@@ -1,9 +1,10 @@
-import {BasicTeam, Team} from "../../cs6131-backend/types/teamTypes";
+import {BasicTeam, MemberStat, Team} from "../../cs6131-backend/types/teamTypes";
 import Vue from "vue";
 import {getCookie} from "typescript-cookie";
+import {BasicUser} from "../../cs6131-backend/types/userTypes";
 
-export const getUserTeams = (username: string): Promise<Array<Team>> => {
-    return new Promise<Array<Team>>((resolve, reject) => {
+export const getUserTeams = (username: string): Promise<Response> => {
+    return new Promise<Response>((resolve, reject) => {
         const token = getCookie('token') || '';
         fetch(`${Vue.prototype.$apilink}/teams/userTeams/${username}`, {
             method: 'GET',
@@ -13,10 +14,8 @@ export const getUserTeams = (username: string): Promise<Array<Team>> => {
                 'Authorization': token
             }
         }).then(res => {
-            if (res.status === 200) return res.json();
-            else reject(res.statusText);
-        }).then(json => resolve(json)
-        ).catch(reason => reject(reason))
+            resolve(res)
+        })
     })
 }
 
@@ -66,6 +65,44 @@ export const getTeam = (name: string): Promise<Team> => {
                 else resolve(data as Team)
             })
             else resolve({} as Team)
+        })
+    })
+}
+
+export const getMembers = (name: string): Promise<Array<string>> => {
+    return new Promise<Array<string>>(resolve => {
+        const token = getCookie('token') || ''
+        fetch(`${Vue.prototype.$apilink}/teams/members/${name}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        }).then(res => {
+            if (res.status === 200) res.json().then(data => {
+                resolve(data.members)
+            })
+            else resolve([])
+        })
+    })
+}
+
+export const getMemberStats = (name: string): Promise<Array<MemberStat>> => {
+    return new Promise<Array<MemberStat>>((resolve, reject) => {
+        const token = getCookie('token') || ''
+        fetch(`${Vue.prototype.$apilink}/teams/getMemberStats/${name}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        }).then(res => {
+            if (res.status === 200) res.json().then(data => {
+                resolve(data)
+            })
+            else reject(res)
         })
     })
 }

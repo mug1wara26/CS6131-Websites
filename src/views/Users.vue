@@ -13,7 +13,7 @@
               </v-avatar>
               <h3 class="ml-4"> {{ user.displayName }} </h3>
               <v-spacer/>
-              <v-btn icon @click="edit = true"><v-icon>mdi-pencil</v-icon></v-btn>
+              <v-btn v-if="canEdit" icon @click="edit = true"><v-icon>mdi-pencil</v-icon></v-btn>
           </v-card-title>
           <v-card-subtitle class="mt-2"> {{ user.email }}</v-card-subtitle>
           <v-divider/>
@@ -45,6 +45,25 @@
           </template>
         </v-card>
       </v-col>
+
+      <v-col cols="9">
+        <v-container class="d-flex">
+          <v-toolbar floating class="justify-center" color="transparent" elevation="0">
+            <v-btn-toggle borderless rounded group mandatory v-model="selected">
+              <v-btn
+                  :value="item"
+                  text
+                  v-for="item in toolbar_items"
+                  :key="item"
+              >
+                {{ item }}
+              </v-btn>
+            </v-btn-toggle>
+          </v-toolbar>
+        </v-container>
+
+        <component :is="selected" :user="user"></component>
+      </v-col>
     </v-row>
 
     <v-dialog
@@ -62,15 +81,17 @@
 <script lang="ts">
 import Vue from "vue";
 import {BasicUser} from "../../cs6131-backend/types/userTypes";
-import {editUser, getUser, onLogin} from "@/api/userApi";
+import {getUser, onLogin, editUser} from "@/api/userApi";
 import {AlertData} from "@/schemas/alertData";
 import {setCookie} from "typescript-cookie";
 import {ValidationError} from "class-validator";
 import DeleteAccountDialog from "@/components/Dialogs/DeleteAccountDialog.vue";
+import MyTeams from "@/components/Teams/MyTeams.vue";
+import UserWriteups from "@/components/User/UserWriteups.vue";
 
 export default Vue.extend({
   name: "Users",
-  components: {DeleteAccountDialog},
+  components: {DeleteAccountDialog, 'Teams': MyTeams, 'WriteUps': UserWriteups},
   data() {
     return {
       user: {} as BasicUser,
@@ -88,6 +109,9 @@ export default Vue.extend({
       defaultImage: require("../../public/assets/default-pfp.webp"),
       profileLinkError: '',
       deleteAccount: false,
+      selected: 'Teams',
+      toolbar_items: ['Teams', 'WriteUps'],
+      canEdit: false
     }
   },
   computed: {
@@ -201,6 +225,7 @@ export default Vue.extend({
         this.cancelEdit()
       }).catch(err => console.log(err))
     } else {
+      this.canEdit = true;
       onLogin((err: AlertData, user: BasicUser) => {
         if (Object.keys(user).length === 0) this.$emit("open-login");
         else {

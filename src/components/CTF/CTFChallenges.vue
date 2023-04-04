@@ -1,6 +1,5 @@
 <template>
   <v-container fluid>
-    <!-- TODO: Do not display if user is not part of team that created it -->
     <v-progress-circular v-if="!loaded" indeterminate class="d-flex justify-center mx-auto"/>
     <div v-else-if="canView">
       <v-row class="d-flex align-center">
@@ -206,8 +205,39 @@ export default Vue.extend({
   methods: {
     onCompete(teamName: string) {
       ctfApi.compete(this.ctf?.id, teamName).then(val => {
-        if (val) this.canView = true;
+        if (val) {
+          this.canView = true;
+          this.loaded = false;
+          this.getChals()
+        }
         else this.$root.$emit('alert', {alertType: 'error', alertTitle: 'Error competing in CTF', alertText: 'Please try again later'})
+      })
+    },
+    getChals() {
+      ctfApi.getCTFChals(this.ctf.id).then(res => {
+        if (res.status === 200) res.json().then(data => {
+          if (data.challenges.length > 0) {
+            this.challenges = data.challenges as Array<BasicChallenge>
+            setLocalStorage(`${this.ctf?.id}_chals`, JSON.stringify(data.challenges))
+          }
+
+          this.canView = data.canView
+          this.canCreate = data.isMember
+          this.loaded = true
+
+          if (!data.canView) {
+            teamApi.getUserTeams(this.user?.username).then(res => {
+              if (res.status === 200) {
+                res.json().then(data => {
+                  this.teams = data.teams
+                })
+              }
+            })
+          }
+        })
+        else {
+          this.$root.$emit('alert', {alertType: 'error', alertTitle: `Error ${res.status}`, alertText: res.statusText})
+        }
       })
     }
   },
@@ -219,27 +249,7 @@ export default Vue.extend({
       this.canView = true
     }
 
-    ctfApi.getCTFChals(this.ctf.id).then(res => {
-      if (res.status === 200) res.json().then(data => {
-        if (data.challenges.length > 0) {
-          this.challenges = data.challenges as Array<BasicChallenge>
-          setLocalStorage(`${this.ctf?.id}_chals`, JSON.stringify(data.challenges))
-        }
-
-        this.canView = data.canView
-        this.canCreate = data.isMember
-        this.loaded = true
-
-        if (!data.canView) {
-          teamApi.getUserTeams(this.user?.username).then(teams => {
-            this.teams = teams
-          })
-        }
-      })
-      else {
-        this.$root.$emit('alert', {alertType: 'error', alertTitle: `Error ${res.status}`, alertText: res.statusText})
-      }
-    })
+    this.getChals()
   }
 });
 </script>

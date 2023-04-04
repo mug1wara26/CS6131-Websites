@@ -5,6 +5,7 @@ import {teamRouter} from "./routes/teamRouter";
 import {ctfRouter} from "./routes/ctfRouter";
 import {chalRouter} from "./routes/chalRouter"
 import cors from "cors";
+import {findMemberStats} from "./model/teamModel";
 
 
 const app = express();

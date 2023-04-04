@@ -91,10 +91,6 @@ export default Vue.extend({
           if(Object.keys(ctf).length !== 0) Object.assign(this.ctf, ctf)
           else this.ctf = {} as CTF
           this.loading = false;
-          // TODO: If private CTF, add Settings page to toolbar_items, if public CTF, check if user is part of the team that created it, if so, add Settings page to toolbar_items
-          // TODO: Check if user can compete
-          // TODO: Display join button if can compete
-          // TODO: Display challenges if competing
         })
       })
     }
