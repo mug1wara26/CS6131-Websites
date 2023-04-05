@@ -5,6 +5,8 @@ import {BasicUser} from "../types/userTypes";
 import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
 import {validate} from "class-validator";
+import {QueryError} from "mysql2";
+import {findRequested} from "../model/teamModel";
 
 dotenv.config();
 
@@ -140,6 +142,63 @@ teamRouter.get('/getMemberStats/:teamName', async (req, res) => {
             })
         })
     })
+})
+
+teamRouter.post('/request', async (req, res) => {
+    const teamName = req.body.teamName
+    const username = req.body.username
+    const token = req.header('Authorization')
+
+    if (teamName && username && token) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) {
+                res.statusMessage = 'Invalid token'
+                return res.status(400).end()
+            }
+            else {
+                const user = decoded as BasicUser
+
+                if (username === user.username) {
+                    teamModel.requestToJoin(teamName, username, (err: QueryError) => {
+                        console.log(err)
+                        if (err) {
+                            if (['ER_DUP_ENTRY', 'ER_NO_REFERENCED_ROW_2'].includes(err.code)) return res.status(400).end()
+                            else return res.status(500).end()
+                        }
+                        else return res.status(200).end()
+                    })
+                }
+                else return res.status(400).end()
+            }
+        })
+    }
+    else return res.status(400).end()
+})
+
+teamRouter.get('/hasRequested/:teamName/:username', async (req, res) => {
+    const teamName = req.params.teamName
+    const username = req.params.username
+    const token = req.header('Authorization')
+
+    if (token) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) {
+                res.statusMessage = "Invalid token"
+                return res.status(400).end()
+            }
+            else {
+                const user = decoded as BasicUser
+                if (user.username === username) {
+                    findRequested(teamName, username, (err: Error, hasRequested: boolean) => {
+                        if (err) return res.status(500).end()
+                        else return res.status(200).end()
+                    })
+                }
+                else return res.status(400).end()
+            }
+        })
+    }
+    else return res.status(400).end()
 })
 
 const isMember = (token: string | undefined, members: Array<string>, callback: Function) => {
