@@ -138,3 +138,38 @@ group by m.username
             }
     })
 }
+
+export const requestToJoin = (teamName: string, username: string, callback: Function) => {
+    const queryString = `
+INSERT INTO request VALUES
+(?, ?)
+    `
+
+    db.query(
+        queryString,
+        [teamName, username],
+        (err) => {
+            callback(err)
+        }
+    )
+}
+
+export const findRequested = (teamName: string, username: string, callback: Function) => {
+    const queryString = `
+SELECT *
+FROM request
+WHERE teamName = ? AND username = ?
+    `
+
+    db.query(
+        queryString,
+        [teamName, username],
+        (err, result) => {
+            if (err) callback(err)
+            else {
+                if((<RowDataPacket[]> result).length > 0) callback(null, true)
+                else callback(null, false)
+            }
+        }
+    )
+}

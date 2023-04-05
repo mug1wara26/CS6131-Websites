@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-progress-circular v-if="loading" indeterminate class="d-flex justify-center mx-auto"/>
+    <v-progress-circular v-if="!loaded" indeterminate class="d-flex justify-center mx-auto"/>
     <p v-else-if="!teamExists">Team Does not Exist</p>
     <v-container v-else>
       <v-row>
@@ -20,6 +20,16 @@
             <v-card-text>
               <p> {{ team.description }} </p>
             </v-card-text>
+            <v-card-actions class="d-flex justify-center">
+              <v-btn
+                  v-if="!isMember"
+                  color="green" @click="request"
+                  :loading="requestJoinLoading"
+                  :disabled="hasRequested">
+                Request
+              </v-btn>
+              <v-btn v-else color="error">Leave</v-btn>
+            </v-card-actions>
           </v-card>
         </v-col>
       </v-row>
@@ -49,7 +59,7 @@ import {Team} from "../../cs6131-backend/types/teamTypes";
 import {BasicUser} from "../../cs6131-backend/types/userTypes";
 import {onLogin} from "@/api/userApi";
 import {AlertData} from "@/schemas/alertData";
-import {getTeam} from "@/api/teamApi";
+import {getMembers, getTeam, hasRequested, requestToJoin} from "@/api/teamApi";
 import TeamCTFs from "@/components/Team/TeamCTFs.vue";
 import TeamMembers from "@/components/Team/TeamMembers.vue";
 import TeamParticipate from "@/components/Team/TeamParticipate.vue";
@@ -69,7 +79,13 @@ export default Vue.extend({
       toolbar_items: {'Team CTFs': 'TeamCTFs', 'Participating CTFs': 'TeamParticipate', 'Members': 'TeamMembers'},
       selected: 'Team CTFs',
       selectedComponent: 'TeamCTFs',
-      defaultImage: require("../../public/assets/default-pfp.webp")
+      defaultImage: require("../../public/assets/default-pfp.webp"),
+      isMember: false,
+      hasRequested: true,
+      getMembersLoaded: false,
+      getTeamsLoaded: false,
+      hasRequestedLoaded: false,
+      requestJoinLoading: false,
     }
   },
   computed: {
@@ -78,6 +94,19 @@ export default Vue.extend({
     },
     avatarImage(): string {
       return this.team.pfp ? this.team.pfp : this.defaultImage
+    },
+    loaded(): boolean {
+      return !this.loading || (this.getTeamsLoaded && this.getMembersLoaded)
+    }
+  },
+  methods: {
+    request() {
+      this.requestJoinLoading = true
+      requestToJoin(this.team.name, this.user.username).then(val => {
+        if (val) this.$root.$emit('alert', {alertType: 'success', alertTitle: 'Request Sent'})
+        else this.$root.$emit('alert', {alertType: 'error', alertTitle: 'An error occurred', alertText: 'Please try again later'})
+        this.requestJoinLoading = false
+      })
     }
   },
   created() {
@@ -88,12 +117,25 @@ export default Vue.extend({
           this.$emit('alert', err);
           this.loading = false;
         }
-        if (Object.keys(user).length !== 0) Object.assign(this.user, user)
-        getTeam(name).then(team => {
-          if (Object.keys(team).length !== 0) Object.assign(this.team, team);
-          else this.team = {} as Team
-          this.loading = false
-        })
+        else {
+          if (Object.keys(user).length !== 0) {
+            Object.assign(this.user, user)
+
+            getMembers(name).then(members => {
+              this.isMember = members.includes(this.user.username)
+              this.getMembersLoaded = true
+            })
+
+            hasRequested(name, this.user.username).then(val => {
+              this.hasRequested = val
+            })
+          }
+          getTeam(name).then(team => {
+            if (Object.keys(team).length !== 0) Object.assign(this.team, team);
+            else this.team = {} as Team
+            this.getTeamsLoaded = true
+          })
+        }
       })
     }
   }

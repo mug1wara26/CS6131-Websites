@@ -11,8 +11,9 @@
       <v-icon>mdi-magnify</v-icon>
     </v-btn>
 
-    <p v-if="teams.length === 0 && loaded" class="d-flex justify-center">You are not part of any teams, consider
+    <p v-if="teams.length === 0 && loaded && !isPublic" class="text-center">You are not part of any teams, consider
       creating one or searching for one to join</p>
+    <p v-if="teams.length === 0 && loaded && isPublic" class="text-center">This user is not part of any teams</p>
     <v-progress-circular v-if="!loaded" indeterminate class="d-flex justify-center mx-auto"/>
 
     <v-row class="mt-2">

@@ -81,7 +81,7 @@ export const getMembers = (name: string): Promise<Array<string>> => {
             }
         }).then(res => {
             if (res.status === 200) res.json().then(data => {
-                resolve(data.members)
+                resolve(data)
             })
             else resolve([])
         })
@@ -103,6 +103,39 @@ export const getMemberStats = (name: string): Promise<Array<MemberStat>> => {
                 resolve(data)
             })
             else reject(res)
+        })
+    })
+}
+
+export const requestToJoin = (teamName: string, username: string): Promise<boolean> => {
+    return new Promise<boolean>(resolve => {
+        const token = getCookie('token') || ''
+        fetch(`${Vue.prototype.$apilink}/teams/request`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({teamName: teamName, username: username})
+        }).then(res => {
+            resolve(res.status === 200)
+        })
+    })
+}
+
+export const hasRequested = (teamName: string, username: string): Promise<boolean> => {
+    return new Promise<boolean>(resolve => {
+        const token = getCookie('token') || ''
+        fetch(`${Vue.prototype.$apilink}/teams/hasRequested/${teamName}/${username}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        }).then(res => {
+            resolve(res.status === 200)
         })
     })
 }
