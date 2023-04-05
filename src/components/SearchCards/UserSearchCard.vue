@@ -14,8 +14,6 @@ import {BasicUser} from "../../../cs6131-backend/types/userTypes";
 
 export default Vue.extend({
   name: "UserSearchCard",
-  props: {
-    'item': BasicUser
-  }
+  props: ['item']
 });
 </script>

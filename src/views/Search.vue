@@ -3,23 +3,12 @@
       fluid
       :class="{'pr-16': $vuetify.breakpoint.mdAndUp, 'px-2': $vuetify.breakpoint.smAndDown}"
   >
-    <v-container class="d-flex justify-center">
-      <v-icon>mdi-magnify</v-icon>
-      <v-text-field
-          v-model="searchText"
-          label="Search"
-          class="ml-2"
-          style="max-width: 300px;"
-      >
-      </v-text-field>
-    </v-container>
     <v-select
         v-if="isMobile"
         v-model="selectedQuery"
         :items="searchQueries"
         item-text="name"
         outlined
-        @change="onClickSelect"
     ></v-select>
 
     <v-row>
@@ -39,8 +28,8 @@
                     link
                     dense
                     class="mt-2"
-                    @click="$router.push({path: 'search', query: {q: item.query}})"
                     v-ripple="false"
+                    @click="searchResults = []; search = ''"
                 >
 
                   <v-list-item-content>
@@ -59,12 +48,25 @@
       </v-col>
 
       <v-col lg="10" sm="12">
+        <v-container class="d-flex justify-center">
+          <v-icon>mdi-magnify</v-icon>
+          <v-text-field
+              v-model="search"
+              label="Search"
+              class="ml-2"
+              style="max-width: 300px;"
+          />
+        </v-container>
 
-        <v-row>
+        <p class="text-center" v-if="search.length === 0 && searchResults.length === 0"> Please type to begin searching </p>
+        <p class="text-center" v-else-if="loaded && searchResults.length === 0">No results</p>
+
+        <v-progress-circular v-else-if="!loaded" indeterminate class="d-flex justify-center mx-auto"/>
+        <v-row v-else>
           <v-col cols="12" lg="4" md="8"
-                 v-for="(item, index) in searchItems[searchCategory].filter(obj=>{ return obj.name.toLowerCase().startsWith(searchText.toLowerCase().trim()) || searchText.trim().length === 0})"
+                 v-for="(item, index) in searchResults"
                  :key="index">
-            <component v-bind:is="currentCardComponent" :item="item"/>
+            <component :is="currentComponent" :item="item"/>
           </v-col>
         </v-row>
       </v-col>
@@ -73,102 +75,108 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import notes from "@/data/Notes";
-import users from "@/data/Users";
-import teams from "@/data/Teams";
-import ctfs from "@/data/CTFs";
-import writeUps from "@/data/WriteUps";
-import NoteSearchCard from "@/components/SearchCards/ChallengeSearchCard.vue";
+import Vue, {Component} from "vue";
 import UserSearchCard from "@/components/SearchCards/UserSearchCard.vue";
 import TeamSearchCard from "@/components/SearchCards/TeamSearchCard.vue";
 import CTFSearchCard from "@/components/SearchCards/CTFSearchCard.vue";
 import WriteUpSearchCard from "@/components/SearchCards/WriteUpSearchCard.vue";
+import {searchByPage} from "@/api/api";
 
 export default Vue.extend({
   name: "Search",
-  components: {NoteSearchCard, UserSearchCard, TeamSearchCard, CTFSearchCard, WriteUpSearchCard},
+  components: {UserSearchCard, TeamSearchCard, CTFSearchCard, WriteUpSearchCard},
   data() {
     return {
-      searchText: '',
+      search: '',
       searchQueries: [
         {
-          "name": "Notes",
-          "query": "notes",
+          name: "Users",
+          query: "user",
+          component: UserSearchCard
         },
         {
-          "name": "Users",
-          "query": "users",
+          name: "Teams",
+          query: "team",
+          component: TeamSearchCard
         },
         {
-          "name": "Teams",
-          "query": "teams",
+          name: "CTFs",
+          query: "ctf",
+          component: CTFSearchCard
         },
         {
-          "name": "CTFs",
-          "query": "ctfs",
-        },
-        {
-          "name": "Write Ups",
-          "query": "writeups",
+          name: "Write Ups",
+          query: "writeup",
+          component: WriteUpSearchCard
         }
       ],
-      searchItems: {
-        'notes': notes,
-        'users': users,
-        'teams': teams,
-        'ctfs': ctfs,
-        'writeups': writeUps
-      },
       selected: 0,
-      searchCategory: 'notes',
-      currentCardComponent: "NoteSearchCard",
+      selectedQuery: "Users",
       windowWidth: innerWidth,
-      selectedQuery: "Notes",
+      loaded: false,
+      searchResults: [],
+      searchDelay: 0,
+      pageNum: 1,
     }
   },
   computed: {
     isMobile(): boolean {
       return this.windowWidth <= 480
     },
-
     isNotMobile(): boolean {
-      return this.windowWidth > 480
+      return !this.isMobile
+    },
+    currentComponent(): Component {
+      if (this.isMobile) {
+        return this.searchQueries.find(obj => obj.name === this.selectedQuery)!.component
+      }
+
+      return this.searchQueries[this.selected].component
+    },
+    selectedTable(): string {
+      if (this.isMobile) {
+        return this.searchQueries.find(obj => obj.name === this.selectedQuery)!.query
+      }
+
+      return this.searchQueries[this.selected].query
     }
   },
   methods: {
-    onClickSelect() {
-      this.$router.push({path: 'search', query: {q: this.selectedQuery.toLowerCase().replaceAll(' ','')}})
+    onSearch() {
+      this.searchDelay += 1
+      this.loaded = false;
+      setTimeout(() => {
+        this.searchDelay -= 1
+        if (this.searchDelay === 0 && this.search !== '') {
+          searchByPage(this.selectedTable, this.pageNum, this.search).then(res => {
+            if (res.status === 200) {
+              res.json().then(data => {
+                this.searchResults = data.results
+                this.loaded=true;
+              })
+            }
+            else {
+              this.$root.$emit('alert', {
+                alertType: 'error',
+                alertTitle: `${res.status} Error`,
+                alertText: res.statusText
+              })
+              this.loaded = true;
+            }
+          })
+        }
+      }, 1000)
     }
   },
-  created() {
-    if (this.$route.query.q !== undefined) {
-      const searchQuery = this.$route.query.q as string
-      if(this.isNotMobile){
-        this.selected = this.searchQueries.findIndex(obj => {
-          return obj.query === searchQuery
-        })
-      }
-      else if (this.isMobile) {
-        this.selectedQuery = this.searchQueries.find(obj => {
-          return obj.query === searchQuery
-        })!.name
-      }
-      this.searchCategory = searchQuery
-
-      const categoryCardComponents: {[index: string]:string} = {
-        'notes': 'NoteSearchCard',
-        'users': 'UserSearchCard',
-        'teams': 'TeamSearchCard',
-        'ctfs': 'CTFSearchCard',
-        'writeups': 'WriteUpSearchCard'
-      }
-      this.currentCardComponent = categoryCardComponents[searchQuery]
-    }
-
+  mounted() {
     window.onresize = () => {
       this.windowWidth = window.innerWidth;
     }
   },
+  watch: {
+    search(newSearch: string, oldSearch: string) {
+      if(newSearch !== oldSearch && newSearch.trim() !== '') this.onSearch()
+    }
+  }
 })
 </script>

@@ -16,7 +16,7 @@
 import Vue from "vue";
 import {MemberStat, Team} from "../../../cs6131-backend/types/teamTypes";
 import {BasicUser} from "../../../cs6131-backend/types/userTypes";
-import * as teampApi from "@/api/teamApi"
+import * as teamApi from "@/api/teamApi"
 
 export default Vue.extend({
   name: "TeamMembers",
@@ -37,7 +37,7 @@ export default Vue.extend({
     }
   },
   created() {
-    teampApi.getMemberStats(this.team.name).then(data => {
+    teamApi.getMemberStats(this.team.name).then(data => {
       this.memberStats = data
       this.loaded = true
     }).catch(res => {
