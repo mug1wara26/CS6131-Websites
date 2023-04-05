@@ -3,21 +3,25 @@ import {RowDataPacket} from "mysql2";
 
 export const searchByPage = (table: string, search: string, page_num: number, callback: Function) => {
     let queryString = ''
+    let appendString = ''
+    let numRowsQuery = 'SELECT COUNT(*)'
     if (table === 'user') queryString = 'SELECT username, displayName, email, pfp, bio'
     else queryString = 'SELECT *'
 
     if (table === 'writeup') {
-        queryString += '\nFROM note'
-        queryString += '\nWHERE id in (SELECT id FROM writeup) and title like ?'
+        appendString += '\nFROM note'
+        appendString += '\nWHERE id in (SELECT id FROM writeup) and title like ?'
     }
-    else queryString += `\nFROM ${table}`
-    if (['ctf', 'team'].includes(table)) queryString += '\nWHERE public and name like ?'
-    else queryString += '\nWHERE username like ?'
+    else appendString += `\nFROM ${table}`
+    if (['ctf', 'team'].includes(table)) appendString += '\nWHERE public and name like ?'
+    else appendString += '\nWHERE username like ?'
+
+    queryString += appendString
+    numRowsQuery += appendString
 
     const limit = (page_num - 1) * 20
     queryString += `\nLIMIT ${limit}, 21`
 
-    console.log(queryString)
     db.query(
         queryString,
         search,
@@ -25,7 +29,13 @@ export const searchByPage = (table: string, search: string, page_num: number, ca
             if (err) callback(err)
             else {
                 const rows = <RowDataPacket[]> result
-                callback(null, rows.slice(0, 20), rows.length === 21)
+                db.query(numRowsQuery, search, (err, result) => {
+                    if (err) callback(err)
+                    else {
+                        const numRows = (<RowDataPacket> result)[0]['COUNT(*)'] as number
+                        callback(null, rows.slice(0, 20), rows.length === 21, Math.ceil(numRows / 20))
+                    }
+                })
             }
         })
 }

@@ -29,7 +29,7 @@
                     dense
                     class="mt-2"
                     v-ripple="false"
-                    @click="searchResults = []; search = ''"
+                    @click="searchResults = []; search = ''; pageNum = 1;"
                 >
 
                   <v-list-item-content>
@@ -60,15 +60,27 @@
 
         <p class="text-center" v-if="search.length === 0 && searchResults.length === 0"> Please type to begin searching </p>
         <p class="text-center" v-else-if="loaded && searchResults.length === 0">No results</p>
-
         <v-progress-circular v-else-if="!loaded" indeterminate class="d-flex justify-center mx-auto"/>
-        <v-row v-else>
-          <v-col cols="12" lg="4" md="8"
-                 v-for="(item, index) in searchResults"
-                 :key="index">
-            <component :is="currentComponent" :item="item"/>
-          </v-col>
-        </v-row>
+        <template v-else>
+          <v-row class="d-flex align-center">
+            <v-col cols="6" class="d-flex justify-end">
+              <v-btn v-if="pageNum !== 1" icon @click="goToPage(1)"><v-icon>mdi-chevron-double-left</v-icon></v-btn>
+              <v-btn v-if="pageNum !== 1" icon @click="previousPage"><v-icon>mdi-arrow-left</v-icon></v-btn>
+            </v-col>
+            <span v-if="totalPages !== 1">{{pageNum}}</span>
+            <v-col cols="5" class="d-flex justify-start">
+              <v-btn v-if="pageNum !== totalPages" icon @click="nextPage"><v-icon>mdi-arrow-right</v-icon></v-btn>
+              <v-btn v-if="pageNum !== totalPages" icon @click="goToPage(totalPages)"><v-icon>mdi-chevron-double-right</v-icon></v-btn>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" lg="4" md="8"
+                   v-for="(item, index) in searchResults"
+                   :key="index">
+              <component :is="currentComponent" :item="item"/>
+            </v-col>
+          </v-row>
+        </template>
       </v-col>
     </v-row>
   </v-container>
@@ -117,6 +129,7 @@ export default Vue.extend({
       searchResults: [],
       searchDelay: 0,
       pageNum: 1,
+      totalPages: 1
     }
   },
   computed: {
@@ -145,6 +158,7 @@ export default Vue.extend({
     onSearch() {
       this.searchDelay += 1
       this.loaded = false;
+      this.totalPages= 1
       setTimeout(() => {
         this.searchDelay -= 1
         if (this.searchDelay === 0 && this.search !== '') {
@@ -152,6 +166,7 @@ export default Vue.extend({
             if (res.status === 200) {
               res.json().then(data => {
                 this.searchResults = data.results
+                this.totalPages = data.numPages
                 this.loaded=true;
               })
             }
@@ -166,6 +181,18 @@ export default Vue.extend({
           })
         }
       }, 1000)
+    },
+    nextPage() {
+      this.pageNum++;
+      this.onSearch()
+    },
+    previousPage() {
+      this.pageNum--;
+      this.onSearch()
+    },
+    goToPage(pageNum: number) {
+      this.pageNum = pageNum
+      this.onSearch()
     }
   },
   mounted() {
