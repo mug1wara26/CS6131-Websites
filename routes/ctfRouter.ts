@@ -199,8 +199,6 @@ ctfRouter.get('/competingctfs/:teamName', async (req, res) => {
                 const user = decoded as BasicUser
 
                 ctfModel.findCompetingCTFs(user.username, teamName, (err: Error, ctfs: Array<CTF>) => {
-                    console.log(err)
-                    console.log(ctfs)
                     if (err) return res.status(500).end()
                     else {
                         return res.status(200).json({ctfs: ctfs})
