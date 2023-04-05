@@ -10,9 +10,9 @@ generalRouter.get('/search/:table', async (req, res) => {
         const search = req.query.search.toString()
         const pageNum = req.query.p.toString()
         if (!isNaN(Number(pageNum))) {
-            generalModel.searchByPage(table, `%${search}%`, Number(pageNum), (err: Error, results: Array<BasicUser >, cutoff: boolean) => {
+            generalModel.searchByPage(table, `%${search}%`, Number(pageNum), (err: Error, results: Array<BasicUser >, cutoff: boolean, numPages: number) => {
                 if (err) return res.status(500).end()
-                else return res.status(200).json({results: results, cutoff: cutoff})
+                else return res.status(200).json({results: results, cutoff: cutoff, numPages: numPages})
             })
         }
         else return res.status(400).end()
