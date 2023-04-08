@@ -6,7 +6,6 @@ import {ctfRouter} from "./routes/ctfRouter";
 import {chalRouter} from "./routes/chalRouter"
 import cors from "cors";
 import {generalRouter} from "./routes/generalRouter";
-import {findRequested} from "./model/teamModel";
 
 
 const app = express();
