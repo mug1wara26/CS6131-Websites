@@ -173,3 +173,20 @@ WHERE teamName = ? AND username = ?
         }
     )
 }
+
+export const findRequestedTeams = (username: string, callback: Function) => {
+    const queryString = `
+SELECT *
+FROM team t, request r
+WHERE BINARY r.username = ? AND BINARY t.name = r.teamName
+    `
+
+    db.query(
+        queryString,
+        username,
+        (err, result) => {
+            if (err) callback(err)
+            else callback(null, <RowDataPacket> result)
+        }
+    )
+}

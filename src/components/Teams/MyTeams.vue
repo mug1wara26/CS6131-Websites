@@ -11,6 +11,11 @@
       <v-icon>mdi-magnify</v-icon>
     </v-btn>
 
+    <v-btn v-if="isPublic" color="green" class="ml-3">
+      Invite
+      <v-icon class="ml-1">group_add</v-icon>
+    </v-btn>
+
     <p v-if="teams.length === 0 && loaded && !isPublic" class="text-center">You are not part of any teams, consider
       creating one or searching for one to join</p>
     <p v-if="teams.length === 0 && loaded && isPublic" class="text-center">This user is not part of any teams</p>

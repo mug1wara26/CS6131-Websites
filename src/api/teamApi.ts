@@ -135,7 +135,30 @@ export const hasRequested = (teamName: string, username: string): Promise<boolea
                 'Authorization': token
             }
         }).then(res => {
-            resolve(res.status === 200)
+            if (res.status === 200) res.json().then(data => {
+                resolve(data.hasRequested)
+            })
+            else resolve(false)
+        })
+    })
+}
+
+export const getRequestedTeams = (username: string): Promise<Array<Team>> => {
+    return new Promise<Array<Team>>(resolve => {
+        const token = getCookie('token') || ''
+
+        fetch(`${Vue.prototype.$apilink}/teams/getRequestedTeams/${username}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        }).then(res => {
+            if (res.status === 200) res.json().then(data => {
+                resolve(data.teams)
+            })
+            else resolve([])
         })
     })
 }

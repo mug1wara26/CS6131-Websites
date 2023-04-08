@@ -23,7 +23,8 @@
             <v-card-actions class="d-flex justify-center">
               <v-btn
                   v-if="!isMember"
-                  color="green" @click="request"
+                  color="green"
+                  @click="request = true"
                   :loading="requestJoinLoading"
                   :disabled="hasRequested">
                 Request
@@ -49,6 +50,17 @@
         </v-toolbar>
       </v-container>
       <component :is="selectedComponent" :team="team" :user="user"></component>
+
+
+      <v-dialog
+          v-model="request"
+          width="400"
+      >
+        <RequestWarningDialog
+            @close-dialog="request = false"
+            @request="onRequest"
+        />
+      </v-dialog>
     </v-container>
   </v-container>
 </template>
@@ -63,10 +75,12 @@ import {getMembers, getTeam, hasRequested, requestToJoin} from "@/api/teamApi";
 import TeamCTFs from "@/components/Team/TeamCTFs.vue";
 import TeamMembers from "@/components/Team/TeamMembers.vue";
 import TeamParticipate from "@/components/Team/TeamParticipate.vue";
+import RequestWarningDialog from "@/components/Dialogs/RequestWarningDialog.vue";
 
 export default Vue.extend({
   name: "Team",
   components: {
+    RequestWarningDialog,
     'TeamCTFs': TeamCTFs,
     'TeamMembers': TeamMembers,
     'TeamParticipate': TeamParticipate
@@ -86,6 +100,7 @@ export default Vue.extend({
       getTeamsLoaded: false,
       hasRequestedLoaded: false,
       requestJoinLoading: false,
+      request: false
     }
   },
   computed: {
@@ -96,14 +111,18 @@ export default Vue.extend({
       return this.team.pfp ? this.team.pfp : this.defaultImage
     },
     loaded(): boolean {
-      return !this.loading || (this.getTeamsLoaded && this.getMembersLoaded)
+      return !this.loading || (this.getTeamsLoaded && this.getMembersLoaded && this.hasRequestedLoaded)
     }
   },
   methods: {
-    request() {
+    onRequest() {
+      this.request = false
       this.requestJoinLoading = true
       requestToJoin(this.team.name, this.user.username).then(val => {
-        if (val) this.$root.$emit('alert', {alertType: 'success', alertTitle: 'Request Sent'})
+        if (val) {
+          this.$root.$emit('alert', {alertType: 'success', alertTitle: 'Request Sent'})
+          this.hasRequested = true
+        }
         else this.$root.$emit('alert', {alertType: 'error', alertTitle: 'An error occurred', alertText: 'Please try again later'})
         this.requestJoinLoading = false
       })
@@ -128,6 +147,7 @@ export default Vue.extend({
 
             hasRequested(name, this.user.username).then(val => {
               this.hasRequested = val
+              this.hasRequestedLoaded = true;
             })
           }
           getTeam(name).then(team => {
