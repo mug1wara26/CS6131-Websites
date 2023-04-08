@@ -250,7 +250,7 @@ export default Vue.extend({
     },
     onRegister(username: string, password: string, displayName: string) {
       login(username, password).then(res => {
-        setCookie('token', res, {sameSite: "lax"});
+        setCookie('token', res, {sameSite: "lax", path: '/'});
         this.onLogin();
         this.showAlert('success', 'Register Successful', `Welcome ${displayName}`)
       }).catch(() => {

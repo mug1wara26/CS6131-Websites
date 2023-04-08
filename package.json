@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "jwt-decode": "^3.1.2",
     "mavon-editor": "^2.10.4",
     "vue": "^2.6.14",
     "vue-class-component": "^7.2.3",
@@ -32,7 +33,6 @@
     "class-validator": "^0.14.0",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
-    "jwt-decode": "^3.1.2",
     "sass": "~1.32.0",
     "sass-loader": "^10.0.0",
     "typescript": "~4.5.5",

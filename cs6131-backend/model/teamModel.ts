@@ -6,7 +6,7 @@ import {Team} from "../types/teamTypes";
 
 export const findUserTeams = (username: string, callback: Function) => {
     const queryString = `
-SELECT *
+SELECT team.*
 FROM team left join member on team.name = member.teamName
 WHERE BINARY username = ?
 ORDER BY name
@@ -139,9 +139,9 @@ group by m.username
     })
 }
 
-export const requestToJoin = (teamName: string, username: string, callback: Function) => {
+export const inviteRequestTeam = (tableName: string, teamName: string, username: string, callback:Function) => {
     const queryString = `
-INSERT INTO request VALUES
+INSERT INTO ${tableName} VALUES
 (?, ?)
     `
 
@@ -153,11 +153,10 @@ INSERT INTO request VALUES
         }
     )
 }
-
-export const findRequested = (teamName: string, username: string, callback: Function) => {
+export const hasRequestedInvited = (table: string, teamName: string, username: string, callback: Function) => {
     const queryString = `
 SELECT *
-FROM request
+FROM ${table}
 WHERE teamName = ? AND username = ?
     `
 
@@ -174,11 +173,11 @@ WHERE teamName = ? AND username = ?
     )
 }
 
-export const findRequestedTeams = (username: string, callback: Function) => {
+export const findRequestedOrInvitedTeams = (table: string, username: string, callback: Function) => {
     const queryString = `
-SELECT *
-FROM team t, request r
-WHERE BINARY r.username = ? AND BINARY t.name = r.teamName
+SELECT team.*
+FROM team, ${table} t
+WHERE BINARY t.username = ? AND BINARY team.name = t.teamName
     `
 
     db.query(
@@ -187,6 +186,43 @@ WHERE BINARY r.username = ? AND BINARY t.name = r.teamName
         (err, result) => {
             if (err) callback(err)
             else callback(null, <RowDataPacket> result)
+        }
+    )
+}
+
+export const findRequestedOrInvitedUsers = (table: string, teamName: string, callback: Function) => {
+    const queryString = `
+SELECT user.username, user.displayName, user.email, user.pfp, user.bio
+FROM user, ${table} t
+WHERE BINARY t.teamName = ? AND BINARY user.username = t.username
+    `
+
+    db.query(
+        queryString,
+        teamName,
+        (err, result) => {
+            if (err) callback(err)
+            else callback(null, <RowDataPacket> result)
+        }
+    )
+}
+
+export const findNotInvitedTeams = (owner: string, username: string, callback: Function) => {
+    const queryString = `
+SELECT *
+FROM team
+WHERE BINARY team.owner = ? AND ? NOT IN (
+    SELECT username
+    FROM invite
+    WHERE teamName = team.name
+)
+    `
+
+    db.query(
+        queryString,
+        [owner, username],
+        (err, result) => {
+            callback(err, <RowDataPacket> result)
         }
     )
 }

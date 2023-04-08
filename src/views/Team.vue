@@ -150,6 +150,10 @@ export default Vue.extend({
               this.hasRequestedLoaded = true;
             })
           }
+          else {
+            this.getMembersLoaded = true;
+            this.hasRequestedLoaded = true
+          }
           getTeam(name).then(team => {
             if (Object.keys(team).length !== 0) Object.assign(this.team, team);
             else this.team = {} as Team

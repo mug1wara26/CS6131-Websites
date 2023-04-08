@@ -75,6 +75,7 @@
           @close-dialog="deleteAccount = false"
       />
     </v-dialog>
+
   </v-container>
 </template>
 
@@ -94,7 +95,7 @@ export default Vue.extend({
   components: {DeleteAccountDialog, 'Teams': MyTeams, 'WriteUps': UserWriteups},
   data() {
     return {
-      user: {} as BasicUser,
+      user: new BasicUser(),
       edit: false,
       editData: {
         displayName: '',
@@ -109,6 +110,7 @@ export default Vue.extend({
       defaultImage: require("../../public/assets/default-pfp.webp"),
       profileLinkError: '',
       deleteAccount: false,
+      invite: false,
       selected: 'Teams',
       toolbar_items: ['Teams', 'WriteUps'],
       canEdit: false
@@ -221,7 +223,7 @@ export default Vue.extend({
     const username = this.$route.params.username;
     if (username) {
       await getUser(username).then(user => {
-        this.user = user as BasicUser
+        Object.assign(this.user, user);
         this.cancelEdit()
       }).catch(err => console.log(err))
     } else {
@@ -229,7 +231,7 @@ export default Vue.extend({
       onLogin((err: AlertData, user: BasicUser) => {
         if (Object.keys(user).length === 0) this.$emit("open-login");
         else {
-          this.user = user;
+          Object.assign(this.user, user);
           this.cancelEdit()
         }
       })

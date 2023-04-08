@@ -2,6 +2,7 @@ import {BasicTeam, MemberStat, Team} from "../../cs6131-backend/types/teamTypes"
 import Vue from "vue";
 import {getCookie} from "typescript-cookie";
 import {BasicUser} from "../../cs6131-backend/types/userTypes";
+import jwt_decode from "jwt-decode";
 
 export const getUserTeams = (username: string): Promise<Response> => {
     return new Promise<Response>((resolve, reject) => {
@@ -19,9 +20,28 @@ export const getUserTeams = (username: string): Promise<Response> => {
     })
 }
 
+export const getUserTeamsFromToken = ():Promise<Array<Team>> => {
+    return new Promise<Array<Team>>(resolve => {
+        const token = getCookie('token') || '';
+        fetch(`${Vue.prototype.$apilink}/teams/userTeams`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        }).then(res => {
+            if (res.status === 200) res.json().then(data => {
+                resolve(data.teams)
+            })
+            else resolve([])
+        })
+    })
+}
+
 export const teamExists = (name: string): Promise<boolean> => {
     return new Promise<boolean>(resolve => {
-        fetch(`${Vue.prototype.$apilink}/teams/${name}`, {
+        fetch(`${Vue.prototype.$apilink}/teams/getTeam/${name}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -54,7 +74,7 @@ export const getTeam = (name: string): Promise<Team> => {
         'Authorization': getCookie('token') || ''
     }
     return new Promise<Team>(resolve => {
-        fetch(`${Vue.prototype.$apilink}/teams/${name}`, {
+        fetch(`${Vue.prototype.$apilink}/teams/getTeam/${name}`, {
             method: 'GET',
             headers: headers
         }).then(res => {
@@ -107,10 +127,10 @@ export const getMemberStats = (name: string): Promise<Array<MemberStat>> => {
     })
 }
 
-export const requestToJoin = (teamName: string, username: string): Promise<boolean> => {
-    return new Promise<boolean>(resolve => {
+const requestOrInviteTeam = (endpoint: string, teamName: string, username: string): Promise<Response> => {
+    return new Promise<Response>(resolve => {
         const token = getCookie('token') || ''
-        fetch(`${Vue.prototype.$apilink}/teams/request`, {
+        fetch(`${Vue.prototype.$apilink}/teams/${endpoint}`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -119,15 +139,32 @@ export const requestToJoin = (teamName: string, username: string): Promise<boole
             },
             body: JSON.stringify({teamName: teamName, username: username})
         }).then(res => {
+            resolve(res)
+        })
+    })
+}
+
+export const requestToJoin = (teamName: string, username: string): Promise<boolean> => {
+    return new Promise<boolean>(resolve => {
+        requestOrInviteTeam('request', teamName, username).then(res => {
             resolve(res.status === 200)
         })
     })
 }
 
-export const hasRequested = (teamName: string, username: string): Promise<boolean> => {
+export const inviteToTeam = (teamName: string, username: string): Promise<boolean> => {
     return new Promise<boolean>(resolve => {
+        requestOrInviteTeam('invite', teamName, username).then(res => {
+            resolve(res.status === 200)
+        })
+    })
+}
+
+const hasRequestedOrInvited = (endpoint: string, teamName: string, username: string): Promise<Response> => {
+    return new Promise<Response>(resolve => {
+
         const token = getCookie('token') || ''
-        fetch(`${Vue.prototype.$apilink}/teams/hasRequested/${teamName}/${username}`, {
+        fetch(`${Vue.prototype.$apilink}/teams/${endpoint}/${teamName}/${username}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -135,6 +172,14 @@ export const hasRequested = (teamName: string, username: string): Promise<boolea
                 'Authorization': token
             }
         }).then(res => {
+            resolve(res)
+        })
+    })
+}
+
+export const hasRequested = (teamName: string, username: string): Promise<boolean> => {
+    return new Promise<boolean>(resolve => {
+        hasRequestedOrInvited('hasRequested', teamName, username).then(res => {
             if (res.status === 200) res.json().then(data => {
                 resolve(data.hasRequested)
             })
@@ -143,11 +188,77 @@ export const hasRequested = (teamName: string, username: string): Promise<boolea
     })
 }
 
-export const getRequestedTeams = (username: string): Promise<Array<Team>> => {
+export const hasInvited = (teamName: string, username: string): Promise<boolean> => {
+    return new Promise<boolean>(resolve => {
+        hasRequestedOrInvited('hasInvited', teamName, username).then(res => {
+            if (res.status === 200) res.json().then(data => {
+                resolve(data.hasInvited)
+            })
+            else resolve(false)
+        })
+    })
+}
+
+export const getRequestedOrInvitedTeams = (endpoint: string, username: string): Promise<Array<Team>> => {
     return new Promise<Array<Team>>(resolve => {
         const token = getCookie('token') || ''
 
-        fetch(`${Vue.prototype.$apilink}/teams/getRequestedTeams/${username}`, {
+        fetch(`${Vue.prototype.$apilink}/teams/${endpoint}/${username}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        }).then(res => {
+            if (res.status === 200) res.json().then(data => {
+                resolve(data.teams)
+            })
+            else resolve([])
+        })
+    })
+}
+
+const getRequestedOrInvitedUsers = (endpoint: string, teamName: string): Promise<Array<BasicUser>> => {
+    return new Promise<Array<BasicUser>>(resolve => {
+        const token = getCookie('token') || ''
+
+        fetch(`${Vue.prototype.$apilink}/teams/${endpoint}/${teamName}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        }).then(res => {
+            if (res.status === 200) res.json().then(data => {
+                resolve(data.users)
+            })
+            else resolve([])
+        })
+    })
+}
+
+export const getRequestedUsers = (teamName: string): Promise<Array<BasicUser>> => {
+    return new Promise<Array<BasicUser>>(resolve => {
+        getRequestedOrInvitedUsers('getRequestedUsers', teamName).then(users => {
+            resolve(users)
+        })
+    })
+}
+
+export const getInvitedUsers = (teamName: string): Promise<Array<BasicUser>> => {
+    return new Promise<Array<BasicUser>>(resolve => {
+        getRequestedOrInvitedUsers('getInvitedUsers', teamName).then(users => {
+            resolve(users)
+        })
+    })
+}
+
+export const getNotInvitedTeams = (username: string): Promise<Array<Team>> => {
+    return new Promise<Array<Team>>(resolve => {
+        const token = getCookie('token') || ''
+        fetch(`${Vue.prototype.$apilink}/teams/getNotInvitedTeams/${username}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',

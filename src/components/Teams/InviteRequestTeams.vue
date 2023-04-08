@@ -1,8 +1,9 @@
 <template>
   <v-container fluid>
     <v-progress-circular v-if="!loaded" indeterminate class="d-flex justify-center mx-auto"/>
-    <TeamGrid v-if="hasTeams" :teams="teams"/>
-    <p v-else>You have not requested to join any teams</p>
+    <TeamGrid v-else-if="hasTeams" :teams="teams"/>
+    <p v-else-if="request">You have not requested to join any teams</p>
+    <p v-else>You have not been invited to join any teams</p>
   </v-container>
 </template>
 
@@ -14,10 +15,11 @@ import {Team} from "../../../cs6131-backend/types/teamTypes";
 import * as teamApi from "@/api/teamApi"
 
 export default Vue.extend({
-  name: "RequestingTeams",
+  name: "InviteRequestTeams",
   components: {TeamGrid},
   props: {
-    user: BasicUser
+    user: BasicUser,
+    request: Boolean
   },
   data() {
     return {
@@ -31,9 +33,9 @@ export default Vue.extend({
     }
   },
   created() {
-    teamApi.getRequestedTeams(this.user.username).then(teams => {
+    teamApi.getRequestedOrInvitedTeams(this.request ? 'getRequestedTeams' : 'getInvitedTeams', this.user?.username).then(teams => {
       this.teams = teams
-      this.loaded = true;
+      this.loaded = true
     })
   }
 });

@@ -15,7 +15,7 @@
           </v-btn-toggle>
         </v-toolbar>
     </v-container>
-    <component :is="selectedComponent" :user="user"></component>
+    <component :is="selectedComponent" :user="user" :request="selected==='Requesting'" :key="selected"></component>
   </v-container>
 </template>
 
@@ -24,16 +24,15 @@ import Vue from "vue";
 import {BasicUser} from "../../cs6131-backend/types/userTypes";
 import {onLogin} from "@/api/userApi";
 import MyTeams from "@/components/Teams/MyTeams.vue";
-import RequestingTeams from "@/components/Teams/RequestingTeams.vue";
-import InvitedTeams from "@/components/Teams/InvitedTeams.vue";
+import InviteRequestTeams from "@/components/Teams/InviteRequestTeams.vue";
 import {AlertData} from "@/schemas/alertData";
 
 export default Vue.extend({
   name: "Teams",
   components: {
     'MyTeams': MyTeams,
-    'RequestingTeams': RequestingTeams,
-    'InvitedTeams': InvitedTeams
+    'RequestingTeams': InviteRequestTeams,
+    'InvitedTeams': InviteRequestTeams
   },
   data() {
     return {
