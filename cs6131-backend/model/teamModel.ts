@@ -271,13 +271,29 @@ INSERT INTO member VALUES
 export const removeInviteOrRequest = (table: string, teamName: string, username: string, callback: Function) => {
     const queryString = `
 DELETE FROM ${table}
-WHERE teamName = ? AND username = ?
+WHERE BINARY teamName = ? AND BINARY username = ?
     `
 
     db.query(
         queryString,
         [teamName, username],
         (err) => {
+            callback(err)
+        }
+    )
+}
+
+export const transferOwnership = (teamName: string, username: string, callback: Function) => {
+    const queryString = `
+UPDATE team
+SET owner = ?
+WHERE BINARY name = ?
+    `
+
+    db.query(
+        queryString,
+        [username, teamName],
+        err => {
             callback(err)
         }
     )

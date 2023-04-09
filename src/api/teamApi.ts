@@ -375,3 +375,20 @@ export const leave = (teamName: string): Promise<boolean> => {
         })
     })
 }
+
+export const transferOwner = (teamName: string, username: string): Promise<boolean> => {
+    return new Promise<boolean>(resolve => {
+        const token = getCookie('token') || ''
+        fetch(`${Vue.prototype.$apilink}/teams/transferOwnership`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({teamName: teamName, username: username})
+        }).then(res => {
+            resolve(res.status === 200)
+        })
+    })
+}

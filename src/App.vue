@@ -274,7 +274,7 @@ export default Vue.extend({
       this.reRender++
     },
     onLeave() {
-      this.reRender++
+      this.$router.push({ path: '/teams' })
     },
   },
   mounted() {
