@@ -392,3 +392,20 @@ export const transferOwner = (teamName: string, username: string): Promise<boole
         })
     })
 }
+
+export const kickUser = (teamName: string, username: string): Promise<boolean> => {
+    return new Promise<boolean>(resolve => {
+        const token = getCookie('token') || ''
+        fetch(`${Vue.prototype.$apilink}/teams/kickUser`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({teamName: teamName, username: username})
+        }).then(res => {
+            resolve(res.status === 200)
+        })
+    })
+}

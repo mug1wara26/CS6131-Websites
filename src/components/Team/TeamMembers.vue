@@ -51,9 +51,24 @@
         <v-data-table
             :items="memberStats"
             :headers="headers"
+            @click:row="onClick"
+            hide-default-footer
         />
       </v-col>
     </v-row>
+
+    <v-dialog
+        v-model="memberInfo"
+        width="400"
+    >
+      <MemberInfoDialog
+          :username="selectedMember"
+          :team-name="team.name"
+          @close-dialog="memberInfo = false"
+          @kick-user="onKickUser"
+      />
+    </v-dialog>
+
   </v-container>
 </template>
 
@@ -62,15 +77,18 @@ import Vue from "vue";
 import {MemberStat, Team} from "../../../cs6131-backend/types/teamTypes";
 import {BasicUser} from "../../../cs6131-backend/types/userTypes";
 import * as teamApi from "@/api/teamApi"
+import MemberInfoDialog from "@/components/Dialogs/MemberInfoDialog.vue";
 
 export default Vue.extend({
   name: "TeamMembers",
+  components: {MemberInfoDialog},
   props: {
-    'team': Team,
-    'user': BasicUser,
+    teamProp: Team,
+    user: BasicUser,
   },
   data() {
     return {
+      team: this.teamProp,
       getMemberStatsLoaded: false,
       getRequestedUsersLoaded: false,
       getInvitedUsersLoaded: false,
@@ -87,6 +105,8 @@ export default Vue.extend({
       invitedUsers: [] as Array<string>,
       acceptRequestLoading: [] as Array<string>,
       denyRequestOrInviteLoading: [] as Array<string>,
+      selectedMember: '',
+      memberInfo: false
     }
   },
   computed: {
@@ -135,6 +155,15 @@ export default Vue.extend({
 
         this.denyRequestOrInviteLoading = this.denyRequestOrInviteLoading.filter(name => name !== username)
       })
+    },
+    onClick(member: MemberStat) {
+      if (this.isOwner && member.username !== this.team?.owner) {
+        this.selectedMember = member.username
+        this.memberInfo = true
+      }
+    },
+    onKickUser(username: string) {
+      this.memberStats = this.memberStats.filter(member => member.username !== username)
     }
   },
   created() {

@@ -28,12 +28,13 @@ import * as ctfApi from "@/api/ctfApi"
 export default Vue.extend({
   name: "TeamParticipate",
   props: {
-    'team': Team,
+    teamProp: Team,
     'user': BasicUser
   },
   components: {CTFSearchCard},
   data() {
     return {
+      team: this.teamProp,
       ctfs: [] as Array<CTF>,
       loaded: false
     }

@@ -52,12 +52,13 @@ import CreateCTFDialog from "@/components/Dialogs/CreateCTFDialog.vue";
 export default Vue.extend({
   name: "TeamCTFs",
   props: {
-    'team': Team,
+    teamProp: Team,
     'user': BasicUser
   },
   components: {CreateCTFDialog, 'CTFSearchCard': CTFSearchCard},
   data() {
     return {
+      team: this.teamProp,
       loaded: false,
       ctfs: [] as Array<CTF>,
       create: false

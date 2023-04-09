@@ -15,7 +15,7 @@
               </v-avatar>
               <h3 class="ml-4"> {{ team.name }} </h3>
             </v-card-title>
-            <v-card-subtitle class="mt-2"> Created by <a :href="`/users/${team.owner}`">{{ team.owner }}</a></v-card-subtitle>
+            <v-card-subtitle class="mt-2">Owned by: <a :href="`/users/${team.owner}`">{{ team.owner }}</a></v-card-subtitle>
             <v-divider/>
             <v-card-text>
               <p> {{ team.description }} </p>
@@ -50,7 +50,7 @@
           </v-btn-toggle>
         </v-toolbar>
       </v-container>
-      <component :is="selectedComponent" :team="team" :user="user"></component>
+      <component :is="selectedComponent" :team-prop="team" :user="user"></component>
 
 
       <v-dialog

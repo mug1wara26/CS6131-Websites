@@ -295,6 +295,9 @@ export default Vue.extend({
       this.user = {} as BasicUser
       this.reRender++
     })
+    this.$root.$on('re-render', () => {
+      this.reRender++
+    })
   },
 });
 </script>
