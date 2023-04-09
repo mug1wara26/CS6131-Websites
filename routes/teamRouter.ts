@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
 import {validate} from "class-validator";
 import {QueryError} from "mysql2";
-import {hasRequestedInvited} from "../model/teamModel";
+import * as querystring from "querystring";
 
 dotenv.config();
 
@@ -164,7 +164,6 @@ teamRouter.get('/getMemberStats/:teamName', async (req, res) => {
 
 const inviteRequestTeam = (table: string, teamName: string, username: string, token: string | undefined, callback: Function) => {
     if (teamName && username && token) {
-        console.log('here')
         jwt.verify(token, SECRET_KEY!, (err, decoded) => {
             if (err) return callback(400, 'Invalid token')
             else {
@@ -389,6 +388,132 @@ teamRouter.get('/getNotInvitedTeams/:username', async (req, res) => {
                 teamModel.findNotInvitedTeams(user.username, username, (err: Error, teams: Array<Team>) => {
                     if (err) return res.status(500).end()
                     else return res.status(200).json({teams: teams})
+                })
+            }
+        })
+    }
+    else return res.status(400).end()
+})
+
+teamRouter.post('/join', async (req, res) => {
+    const teamName = req.body.teamName
+    const username = req.body.username
+    const token = req.header('Authorization')
+
+    if (token && teamName && username) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) {
+                res.statusMessage = 'Invalid token'
+                return res.status(400).end()
+            }
+            else {
+                const user = decoded as BasicUser
+                teamModel.findMembers(teamName, (err: Error, members: Array<string>) => {
+                    if (err) return res.status(500).end()
+                    else {
+                        if (members.includes(username)) return res.status(400).end()
+                        else {
+                            teamModel.findOne(teamName, (err: Error, team: Team) => {
+                                if (err) return res.status(500).end()
+                                if (team.owner === user.username) {
+                                    teamModel.joinTeam(teamName, username, (err: Error) => {
+                                        if (err) return res.status(500).end()
+                                        else return res.status(200).end()
+                                    })
+                                }
+                                else return res.status(400).end()
+                            })
+                        }
+                    }
+                })
+            }
+        })
+    }
+})
+
+const denyRequestOrInvite = (table: string, teamName: string, username: string, token: string | undefined, callback: Function) => {
+    if (token && teamName && username) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) return callback(400, 'Invalid token')
+            else {
+                const user = decoded as BasicUser
+
+                teamModel.findOne(teamName, (err: Error, team: Team) => {
+                    if (err) return callback(500, 'Internal Server Error')
+                    else if (team.owner === user.username) {
+                        teamModel.removeInviteOrRequest(table, teamName, username, (err: Error) => {
+                            if (err) callback(500, 'Internal Server Error')
+                            else callback(200, 'OK')
+                        })
+                    }
+                    else return callback(400, 'Bad request')
+                })
+            }
+        })
+    }
+    else return callback(400, 'Bad request')
+}
+
+teamRouter.post('/denyRequest', async (req, res) => {
+    const teamName = req.body.teamName
+    const username = req.body.username
+    const token = req.header('Authorization')
+
+    denyRequestOrInvite('request', teamName, username, token, (status: number, statusMessage: string) => {
+        res.statusMessage = statusMessage
+        return res.status(status).end()
+    })
+})
+
+teamRouter.post('/removeInvite', async (req, res) => {
+    const teamName = req.body.teamName
+    const username = req.body.username
+    const token = req.header('Authorization')
+
+    denyRequestOrInvite('invite', teamName, username, token, (status: number, statusMessage: string) => {
+        res.statusMessage = statusMessage
+        return res.status(status).end()
+    })
+})
+
+teamRouter.post('/leave', async (req, res) => {
+    const teamName = req.body.teamName
+    const token = req.header('Authorization')
+
+    if (token && teamName) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) {
+                res.statusMessage = 'Invalid token'
+                return res.status(400).end()
+            }
+            else {
+                const user = decoded as BasicUser
+
+                teamModel.findMembers(teamName, (err: Error, members: Array<string>) => {
+                    if (err) return res.status(500).end()
+                    else if (members.includes(user.username)) {
+                        if (members.length === 1) {
+                            teamModel.deleteTeam(teamName, (err: Error) => {
+                                if (err) return res.status(500).end()
+                                else return res.status(200).end()
+                            })
+                        }
+                        else {
+                            teamModel.findOne(teamName, (err: Error, team: Team) => {
+                                if (err) return res.status(500).end()
+                                else {
+                                    if (team.owner !== user.username) {
+                                        teamModel.leaveTeam(teamName, user.username, (err: Error) => {
+                                            if (err) return res.status(500).end()
+                                            else return res.status(200).end()
+                                        })
+                                    }
+                                    else return res.status(400).end()
+                                }
+                            })
+                        }
+                    }
+                    else return res.status(400).end()
                 })
             }
         })

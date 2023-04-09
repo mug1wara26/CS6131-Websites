@@ -226,3 +226,63 @@ WHERE BINARY team.owner = ? AND ? NOT IN (
         }
     )
 }
+
+export const deleteTeam = (teamName: string, callback: Function) => {
+    const queryString = `
+DELETE FROM team
+WHERE BINARY team.name = ?
+    `
+
+    db.query(
+        queryString,
+        teamName,
+        (err) => {
+            callback(err)
+        }
+    )
+}
+
+export const leaveTeam = (teamName: string, username: string, callback: Function) => {
+    const queryString = `
+DELETE FROM member
+WHERE BINARY team.name = ? AND BINARY username = ?
+    `
+
+    db.query(
+        queryString,
+        [teamName, username],
+        (err) => {
+            callback(err)
+        }
+    )
+}
+
+export const joinTeam = (teamName: string, username: string, callback: Function) => {
+    const queryString = `
+INSERT INTO member VALUES
+(?, ?)
+    `
+
+    db.query(
+        queryString,
+        [teamName, username],
+        (err) => {
+            callback(err)
+        }
+    )
+}
+
+export const removeInviteOrRequest = (table: string, teamName: string, username: string, callback: Function) => {
+    const queryString = `
+DELETE FROM ${table}
+WHERE teamName = ? AND username = ?
+    `
+
+    db.query(
+        queryString,
+        [teamName, username],
+        (err) => {
+            callback(err)
+        }
+    )
+}

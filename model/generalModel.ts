@@ -11,10 +11,18 @@ export const searchByPage = (table: string, search: string, page_num: number, ca
     if (table === 'writeup') {
         appendString += '\nFROM note'
         appendString += '\nWHERE id in (SELECT id FROM writeup) and title like ?'
+        appendString += '\nORDER BY title'
     }
     else appendString += `\nFROM ${table}`
-    if (['ctf', 'team'].includes(table)) appendString += '\nWHERE public and name like ?'
-    else appendString += '\nWHERE username like ?'
+    if (['ctf', 'team'].includes(table)) {
+        appendString += '\nWHERE public and name like ?'
+        appendString += '\nORDER BY name'
+    }
+    else if (table === 'user') {
+        appendString += '\nWHERE username like ?'
+        appendString += '\nORDER BY username'
+    }
+
 
     queryString += appendString
     numRowsQuery += appendString
