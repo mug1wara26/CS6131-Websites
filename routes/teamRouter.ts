@@ -395,7 +395,7 @@ teamRouter.get('/getNotInvitedTeams/:username', async (req, res) => {
     else return res.status(400).end()
 })
 
-teamRouter.post('/join', async (req, res) => {
+teamRouter.post('/acceptRequest', async (req, res) => {
     const teamName = req.body.teamName
     const username = req.body.username
     const token = req.header('Authorization')
@@ -431,6 +431,36 @@ teamRouter.post('/join', async (req, res) => {
     }
 })
 
+teamRouter.post('/acceptInvite', async (req, res) => {
+    const teamName = req.body.teamName
+    const token = req.header('Authorization')
+
+    if (token && teamName) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) {
+                res.statusMessage = 'Invalid token'
+                return res.status(400).end()
+            }
+            else {
+                const user = decoded as BasicUser
+
+                teamModel.hasRequestedInvited('invite', teamName, user.username, (err: Error, hasInvited: boolean) => {
+                    if (err) return res.status(500).end()
+                    else if (hasInvited) {
+                        teamModel.joinTeam(teamName, user.username, (err: Error) => {
+                            if (err) return res.status(500).end()
+                            else return res.status(200).end()
+                        })
+                    }
+                    else return res.status(400).end()
+                })
+            }
+        })
+    }
+    else return res.status(400).end()
+})
+
+// For team owner to remove requests or invite
 const denyRequestOrInvite = (table: string, teamName: string, username: string, token: string | undefined, callback: Function) => {
     if (token && teamName && username) {
         jwt.verify(token, SECRET_KEY!, (err, decoded) => {
@@ -474,6 +504,30 @@ teamRouter.post('/removeInvite', async (req, res) => {
         res.statusMessage = statusMessage
         return res.status(status).end()
     })
+})
+
+// For the user to reject invite requests from other teams
+teamRouter.post('/rejectInvite', async (req, res) => {
+    const teamName = req.body.teamName
+    const token = req.header('Authorization')
+
+    if (token && teamName) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) {
+                res.statusMessage = 'Invalid token'
+                return res.status(400).end()
+            }
+            else {
+                const user = decoded as BasicUser
+
+                teamModel.removeInviteOrRequest('invite', teamName, user.username, (err: Error) => {
+                    if (err) return res.status(500).end()
+                    else return res.status(200).end()
+                })
+            }
+        })
+    }
+    else return res.status(400).end()
 })
 
 teamRouter.post('/leave', async (req, res) => {
