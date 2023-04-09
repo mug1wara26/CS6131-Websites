@@ -13,19 +13,27 @@
 
             <v-divider/>
 
-            <p v-if="users.length === 0" class="text-center mt-4"> No {{selected}} Users</p>
+            <p v-if="users.length === 0" class="text-center mt-4"> No {{ selected }} Users</p>
             <template v-else v-for="(item, index) in users">
               <v-list-item :key="item">
                 <v-list-item-content>
-                  <v-list-item-title> <a :href="`/users/${item}`">{{item}}</a> </v-list-item-title>
+                  <v-list-item-title><a :href="`/users/${item}`">{{ item }}</a></v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-action>
                   <v-row class="d-flex justify-end mr-1">
                     <v-col cols="4">
-                      <v-btn icon :disabled="selected!=='Requesting'"><v-icon v-if="selected==='Requesting'">mdi-check</v-icon></v-btn>
+                      <v-btn
+                          icon
+                          :loading="acceptRequestLoading.includes(item)"
+                          :disabled="selected!=='Requesting'"
+                          @click="acceptRequest(item)">
+                        <v-icon v-if="selected==='Requesting'">mdi-check</v-icon>
+                      </v-btn>
                     </v-col>
                     <v-col cols="4">
-                      <v-btn icon><v-icon>mdi-close</v-icon></v-btn>
+                      <v-btn icon :loading="denyRequestOrInviteLoading.includes(item)" @click="denyRequestOrInvite(item)">
+                        <v-icon>mdi-close</v-icon>
+                      </v-btn>
                     </v-col>
                   </v-row>
                 </v-list-item-action>
@@ -77,6 +85,8 @@ export default Vue.extend({
       selected: 'Requesting',
       requestedUsers: [] as Array<string>,
       invitedUsers: [] as Array<string>,
+      acceptRequestLoading: [] as Array<string>,
+      denyRequestOrInviteLoading: [] as Array<string>,
     }
   },
   computed: {
@@ -88,6 +98,43 @@ export default Vue.extend({
     },
     users(): Array<string> {
       return this.selected === 'Requesting' ? this.requestedUsers : this.invitedUsers
+    }
+  },
+  methods: {
+    acceptRequest(username: string) {
+      this.acceptRequestLoading.push(username)
+
+      teamApi.joinTeam(this.team?.name, username).then(val => {
+        if (val) {
+          this.requestedUsers = this.requestedUsers.filter(name => name !== username)
+          this.memberStats.push({username: username, num_competing: 0, num_solves: 0, total_points: '0'})
+        }
+        else this.$root.$emit('alert', {alertType: 'error', alertTitle: 'Error accepting request', alertText: 'Please try again later'})
+
+        this.acceptRequestLoading = this.acceptRequestLoading.filter(name => name !== username)
+      })
+    },
+    denyRequestOrInvite(username: string) {
+      if (this.selected === 'Requesting') this.denyRequest(username)
+      if (this.selected === 'Invited') this.removeInvite(username)
+    },
+    denyRequest(username: string) {
+      this.denyRequestOrInviteLoading.push(username)
+      teamApi.denyRequest(this.team?.name, username).then(val => {
+        if (val) this.requestedUsers = this.requestedUsers.filter(name => name !== username)
+        else this.$root.$emit('alert', {alertType: 'error', alertTitle: 'Error denying request', alertText: 'Please try again later'})
+
+        this.denyRequestOrInviteLoading = this.denyRequestOrInviteLoading.filter(name => name !== username)
+      })
+    },
+    removeInvite(username: string) {
+      this.denyRequestOrInviteLoading.push(username)
+      teamApi.removeInvite(this.team?.name, username).then(val => {
+        if (val) this.invitedUsers = this.invitedUsers.filter(name => name !== username)
+        else this.$root.$emit('alert', {alertType: 'error', alertTitle: 'Error removing invite', alertText: 'Please try again later'})
+
+        this.denyRequestOrInviteLoading = this.denyRequestOrInviteLoading.filter(name => name !== username)
+      })
     }
   },
   created() {
@@ -102,8 +149,7 @@ export default Vue.extend({
           this.invitedUsers = users.map(user => user.username)
           this.getInvitedUsersLoaded = true
         })
-      }
-      else this.getMemberStatsLoaded = true
+      } else this.getMemberStatsLoaded = true
     }).catch(res => {
       this.$root.$emit('alert', {alertType: 'error', alertTitle: `${res.status} Error`, alertText: res.statusText})
     })

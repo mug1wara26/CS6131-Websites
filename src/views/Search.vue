@@ -51,6 +51,7 @@
         <v-container class="d-flex justify-center">
           <v-icon>mdi-magnify</v-icon>
           <v-text-field
+              autofocus
               v-model="search"
               label="Search"
               class="ml-2"
@@ -58,19 +59,28 @@
           />
         </v-container>
 
-        <p class="text-center" v-if="search.length === 0 && searchResults.length === 0"> Please type to begin searching </p>
+        <p class="text-center" v-if="search.length === 0 && searchResults.length === 0"> Please type to begin
+          searching </p>
         <p class="text-center" v-else-if="loaded && searchResults.length === 0">No results</p>
         <v-progress-circular v-else-if="!loaded" indeterminate class="d-flex justify-center mx-auto"/>
         <template v-else>
           <v-row class="d-flex align-center">
             <v-col cols="6" class="d-flex justify-end">
-              <v-btn v-if="pageNum !== 1" icon @click="goToPage(1)"><v-icon>mdi-chevron-double-left</v-icon></v-btn>
-              <v-btn v-if="pageNum !== 1" icon @click="previousPage"><v-icon>mdi-arrow-left</v-icon></v-btn>
+              <v-btn v-if="pageNum !== 1" icon @click="goToPage(1)">
+                <v-icon>mdi-chevron-double-left</v-icon>
+              </v-btn>
+              <v-btn v-if="pageNum !== 1" icon @click="previousPage">
+                <v-icon>mdi-arrow-left</v-icon>
+              </v-btn>
             </v-col>
-            <span v-if="totalPages !== 1">{{pageNum}}</span>
+            <span v-if="totalPages !== 1">{{ pageNum }}</span>
             <v-col cols="5" class="d-flex justify-start">
-              <v-btn v-if="pageNum !== totalPages" icon @click="nextPage"><v-icon>mdi-arrow-right</v-icon></v-btn>
-              <v-btn v-if="pageNum !== totalPages" icon @click="goToPage(totalPages)"><v-icon>mdi-chevron-double-right</v-icon></v-btn>
+              <v-btn v-if="pageNum !== totalPages" icon @click="nextPage">
+                <v-icon>mdi-arrow-right</v-icon>
+              </v-btn>
+              <v-btn v-if="pageNum !== totalPages" icon @click="goToPage(totalPages)">
+                <v-icon>mdi-chevron-double-right</v-icon>
+              </v-btn>
             </v-col>
           </v-row>
           <v-row>
@@ -87,7 +97,7 @@
 </template>
 
 <script lang="ts">
-import Vue, {Component} from "vue";
+import Vue from "vue";
 import UserSearchCard from "@/components/SearchCards/UserSearchCard.vue";
 import TeamSearchCard from "@/components/SearchCards/TeamSearchCard.vue";
 import CTFSearchCard from "@/components/SearchCards/CTFSearchCard.vue";
@@ -104,22 +114,22 @@ export default Vue.extend({
         {
           name: "Users",
           query: "user",
-          component: UserSearchCard
+          component: 'UserSearchCard'
         },
         {
           name: "Teams",
           query: "team",
-          component: TeamSearchCard
+          component: 'TeamSearchCard'
         },
         {
           name: "CTFs",
           query: "ctf",
-          component: CTFSearchCard
+          component: 'CTFSearchCard'
         },
         {
           name: "Write Ups",
           query: "writeup",
-          component: WriteUpSearchCard
+          component: 'WriteUpSearchCard'
         }
       ],
       selected: 0,
@@ -139,7 +149,7 @@ export default Vue.extend({
     isNotMobile(): boolean {
       return !this.isMobile
     },
-    currentComponent(): Component {
+    currentComponent(): string {
       if (this.isMobile) {
         return this.searchQueries.find(obj => obj.name === this.selectedQuery)!.component
       }
@@ -158,7 +168,7 @@ export default Vue.extend({
     onSearch() {
       this.searchDelay += 1
       this.loaded = false;
-      this.totalPages= 1
+      this.totalPages = 1
       setTimeout(() => {
         this.searchDelay -= 1
         if (this.searchDelay === 0 && this.search !== '') {
@@ -167,10 +177,9 @@ export default Vue.extend({
               res.json().then(data => {
                 this.searchResults = data.results
                 this.totalPages = data.numPages
-                this.loaded=true;
+                this.loaded = true;
               })
-            }
-            else {
+            } else {
               this.$root.$emit('alert', {
                 alertType: 'error',
                 alertTitle: `${res.status} Error`,
@@ -202,7 +211,7 @@ export default Vue.extend({
   },
   watch: {
     search(newSearch: string, oldSearch: string) {
-      if(newSearch !== oldSearch && newSearch.trim() !== '') this.onSearch()
+      if (newSearch !== oldSearch && newSearch.trim() !== '') this.onSearch()
     }
   }
 })

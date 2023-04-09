@@ -70,18 +70,13 @@ and BINARY comp.competitorName = ?
 
 export const solve = (ctfid: string, chalName: string, username: string, callback: Function) => {
     const queryString = `
-INSERT INTO solve 
-SELECT chal.name, chal.ctfid, comp.teamName, comp.competitorName
-FROM challenge chal, competitor comp
-WHERE chal.ctfid = comp.ctfid
-and binary chal.ctfid = ?
-and binary chal.name = ?
-and BINARY comp.competitorName = ?
+INSERT INTO solve VALUES
+(?, ?, ?)
     `
 
     db.query(
         queryString,
-        [ctfid, chalName, username],
+        [chalName, ctfid, username],
         (err, result) => {
             if (err) callback(err)
             else callback(null)
