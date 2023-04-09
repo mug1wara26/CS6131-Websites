@@ -575,6 +575,34 @@ teamRouter.post('/leave', async (req, res) => {
     else return res.status(400).end()
 })
 
+teamRouter.post('/kickUser', async (req, res) => {
+    const teamName = req.body.teamName
+    const username = req.body.username
+    const token = req.header('Authorization')
+
+    if (token && username && teamName) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) {
+                res.statusMessage = 'Invalid token'
+                return res.status(400).end()
+            } else {
+                const user = decoded as BasicUser
+
+                teamModel.findOne(teamName, (err: Error, team: Team) => {
+                    if (err) return res.status(500).end()
+                    else if (team.owner === user.username && username !== user.username) {
+                        teamModel.leaveTeam(teamName, username, (err: Error) => {
+                            if (err) return res.status(500).end()
+                            else return res.status(200).end()
+                        })
+                    }
+                    else return res.status(400).end()
+                })
+            }
+        })
+    }
+})
+
 teamRouter.post('/transferOwnership', async (req, res) => {
     const teamName = req.body.teamName
     const username = req.body.username
