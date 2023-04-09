@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-progress-circular v-if="!loaded" indeterminate class="d-flex justify-center mx-auto"/>
-    <TeamGrid v-else-if="hasTeams" :teams="teams"/>
+    <TeamGrid v-else-if="hasTeams" :teamsProp="teams" :isInvited="invite"/>
     <p v-else-if="request">You have not requested to join any teams</p>
     <p v-else>You have not been invited to join any teams</p>
   </v-container>
@@ -19,7 +19,8 @@ export default Vue.extend({
   components: {TeamGrid},
   props: {
     user: BasicUser,
-    request: Boolean
+    request: Boolean,
+    invite: Boolean
   },
   data() {
     return {

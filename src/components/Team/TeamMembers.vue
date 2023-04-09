@@ -104,7 +104,7 @@ export default Vue.extend({
     acceptRequest(username: string) {
       this.acceptRequestLoading.push(username)
 
-      teamApi.joinTeam(this.team?.name, username).then(val => {
+      teamApi.acceptRequest(this.team?.name, username).then(val => {
         if (val) {
           this.requestedUsers = this.requestedUsers.filter(name => name !== username)
           this.memberStats.push({username: username, num_competing: 0, num_solves: 0, total_points: '0'})

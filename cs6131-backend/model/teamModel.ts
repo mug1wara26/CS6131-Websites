@@ -164,11 +164,7 @@ WHERE teamName = ? AND username = ?
         queryString,
         [teamName, username],
         (err, result) => {
-            if (err) callback(err)
-            else {
-                if((<RowDataPacket[]> result).length > 0) callback(null, true)
-                else callback(null, false)
-            }
+            callback(null, (<RowDataPacket[]> result).length > 0)
         }
     )
 }

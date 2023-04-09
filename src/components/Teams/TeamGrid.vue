@@ -5,7 +5,7 @@
         <v-col cols="12" lg="4" md="8"
                v-for="(item, index) in teams"
                :key="index">
-          <TeamSearchCard :item="item"/>
+          <TeamSearchCard :item="item" :isInvited="isInvited" @reject-invite="onReject" @accept-invite="onAccept"/>
         </v-col>
       </v-row>
     </v-col>
@@ -21,7 +21,22 @@ export default Vue.extend({
   name: "TeamGrid",
   components: {TeamSearchCard},
   props: {
-    teams: Array as PropType<Team[]>
-  }
+    teamsProp: Array as PropType<Team[]>,
+    isInvited: Boolean
+  },
+  data() {
+    return {
+      teams: this.teamsProp
+    }
+  },
+  methods: {
+    onReject(teamName: string) {
+      this.teams = this.teams.filter(team => team.name !== teamName)
+    },
+    onAccept(teamName: string) {
+      this.teams = this.teams.filter(team => team.name !== teamName)
+      this.$root.$emit('alert', {alertType: 'success', alertTitle: `Successfully joined ${teamName}`})
+    }
+  },
 })
 </script>

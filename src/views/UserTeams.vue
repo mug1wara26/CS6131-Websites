@@ -15,7 +15,7 @@
           </v-btn-toggle>
         </v-toolbar>
     </v-container>
-    <component :is="selectedComponent" :user="user" :request="selected==='Requesting'" :key="selected"></component>
+    <component :is="selectedComponent" :user="user" :request="selected==='Requesting'" :invite="selected === 'Invited'" :key="selected"></component>
   </v-container>
 </template>
 

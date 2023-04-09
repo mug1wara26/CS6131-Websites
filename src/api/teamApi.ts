@@ -274,10 +274,10 @@ export const getNotInvitedTeams = (username: string): Promise<Array<Team>> => {
     })
 }
 
-export const joinTeam = (teamName: string, username: string): Promise<boolean> => {
+export const acceptRequest = (teamName: string, username: string): Promise<boolean> => {
     return new Promise<boolean>(resolve => {
         const token = getCookie('token') || ''
-        fetch(`${Vue.prototype.$apilink}/teams/join`, {
+        fetch(`${Vue.prototype.$apilink}/teams/acceptRequest`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -308,6 +308,23 @@ export const denyRequest = (teamName: string, username: string): Promise<boolean
     })
 }
 
+export const acceptInvite = (teamName: string): Promise<boolean> => {
+    return new Promise<boolean>(resolve => {
+        const token = getCookie('token') || ''
+        fetch(`${Vue.prototype.$apilink}/teams/acceptInvite`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({teamName: teamName})
+        }).then(res => {
+            resolve(res.status === 200)
+        })
+    })
+}
+
 export const removeInvite = (teamName: string, username: string): Promise<boolean> => {
     return new Promise<boolean>(resolve => {
         const token = getCookie('token') || ''
@@ -319,6 +336,23 @@ export const removeInvite = (teamName: string, username: string): Promise<boolea
                 'Authorization': token
             },
             body: JSON.stringify({teamName: teamName, username: username})
+        }).then(res => {
+            resolve(res.status === 200)
+        })
+    })
+}
+
+export const rejectInvite = (teamName: string): Promise<boolean> => {
+    return new Promise<boolean>(resolve => {
+        const token = getCookie('token') || ''
+        fetch(`${Vue.prototype.$apilink}/teams/rejectInvite`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({teamName: teamName})
         }).then(res => {
             resolve(res.status === 200)
         })
