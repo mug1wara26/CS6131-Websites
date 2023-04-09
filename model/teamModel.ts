@@ -241,7 +241,7 @@ WHERE BINARY team.name = ?
 export const leaveTeam = (teamName: string, username: string, callback: Function) => {
     const queryString = `
 DELETE FROM member
-WHERE BINARY team.name = ? AND BINARY username = ?
+WHERE BINARY teamName = ? AND BINARY username = ?
     `
 
     db.query(
