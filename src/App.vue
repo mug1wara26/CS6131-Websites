@@ -148,6 +148,7 @@
             @open-register="register=true"
             @open-login="login=true"
             @alert="(alertData) => showAlert(alertData.alertType, alertData.alertTitle, alertData.alertText)"
+            @leave="onLeave"
         />
       </v-container>
     </v-main>
@@ -271,7 +272,10 @@ export default Vue.extend({
       this.user = {} as BasicUser
       this.$router.push({ path: '/home' })
       this.reRender++
-    }
+    },
+    onLeave() {
+      this.reRender++
+    },
   },
   mounted() {
     window.onresize = () => {

@@ -358,3 +358,20 @@ export const rejectInvite = (teamName: string): Promise<boolean> => {
         })
     })
 }
+
+export const leave = (teamName: string): Promise<boolean> => {
+    return new Promise<boolean>(resolve => {
+        const token = getCookie('token') || ''
+        fetch(`${Vue.prototype.$apilink}/teams/leave`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({teamName: teamName})
+        }).then(res => {
+            resolve(res.status === 200)
+        })
+    })
+}

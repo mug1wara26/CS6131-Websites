@@ -29,7 +29,8 @@
                   :disabled="hasRequested">
                 Request
               </v-btn>
-              <v-btn v-else color="error">Leave</v-btn>
+
+              <v-btn v-else color="error" :loading="leaveLoading" @click="leaveTeam()">Leave</v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -71,7 +72,7 @@ import {Team} from "../../cs6131-backend/types/teamTypes";
 import {BasicUser} from "../../cs6131-backend/types/userTypes";
 import {onLogin} from "@/api/userApi";
 import {AlertData} from "@/schemas/alertData";
-import {getMembers, getTeam, hasRequested, requestToJoin} from "@/api/teamApi";
+import * as teamApi from "@/api/teamApi";
 import TeamCTFs from "@/components/Team/TeamCTFs.vue";
 import TeamMembers from "@/components/Team/TeamMembers.vue";
 import TeamParticipate from "@/components/Team/TeamParticipate.vue";
@@ -100,6 +101,7 @@ export default Vue.extend({
       getTeamsLoaded: false,
       hasRequestedLoaded: false,
       requestJoinLoading: false,
+      leaveLoading: false,
       request: false
     }
   },
@@ -118,13 +120,24 @@ export default Vue.extend({
     onRequest() {
       this.request = false
       this.requestJoinLoading = true
-      requestToJoin(this.team.name, this.user.username).then(val => {
+      teamApi.requestToJoin(this.team.name, this.user.username).then(val => {
         if (val) {
           this.$root.$emit('alert', {alertType: 'success', alertTitle: 'Request Sent'})
           this.hasRequested = true
         }
         else this.$root.$emit('alert', {alertType: 'error', alertTitle: 'An error occurred', alertText: 'Please try again later'})
         this.requestJoinLoading = false
+      })
+    },
+    leaveTeam() {
+      this.leaveLoading = true;
+      teamApi.leave(this.team.name).then(val => {
+        if (val) {
+          this.$emit('leave')
+          this.$root.$emit('alert', {alertType: 'success', alertTitle: 'Successfully left team'})
+        }
+        else this.$root.$emit('alert', {alertType: 'error', alertTitle: 'An error occurred', alertText: 'Please try again later'})
+        this.leaveLoading = false;
       })
     }
   },
@@ -140,12 +153,12 @@ export default Vue.extend({
           if (Object.keys(user).length !== 0) {
             Object.assign(this.user, user)
 
-            getMembers(name).then(members => {
+            teamApi.getMembers(name).then(members => {
               this.isMember = members.includes(this.user.username)
               this.getMembersLoaded = true
             })
 
-            hasRequested(name, this.user.username).then(val => {
+            teamApi.hasRequested(name, this.user.username).then(val => {
               this.hasRequested = val
               this.hasRequestedLoaded = true;
             })
@@ -154,7 +167,7 @@ export default Vue.extend({
             this.getMembersLoaded = true;
             this.hasRequestedLoaded = true
           }
-          getTeam(name).then(team => {
+          teamApi.getTeam(name).then(team => {
             if (Object.keys(team).length !== 0) Object.assign(this.team, team);
             else this.team = {} as Team
             this.getTeamsLoaded = true
