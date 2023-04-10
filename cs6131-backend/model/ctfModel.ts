@@ -1,6 +1,6 @@
 import {db} from "../db";
 import {RowDataPacket} from "mysql2";
-import {CTF} from "../types/ctfTypes";
+import {CTF, TeamLeaderboard, TeamUserLeaderboard, UserLeaderboard} from "../types/ctfTypes";
 import {Challenge} from "../types/chalTypes";
 
 export const findTeamCTFs = (teamName: string, callback: Function) => {
@@ -151,6 +151,94 @@ WHERE id = ? AND teamCreator = teamName AND username = ?
         (err, result) => {
             if (err) callback(err)
             else callback(null, Boolean((<RowDataPacket> result)[0]))
+        }
+    )
+}
+
+export const findTeamLeaderboard = (ctfid: string, callback: Function) => {
+    const queryString = `
+SELECT teamName, IFNULL(SUM(points), 0) total
+FROM competitor c
+LEFT JOIN solve s ON s.username = competitorName AND s.ctfid = c.ctfid
+LEFT JOIN challenge chal ON chal.name = s.chalName AND chal.ctfid = c.ctfid
+WHERE c.ctfid = ?
+GROUP BY teamName
+ORDER BY total DESC
+    `
+
+    db.query(
+        queryString,
+        ctfid,
+        (err, results) => {
+            if (err) callback(err)
+            else {
+                const returnData = results as Array<TeamLeaderboard>
+                let index = 1;
+                for (const key in returnData) {
+                    returnData[key].index = index
+                    index++
+                }
+                callback(null, returnData)
+            }
+        }
+    )
+}
+
+export const findUserLeaderboard = (ctfid: string, callback: Function) => {
+    const queryString = `
+SELECT competitorName username, teamName, IFNULL(SUM(points), 0) total
+FROM competitor c
+LEFT JOIN solve s ON s.username = competitorName AND s.ctfid = c.ctfid
+LEFT JOIN challenge chal ON chal.name = s.chalName AND chal.ctfid = c.ctfid
+WHERE c.ctfid = ?
+GROUP BY competitorName
+ORDER BY total DESC
+    `
+
+    db.query(
+        queryString,
+        ctfid,
+        (err, results) => {
+            if (err) callback(err)
+            else {
+                const returnData = results as Array<UserLeaderboard>
+                let index = 1;
+                for (const key in returnData) {
+                    returnData[key].index = index
+                    index++
+                }
+                callback(null, returnData)
+            }
+        }
+    )
+}
+
+export const findTeamUserLeaderboard = (ctfid: string, teamName: string, callback: Function) => {
+    const queryString = `
+SELECT competitorName username, count(s.chalName) num_solves, IFNULL(sum(points),0) total
+FROM competitor c
+LEFT JOIN solve s ON c.ctfid = s.ctfid AND s.username = c.competitorName
+LEFT JOIN challenge chal ON chal.ctfid = c.ctfid AND chal.name = s.chalName
+WHERE c.ctfid = ?
+AND BINARY teamName = ?
+GROUP BY competitorName
+ORDER BY total DESC
+    `
+
+    db.query(
+        queryString,
+        [ctfid, teamName],
+        (err, results) => {
+            if (err) callback(err)
+            else {
+                const returnData = results as Array<TeamUserLeaderboard>
+                let index = 1;
+                for (const key in returnData) {
+                    returnData[key].index = index
+                    index++
+                }
+                callback(null, returnData)
+            }
         }
     )
 }

@@ -53,7 +53,12 @@
             :headers="headers"
             @click:row="onClick"
             hide-default-footer
-        />
+        >
+          <template v-slot:[`item.username`]="{ item }">
+            {{item.username}}
+            <v-icon v-if="item.username===team.owner">mdi-crown</v-icon>
+          </template>
+        </v-data-table>
       </v-col>
     </v-row>
 

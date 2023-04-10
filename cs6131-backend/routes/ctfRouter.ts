@@ -2,7 +2,7 @@ import express, {Request, Response} from "express";
 import * as ctfModel from '../model/ctfModel'
 import * as teamModel from '../model/teamModel'
 import * as chalModel from '../model/chalModel'
-import {BasicCTF, CTF} from "../types/ctfTypes";
+import {BasicCTF, CTF, TeamLeaderboard, TeamUserLeaderboard, UserLeaderboard} from "../types/ctfTypes";
 import jwt from "jsonwebtoken";
 import {BasicUser} from "../types/userTypes";
 import {Team} from "../types/teamTypes";
@@ -208,6 +208,64 @@ ctfRouter.get('/competingctfs/:teamName', async (req, res) => {
         })
     }
     else return res.status(400).end()
+})
+
+ctfRouter.get('/teamLeaderboard/:ctfid', async (req,res) => {
+    const ctfid = req.params.ctfid
+
+    ctfModel.findTeamLeaderboard(ctfid, (err: Error, leaderboard: Array<TeamLeaderboard>) => {
+        if (err) return res.status(500).end()
+        else return res.status(200).json({leaderboard: leaderboard})
+    })
+})
+
+ctfRouter.get('/userLeaderboard/:ctfid', async (req,res) => {
+    const ctfid = req.params.ctfid
+
+    ctfModel.findUserLeaderboard(ctfid, (err: Error, leaderboard: Array<UserLeaderboard>) => {
+        if (err) return res.status(500).end()
+        else return res.status(200).json({leaderboard: leaderboard})
+    })
+})
+
+ctfRouter.get('/teamUserLeaderboard/:ctfid/:teamName', async (req,res) => {
+    const ctfid = req.params.ctfid
+    const teamName = req.params.teamName
+    const token = req.header('Authorization')
+
+    ctfModel.findTeamUserLeaderboard(ctfid, teamName, (err: Error, leaderboard: Array<TeamUserLeaderboard>) => {
+        if (err) return res.status(500).end()
+        else {
+            teamModel.findOne(teamName, (err: Error, team: Team) => {
+                if (err) return res.status(500).end()
+                if (team) {
+                    if (team.public) return res.status(200).json({leaderboard: leaderboard, hasAccess: true})
+                    else {
+                        if (token) {
+                            jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+                                if (err) {
+                                    res.statusMessage = 'Invalid token'
+                                    return res.status(400).end()
+                                }
+                                else {
+                                    const user = decoded as BasicUser
+
+                                    teamModel.findMembers(teamName, (err: Error, members: Array<string>) => {
+                                        if (err) return res.status(500).end()
+                                        if (members.includes(user.username)) return res.status(200).json({leaderboard: leaderboard, hasAccess: true})
+                                        else return res.status(200).json({hasAccess: false, leaderboard: []})
+                                    })
+                                }
+                            })
+                        }
+                        else return res.status(200).json({hasAccess: false, leaderboard: []})
+
+                    }
+                }
+                else return res.status(400).end()
+            })
+        }
+    })
 })
 
 const validateCTFCreation = (ctf: BasicCTF, username: string, callback: Function) => {

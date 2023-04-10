@@ -1,5 +1,5 @@
 import {getCookie} from "typescript-cookie";
-import {BasicCTF, CTF} from "../../cs6131-backend/types/ctfTypes";
+import {BasicCTF, CTF, TeamUserLeaderboard} from "../../cs6131-backend/types/ctfTypes";
 import Vue from "vue";
 
 export const getTeamCTFs = (teamName: string): Promise<Array<CTF>> => {
@@ -117,5 +117,36 @@ export const compete = (ctfid: string, teamName: string): Promise<boolean> => {
             if (res.status === 200) resolve(true)
             else resolve(false)
         })
+    })
+}
+
+export function getLeaderboard<T>(leaderboard: string, ctfid: string): Promise<Array<T>> {
+    return new Promise<Array<T>>((resolve, reject) => {
+        const url = `${Vue.prototype.$apilink}/ctfs/${leaderboard}/${ctfid}`
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }).then(res => {
+            if (res.status === 200) res.json().then(data => resolve(data.leaderboard))
+            else reject(res.statusText)
+        })
+    })
+}
+
+export const getTeamUserLeaderboard = (ctfid: string, teamName: string): Promise<Response> => {
+    return new Promise<Response>(resolve => {
+        const token = getCookie('token') || ''
+        fetch(`${Vue.prototype.$apilink}/ctfs/teamUserLeaderboard/${ctfid}/${teamName}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        }).then(res => resolve(res))
     })
 }

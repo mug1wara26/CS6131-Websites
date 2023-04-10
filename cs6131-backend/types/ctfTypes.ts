@@ -1,5 +1,6 @@
 // @ts-nocheck
 import {IsIn, IsNumber, IsOptional, IsUrl, Length, Matches, Max, Min} from "class-validator";
+import exp from "constants";
 
 export class BasicCTF {
     @Length(3, 36)
@@ -28,4 +29,24 @@ export class BasicCTF {
 export class CTF extends BasicCTF {
     @Length(36)
     id: string;
+}
+
+export interface TeamLeaderboard {
+    index: number,
+    teamName: string,
+    total: string
+}
+
+export interface UserLeaderboard {
+    index: number,
+    username: string,
+    teamName: string,
+    total: string
+}
+
+export interface TeamUserLeaderboard {
+    index: number,
+    username: string,
+    num_solves: number,
+    total_points: string
 }
