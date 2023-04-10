@@ -121,7 +121,7 @@ WHERE BINARY ctfid = ? and BINARY competitorName = ?
     )
 }
 
-export const findCompetingCTFs = (username: string, teamName: string, callback: Function) => {
+export const findCompetingCTFsUnderTeam = (username: string, teamName: string, callback: Function) => {
     const queryString = `
 SELECT ctf.*
 FROM competitor c, ctf
@@ -134,6 +134,47 @@ WHERE c.ctfid = ctf.id AND BINARY c.teamName = ? AND BINARY c.competitorName = ?
         (err, result) => {
             if (err) callback(err)
             else callback(null, <RowDataPacket> result)
+        }
+    )
+}
+
+export const findAllCompetingCTFs = (username: string, callback: Function) => {
+    const queryString = `
+SELECT ctf.*, c.teamName
+FROM competitor c, ctf
+WHERE c.ctfid = ctf.id AND BINARY c.competitorName = ?
+    `
+
+    db.query(
+        queryString,
+        username,
+        (err, result) => {
+            if (err) callback(err)
+            else {
+                const ctfs = []
+                for (const key in (<RowDataPacket[]> result)) {
+                    const {teamName, ...ctf} = (<RowDataPacket[]>result)[key]
+                    ctfs.push({ctf: ctf, competingTeam: teamName})
+                }
+                callback(null, ctfs)
+            }
+        }
+    )
+}
+
+export const findAllTeamCreatedCTFs = (username: string, callback: Function) => {
+    const queryString = `
+SELECT ctf.*
+FROM member, ctf
+WHERE member.username = ?
+AND member.teamName = ctf.teamCreator
+    `
+
+    db.query(
+        queryString,
+        username,
+        (err, results) => {
+            callback(err, results)
         }
     )
 }
