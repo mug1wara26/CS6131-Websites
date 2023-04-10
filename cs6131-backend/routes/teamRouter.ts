@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
 import {validate} from "class-validator";
 import {QueryError} from "mysql2";
-import * as querystring from "querystring";
 
 dotenv.config();
 

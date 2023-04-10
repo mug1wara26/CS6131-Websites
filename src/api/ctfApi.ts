@@ -1,5 +1,5 @@
 import {getCookie} from "typescript-cookie";
-import {BasicCTF, CTF, TeamUserLeaderboard} from "../../cs6131-backend/types/ctfTypes";
+import {BasicCTF, CTF, ctfCompetingTeam, TeamUserLeaderboard} from "../../cs6131-backend/types/ctfTypes";
 import Vue from "vue";
 
 export const getTeamCTFs = (teamName: string): Promise<Array<CTF>> => {
@@ -23,7 +23,7 @@ export const getTeamCTFs = (teamName: string): Promise<Array<CTF>> => {
 export const getCompetingCTFs = (teamName: string): Promise<Array<CTF>> => {
     return new Promise<Array<CTF>>(resolve => {
         const token = getCookie('token') || '';
-        fetch(`${Vue.prototype.$apilink}/ctfs/competingctfs/${teamName}`, {
+        fetch(`${Vue.prototype.$apilink}/ctfs/competingCTFsUnderTeam/${teamName}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -35,6 +35,42 @@ export const getCompetingCTFs = (teamName: string): Promise<Array<CTF>> => {
                 resolve(data.ctfs)
             });
             else resolve([])
+        })
+    })
+}
+
+export const getAllCompetingCTFs = (): Promise<Array<ctfCompetingTeam>> => {
+    return new Promise<Array<ctfCompetingTeam>>((resolve, reject) => {
+        const token = getCookie('token') || '';
+        fetch(`${Vue.prototype.$apilink}/ctfs/allCompetingCTFs/`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        }).then(res => {
+            if (res.status === 200) res.json().then(data => {
+                resolve(data.ctfs)
+            });
+            else reject(res)
+        })
+    })
+}
+
+export const getAllTeamCreatedCTFs = (username: string): Promise<Array<CTF>> => {
+    return new Promise<Array<CTF>>((resolve, reject) => {
+        const token = getCookie('token') || '';
+        fetch(`${Vue.prototype.$apilink}/ctfs/teamCreatedCTFs/${username}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        }).then(res => {
+            if (res.status === 200) res.json().then(data => resolve(data.ctfs));
+            else reject(res)
         })
     })
 }

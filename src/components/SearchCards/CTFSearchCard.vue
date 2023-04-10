@@ -1,6 +1,10 @@
 <template>
   <v-card class="pa-4 fill-height d-flex flex-column" elevation="4" outlined>
     <v-card-title> <a :href="`/ctfs/${item.id}`"> {{ item.name }} </a> <span v-if="!item.public" class="font-weight-light text-subtitle-1">&nbsp;(private)</span> </v-card-title>
+    <v-card-subtitle>
+      Created by <a :href="`/teams/${item.teamCreator}}`">{{item.teamCreator}}</a> <br/>
+      <span v-if="competingTeam">Competing under <a :href="`/teams/${competingTeam}`">{{competingTeam}}</a></span>
+    </v-card-subtitle>
     <v-card-text>
       Date: {{ new Date(item.date*1000).toLocaleString() }} <br/>
       Format: {{ item.format }} <br/>
@@ -15,6 +19,6 @@ import Vue from "vue";
 
 export default Vue.extend({
   name: "NoteSearchCard",
-  props: ['item']
+  props: ['item', 'competingTeam']
 });
 </script>

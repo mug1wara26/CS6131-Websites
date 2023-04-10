@@ -55,7 +55,7 @@
         </v-col>
 
         <v-col cols="10">
-          <mavon-editor v-model="value" language="en"/>
+          <mavon-editor v-model="value" language="en" style="color: black"/>
         </v-col>
       </v-row>
     </v-container>

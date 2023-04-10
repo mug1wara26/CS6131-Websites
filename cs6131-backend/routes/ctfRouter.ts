@@ -2,7 +2,14 @@ import express, {Request, Response} from "express";
 import * as ctfModel from '../model/ctfModel'
 import * as teamModel from '../model/teamModel'
 import * as chalModel from '../model/chalModel'
-import {BasicCTF, CTF, TeamLeaderboard, TeamUserLeaderboard, UserLeaderboard} from "../types/ctfTypes";
+import {
+    BasicCTF,
+    CTF,
+    ctfCompetingTeam,
+    TeamLeaderboard,
+    TeamUserLeaderboard,
+    UserLeaderboard
+} from "../types/ctfTypes";
 import jwt from "jsonwebtoken";
 import {BasicUser} from "../types/userTypes";
 import {Team} from "../types/teamTypes";
@@ -185,7 +192,7 @@ ctfRouter.get('/compete/:ctfid/:teamName', async (req, res) => {
     else return res.status(400).end()
 })
 
-ctfRouter.get('/competingctfs/:teamName', async (req, res) => {
+ctfRouter.get('/competingCTFsUnderTeam/:teamName', async (req, res) => {
     const teamName = req.params.teamName
     const token = req.header('Authorization')
 
@@ -198,12 +205,60 @@ ctfRouter.get('/competingctfs/:teamName', async (req, res) => {
             else {
                 const user = decoded as BasicUser
 
-                ctfModel.findCompetingCTFs(user.username, teamName, (err: Error, ctfs: Array<CTF>) => {
+                ctfModel.findCompetingCTFsUnderTeam(user.username, teamName, (err: Error, ctfs: Array<CTF>) => {
                     if (err) return res.status(500).end()
                     else {
                         return res.status(200).json({ctfs: ctfs})
                     }
                 })
+            }
+        })
+    }
+    else return res.status(400).end()
+})
+
+ctfRouter.get('/allCompetingCTFs', async (req, res) => {
+    const token = req.header('Authorization')
+
+    if (token) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) {
+                res.statusMessage = 'Invalid token'
+                return res.status(400).end()
+            }
+            else {
+                const user = decoded as BasicUser
+
+                ctfModel.findAllCompetingCTFs(user.username, (err: Error, ctfs: Array<ctfCompetingTeam>) => {
+                    if (err) return res.status(500).end()
+                    else return res.status(200).json({ctfs: ctfs})
+                })
+            }
+        })
+    }
+    else return res.status(500).end()
+})
+
+ctfRouter.get('/teamCreatedCTFs/:username', async (req, res) => {
+    const username = req.params.username
+    const token = req.header('Authorization')
+
+    if (token) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) {
+                res.statusMessage = 'Invalid token'
+                return res.status(400).end()
+            }
+            else {
+                const user = decoded as BasicUser
+
+                if (user.username === username) {
+                    ctfModel.findAllTeamCreatedCTFs(username, (err: Error, ctfs: Array<CTF>) => {
+                        if (err) return res.status(500).end()
+                        else return res.status(200).json({ctfs: ctfs})
+                    })
+                }
+                else return res.status(400).end()
             }
         })
     }

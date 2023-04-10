@@ -106,7 +106,7 @@ export default Vue.extend({
         ],
         usernameRules: [
           (username: string | null) => !!username || 'Username is required',
-          (username: string | null) => (username && username.length > 6 && username.length < 32) || 'Username must be between 6 and 32 characters',
+          (username: string | null) => (username && username.length >= 6 && username.length < 32) || 'Username must be between 6 and 32 characters',
           (username: string | null) => (username && /^[a-zA-Z0-9_]*$/.test(username) || 'Only alphanumeric characters and underscores are allowed')
         ],
       };

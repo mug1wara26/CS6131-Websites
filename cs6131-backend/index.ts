@@ -6,6 +6,7 @@ import {ctfRouter} from "./routes/ctfRouter";
 import {chalRouter} from "./routes/chalRouter"
 import cors from "cors";
 import {generalRouter} from "./routes/generalRouter";
+import {noteRouter} from "./routes/noteRouter";
 
 const app = express();
 app.use(bodyParser.json());
@@ -14,6 +15,7 @@ app.use("/users", userRouter);
 app.use("/teams", teamRouter);
 app.use("/ctfs", ctfRouter);
 app.use("/chals", chalRouter);
+app.use("/notes", noteRouter);
 app.use("", generalRouter);
 
 const port = process.env.PORT || 3000;

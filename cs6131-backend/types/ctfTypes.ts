@@ -50,3 +50,8 @@ export interface TeamUserLeaderboard {
     num_solves: number,
     total_points: string
 }
+
+export interface ctfCompetingTeam {
+    ctf: CTF,
+    competingTeam: string
+}

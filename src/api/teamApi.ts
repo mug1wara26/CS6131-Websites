@@ -2,7 +2,6 @@ import {BasicTeam, MemberStat, Team} from "../../cs6131-backend/types/teamTypes"
 import Vue from "vue";
 import {getCookie} from "typescript-cookie";
 import {BasicUser} from "../../cs6131-backend/types/userTypes";
-import jwt_decode from "jwt-decode";
 
 export const getUserTeams = (username: string): Promise<Response> => {
     return new Promise<Response>((resolve, reject) => {
