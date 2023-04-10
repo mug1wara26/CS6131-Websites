@@ -11,6 +11,8 @@ import CTF from "@/views/CTF.vue"
 import flag from "@/views/flag.vue";
 import Team from "@/views/Team.vue";
 import Challenge from "@/views/Challenge.vue";
+import CreateWriteup from "@/views/CreateWriteup.vue";
+import Writeup from "@/views/Writeup.vue";
 
 Vue.use(VueRouter)
 
@@ -54,6 +56,16 @@ const routes = [
         path: '/writeups',
         name: 'writeups',
         component: WriteUps
+    },
+    {
+        path: '/writeups/create',
+        name: 'createWriteup',
+        component: CreateWriteup
+    },
+    {
+        path: '/writeups/:id',
+        name: 'writeup',
+        component: Writeup
     },
     {
         path: '/ctfs',

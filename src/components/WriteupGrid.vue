@@ -2,7 +2,7 @@
   <v-row class="mt-2">
     <v-col lg="10" sm="12">
       <v-row>
-        <v-col cols="12" lg="6" md="6"
+        <v-col cols="12" lg="4" md="8"
                v-for="(item, index) in items"
                :key="index">
           <WriteUpSearchCard :item="item"/>

@@ -1,9 +1,23 @@
-export class Writeup {
-    id: string;
+import {IsBoolean, IsOptional, Length, Matches} from "class-validator";
+
+export class BasicWriteup {
+    @IsBoolean()
     public: boolean;
-    votes: number;
+    @Length(1, 128)
+    @Matches(/^[A-Za-z0-9\s]*$/)
     title: string;
+    @Length(1, 65535)
     content: string;
-    chalName?: string;
-    ctfid?: string;
+    @IsOptional()
+    @Length(1,64)
+    @Matches(/^[A-Za-z0-9_\s]*$/)
+    chalName: string;
+    @IsOptional()
+    @Length(36)
+    ctfid: string;
+}
+
+export class Writeup extends BasicWriteup {
+    id: string;
+    votes: number;
 }
