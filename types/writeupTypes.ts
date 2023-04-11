@@ -18,6 +18,7 @@ export class BasicWriteup {
 }
 
 export class Writeup extends BasicWriteup {
+    @Length(36)
     id: string;
     votes: number;
 }

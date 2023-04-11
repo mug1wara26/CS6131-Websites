@@ -79,15 +79,15 @@ export const loginWithUsername = (username: string, password: string, callback: 
 export const editUser = (user: BasicUser, callback: Function) => {
     let queryString = `
 UPDATE user
-SET BINARY displayName = ?, BINARY email = ?`
+SET displayName = ?, email = ?`
 
     const input = [user.displayName, user.email]
     if (user.pfp) {
-        queryString += ', BINARY pfp = ?'
+        queryString += ', pfp = ?'
         input.push(user.pfp)
     }
     if (user.bio) {
-        queryString += ', BINARY bio = ? '
+        queryString += ', bio = ? '
         input.push(user.bio)
     }
 
