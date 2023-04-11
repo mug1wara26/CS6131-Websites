@@ -13,8 +13,6 @@ Go to /cs6131-backend and run
 ```
 $ npx tsc
 $ cp package.json ./dist
-$ cd ./dist
-$ npm install
 ```
 
 2. Before we run the app, we must seed the database. First make sure that a mysql server is running at port 3306.
@@ -33,6 +31,7 @@ Replace JWT_SECRET_KEY with your own secure randomly generated key, for testing 
 3. Now we can run the app \
 Go to /cs6131/dist and run
 ```
+$ npm install
 $ node index.js
 ```
 You should see the server running on port 3000 \
