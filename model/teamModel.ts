@@ -116,7 +116,7 @@ export const findMemberStats = (teamName: string, callback: Function) => {
 SELECT m.username, count(c.ctfid) num_competing, count(s.ctfid) num_solves, sum(chal.points) total_points
 from member m
 left join competitor c on m.username = c.competitorName and m.teamName = c.teamName
-left join solve s on c.ctfid = s.ctfid
+left join solve s on c.ctfid = s.ctfid and s.username = c.competitorName
 left join challenge chal on chal.name = s.chalName and chal.ctfid = s.ctfid
 left join ctf on c.ctfid = ctf.id and ctf.public
 where m.teamName = ?

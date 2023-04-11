@@ -128,7 +128,7 @@ userRouter.get('/delete/:username', async (req, res) => {
                 const user = decoded as BasicUser
                 if (user.username === req.params.username) {
                     userModel.deleteAccount(user.username, (err: Error) => {
-                        if (err) return res.status(500).end()
+                        if (err) return res.status(499).end()
                         else return res.status(200).end()
                     })
                 }
