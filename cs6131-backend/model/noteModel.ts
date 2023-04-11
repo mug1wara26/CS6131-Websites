@@ -85,3 +85,19 @@ WHERE noteid = ?
         }
     )
 }
+
+export const updateWriteup = (writeup: Writeup, callback: Function) => {
+    const queryString = `
+UPDATE note n LEFT JOIN writeup w ON n.id = w.id
+SET n.title = ?, n.content = ?, n.chalName = ?, n.ctfid = ?, w.public = ?
+WHERE n.id = ?
+    `
+
+    db.query(
+        queryString,
+        [writeup.title, writeup.content, writeup.chalName, writeup.ctfid, writeup.public, writeup.id],
+        (err) => {
+            callback(err)
+        }
+    )
+}

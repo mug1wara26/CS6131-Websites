@@ -56,13 +56,10 @@ export default Vue.extend({
   },
   methods: {
     onClickCreate() {
-      if (this.title) {
-        if (this.title.length > 128) return this.setError('Title cannot be longer than 128 characters')
-        if (!/^[A-Za-z0-9\s]*$/.test(this.title)) return this.setError('Title can only contain alphanumeric characters and spaces')
-
-        this.createWriteup()
-      }
-      else return this.setError('Please specify a title')
+      noteApi.validateWriteupTitle(this.title, (err: string) => {
+        if (err) this.setError(err)
+        else this.createWriteup()
+      })
     },
     setError(error: string) {
       this.error = error
