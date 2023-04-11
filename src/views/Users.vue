@@ -196,7 +196,7 @@ export default Vue.extend({
             this.editLoading = false
           })
         }
-        if (res.status === 400) {
+        else if (res.status === 400) {
           res.json().then(data => {
             this.editLoading = false
             if (data) {

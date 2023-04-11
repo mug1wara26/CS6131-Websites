@@ -127,4 +127,37 @@ noteRouter.get('/getWriteup/:noteid', async (req, res) => {
     })
 })
 
+noteRouter.post('/updateWriteup', async (req, res) => {
+    const writeup = Object.assign(new Writeup(), req.body.writeup)
+    const token = req.header('Authorization')
+
+    if (token && writeup) {
+        jwt.verify(token, SECRET_KEY!, (err, decoded) => {
+            if (err) {
+                res.statusMessage = 'Invalid token'
+                return res.status(400).end()
+            } else {
+                const user = decoded as BasicUser
+
+                validate(writeup).then(errors => {
+                    if (errors.length > 0) return res.status(400).json({errors: errors})
+                    else {
+                        noteModel.findAuthors(writeup.id, (err: QueryError, authors: Array<string>) => {
+                            if (err) return res.status(500).end()
+                            if (authors.includes(user.username)) {
+                                noteModel.updateWriteup(writeup, (err: QueryError) => {
+                                    if (err) return res.status(500).end()
+                                    else return res.status(200).end()
+                                })
+                            }
+                            else return res.status(400).end()
+                        })
+                    }
+                })
+            }
+        })
+    }
+    else return res.status(400).end()
+})
+
 export {noteRouter}

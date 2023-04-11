@@ -37,6 +37,22 @@ export const createWriteup = (writeup: BasicWriteup): Promise<Writeup> => {
     })
 }
 
+
+export const updateWriteup = (writeup: BasicWriteup): Promise<Response> => {
+    return new Promise<Response>(resolve => {
+        const token = getCookie('token') || ''
+        fetch(`${Vue.prototype.$apilink}/notes/updateWriteup`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({writeup: writeup})
+        }).then(res => resolve(res))
+    })
+}
+
 export const getWriteup = (noteid: string): Promise<Response> => {
     return new Promise<Response>(resolve => {
         const token = getCookie('token') || ''
@@ -49,4 +65,15 @@ export const getWriteup = (noteid: string): Promise<Response> => {
             }
         }).then(res => resolve(res))
     })
+}
+
+export const validateWriteupTitle = (title: string, callback: Function) => {
+    if (title) {
+        if (title.length > 128) return callback('Title cannot be longer than 128 characters')
+        if (!/^[A-Za-z0-9\s]*$/.test(title)) return callback('Title can only contain alphanumeric characters and spaces')
+
+        return callback(null)
+    }
+    else return callback('Please specify a title')
+
 }

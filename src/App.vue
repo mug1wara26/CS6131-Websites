@@ -165,13 +165,7 @@ import {login, onLogin} from "@/api/userApi";
 import {removeCookie, setCookie} from "typescript-cookie";
 import {AlertData} from "@/schemas/alertData";
 
-if (process.env.NODE_ENV === 'production') {
-  console.log("Running in production")
-  Vue.prototype.$apilink = 'https://cs6131-backend-rpllssu76q-as.a.run.app';
-} else {
-  console.log("Running locally")
-  Vue.prototype.$apilink = 'http://localhost:3000'
-}
+Vue.prototype.$apilink = 'http://localhost:3000'
 
 export default Vue.extend({
   name: 'App',
