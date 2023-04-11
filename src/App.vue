@@ -262,7 +262,7 @@ export default Vue.extend({
       })
     },
     logout() {
-      removeCookie('token')
+      removeCookie('token', {path: '/'})
       this.user = {} as BasicUser
       this.$router.push({ path: '/home' })
       this.reRender++

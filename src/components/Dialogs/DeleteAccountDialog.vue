@@ -39,7 +39,7 @@ export default Vue.extend({
       this.loading = true;
       userApi.deleteAccount(this.username).then(val => {
         if (val) {
-          removeCookie('token', {path:''})
+          removeCookie('token', {path:'/'})
           this.$router.push({ path: '/home' })
           this.$root.$emit('account-delete')
         }
