@@ -1,6 +1,5 @@
 .env
 .ipynb_checkpoints/
-mysql_seeding.ipynb
 
 .DS_Store
 node_modules
