@@ -165,7 +165,15 @@ import {login, onLogin} from "@/api/userApi";
 import {removeCookie, setCookie} from "typescript-cookie";
 import {AlertData} from "@/schemas/alertData";
 
-Vue.prototype.$apilink = 'http://localhost:3000'
+
+if (process.env.NODE_ENV === 'production') {
+  console.log("Running in production")
+  Vue.prototype.$apilink = 'https://mug1wara26.app.wern.cc';
+} else {
+  console.log("Running locally")
+  Vue.prototype.$apilink = 'http://localhost:3000'
+}
+
 
 export default Vue.extend({
   name: 'App',
