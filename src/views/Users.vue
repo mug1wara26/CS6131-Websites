@@ -46,24 +46,28 @@
         </v-card>
       </v-col>
 
-      <v-col cols="9">
-        <v-container class="d-flex">
-          <v-toolbar floating class="justify-center" color="transparent" elevation="0">
-            <v-btn-toggle borderless rounded group mandatory v-model="selected">
-              <v-btn
-                  :value="item"
-                  text
-                  v-for="item in toolbar_items"
-                  :key="item"
-              >
-                {{ item }}
-              </v-btn>
-            </v-btn-toggle>
-          </v-toolbar>
-        </v-container>
+            <v-progress-circular v-if="!loaded" indeterminate class="d-flex justify-center mx-auto"/>
+      <template v-else>
+        <v-col cols="9">
+          <v-container class="d-flex">
+            <v-toolbar floating class="justify-center" color="transparent" elevation="0">
+              <v-btn-toggle borderless rounded group mandatory v-model="selected">
+                <v-btn
+                    :value="item"
+                    text
+                    v-for="item in toolbar_items"
+                    :key="item"
+                >
+                  {{ item }}
+                </v-btn>
+              </v-btn-toggle>
+            </v-toolbar>
+          </v-container>
 
-        <component :is="selected" :user="user"></component>
-      </v-col>
+          <component :is="selected" :user="user"></component>
+        </v-col>
+      </template>
+
     </v-row>
 
     <v-dialog
@@ -113,7 +117,8 @@ export default Vue.extend({
       invite: false,
       selected: 'Teams',
       toolbar_items: ['Teams', 'WriteUps'],
-      canEdit: false
+      canEdit: false,
+      loaded: false
     }
   },
   computed: {
@@ -219,12 +224,13 @@ export default Vue.extend({
       })
     }
   },
-  async created() {
+  mounted () {
     const username = this.$route.params.username;
     if (username) {
-      await getUser(username).then(user => {
+      getUser(username).then(user => {
         Object.assign(this.user, user);
         this.cancelEdit()
+        this.loaded = true
       }).catch(err => console.log(err))
     } else {
       this.canEdit = true;
@@ -234,6 +240,7 @@ export default Vue.extend({
           Object.assign(this.user, user);
           this.cancelEdit()
         }
+        this.loaded = true
       })
     }
   }
